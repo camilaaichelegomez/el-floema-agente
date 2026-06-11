@@ -2,7 +2,7 @@ google-genai
 google-auth
 google-cloud-aiplatform
 chromadb
-sentence-transformers
+sentence-transformers==2.2.2
 pymongo
 flask
 requests

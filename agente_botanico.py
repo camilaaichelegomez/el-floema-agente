@@ -155,39 +155,43 @@ def _parse_results(results):
     return articles
 
 def search_articles(query, top_k=TOP_K):
-    model      = _get_embed_model()
-    collection = _get_collection()
-    total      = collection.count()
-    embedding  = model.encode([query]).tolist()
-    plant_key  = _detect_plant_key(query)
-    seen       = set()
-    articles   = []
-    if plant_key:
-        try:
+    try:
+        model      = _get_embed_model()
+        collection = _get_collection()
+        total      = collection.count()
+        embedding  = model.encode([query]).tolist()
+        plant_key  = _detect_plant_key(query)
+        seen       = set()
+        articles   = []
+        if plant_key:
+            try:
+                res = collection.query(
+                    query_embeddings=embedding,
+                    n_results=min(top_k // 2 + 1, total),
+                    include=["documents", "metadatas", "distances"],
+                    where={"plant_key": {"$eq": plant_key}},
+                )
+                for a in _parse_results(res):
+                    if a["title"] not in seen:
+                        seen.add(a["title"])
+                        articles.append(a)
+            except Exception:
+                pass
+        remaining = top_k - len(articles)
+        if remaining > 0:
             res = collection.query(
                 query_embeddings=embedding,
-                n_results=min(top_k // 2 + 1, total),
+                n_results=min(top_k * 2, total),
                 include=["documents", "metadatas", "distances"],
-                where={"plant_key": {"$eq": plant_key}},
             )
             for a in _parse_results(res):
-                if a["title"] not in seen:
+                if a["title"] not in seen and len(articles) < top_k:
                     seen.add(a["title"])
                     articles.append(a)
-        except Exception:
-            pass
-    remaining = top_k - len(articles)
-    if remaining > 0:
-        res = collection.query(
-            query_embeddings=embedding,
-            n_results=min(top_k * 2, total),
-            include=["documents", "metadatas", "distances"],
-        )
-        for a in _parse_results(res):
-            if a["title"] not in seen and len(articles) < top_k:
-                seen.add(a["title"])
-                articles.append(a)
-    return articles
+        return articles
+    except Exception as e:
+        print(f"ChromaDB no disponible: {e}")
+        return []
 
 def format_context(articles):
     lines = []
@@ -966,11 +970,6 @@ def main():
         location=GCP_LOCATION,
         credentials=credentials,
     )
-
-    get_mongo_collection()
-    _get_embed_model()
-    _get_collection()
-    print(f"Biblioteca lista: {_get_collection().count()} artículos indexados")
 
     if args.web:
         if not FLASK_AVAILABLE:
