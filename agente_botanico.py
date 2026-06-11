@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Agente Conversacional Botánico — El Floema
-Gemini 2.5 Flash + ChromaDB RAG + MongoDB Atlas + interfaz web
+Gemini 2.5 Flash + Supabase pgvector RAG + MongoDB Atlas + interfaz web
 """
 
 import argparse
@@ -24,10 +24,15 @@ except ImportError:
     sys.exit(1)
 
 try:
-    import chromadb
     from sentence_transformers import SentenceTransformer
 except ImportError:
-    print("Ejecuta: pip install chromadb sentence-transformers")
+    print("Ejecuta: pip install sentence-transformers")
+    sys.exit(1)
+
+try:
+    from supabase import create_client as _supabase_create_client
+except ImportError:
+    print("Ejecuta: pip install supabase")
     sys.exit(1)
 
 try:
@@ -46,9 +51,9 @@ except ImportError:
 
 _cache = {}
 
-CHROMA_DIR   = Path("biblioteca-cientifica/.chroma_db")
-COLLECTION   = "articulos_botanicos"
-EMBED_MODEL  = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://powpibehemondwobngxh.supabase.co")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
+EMBED_MODEL  = "paraphrase-multilingual-MiniLM-L12-v2"
 GEMINI_MODEL = "gemini-2.5-flash"
 GCP_PROJECT  = "gen-lang-client-0826649426"
 GCP_LOCATION = "us-central1"
@@ -103,8 +108,8 @@ def get_credentials():
         print(f"ERROR credenciales: {e}")
         sys.exit(1)
 
-_embed_model = None
-_chroma_col  = None
+_embed_model    = None
+_supabase_client = None
 
 def _get_embed_model():
     global _embed_model
@@ -112,14 +117,11 @@ def _get_embed_model():
         _embed_model = SentenceTransformer(EMBED_MODEL)
     return _embed_model
 
-def _get_collection():
-    global _chroma_col
-    if _chroma_col is None:
-        if not CHROMA_DIR.exists():
-            raise FileNotFoundError("Indice RAG no encontrado.")
-        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        _chroma_col = client.get_collection(COLLECTION)
-    return _chroma_col
+def _get_supabase():
+    global _supabase_client
+    if _supabase_client is None:
+        _supabase_client = _supabase_create_client(SUPABASE_URL, SUPABASE_KEY)
+    return _supabase_client
 
 _PLANT_ALIASES = {
     "boldo": "boldo", "matico": "matico", "maqui": "maqui",
@@ -138,59 +140,49 @@ def _detect_plant_key(query):
             return key
     return None
 
-def _parse_results(results):
-    articles = []
-    for doc, meta, dist in zip(results["documents"][0], results["metadatas"][0], results["distances"][0]):
-        articles.append({
-            "similarity": round(1 - dist, 3),
-            "title":      meta.get("title", ""),
-            "authors":    meta.get("authors", ""),
-            "year":       meta.get("year") or "",
-            "journal":    meta.get("journal", ""),
-            "source":     meta.get("source", ""),
-            "plant_key":  meta.get("plant_key", ""),
-            "doi":        meta.get("doi", ""),
-            "snippet":    doc[:600],
-        })
-    return articles
+def _row_to_article(row):
+    return {
+        "similarity": round(float(row.get("similarity", 0)), 3),
+        "title":      row.get("title", ""),
+        "authors":    row.get("authors", ""),
+        "year":       row.get("year") or "",
+        "journal":    row.get("journal", ""),
+        "source":     row.get("source", ""),
+        "plant_key":  row.get("plant_key", ""),
+        "doi":        row.get("doi", ""),
+        "snippet":    row.get("snippet", ""),
+    }
 
 def search_articles(query, top_k=TOP_K):
     try:
-        model      = _get_embed_model()
-        collection = _get_collection()
-        total      = collection.count()
-        embedding  = model.encode([query]).tolist()
-        plant_key  = _detect_plant_key(query)
-        seen       = set()
-        articles   = []
-        if plant_key:
-            try:
-                res = collection.query(
-                    query_embeddings=embedding,
-                    n_results=min(top_k // 2 + 1, total),
-                    include=["documents", "metadatas", "distances"],
-                    where={"plant_key": {"$eq": plant_key}},
-                )
-                for a in _parse_results(res):
-                    if a["title"] not in seen:
-                        seen.add(a["title"])
-                        articles.append(a)
-            except Exception:
-                pass
-        remaining = top_k - len(articles)
-        if remaining > 0:
-            res = collection.query(
-                query_embeddings=embedding,
-                n_results=min(top_k * 2, total),
-                include=["documents", "metadatas", "distances"],
-            )
-            for a in _parse_results(res):
-                if a["title"] not in seen and len(articles) < top_k:
-                    seen.add(a["title"])
-                    articles.append(a)
-        return articles
+        model     = _get_embed_model()
+        client    = _get_supabase()
+        embedding = model.encode([query])[0].tolist()
+        plant_key = _detect_plant_key(query)
+
+        # Request extra results so we can prioritize plant_key matches client-side
+        fetch_count = top_k * 2 if plant_key else top_k
+        res = client.rpc("buscar_articulos", {
+            "query_embedding": embedding,
+            "match_count": fetch_count,
+        }).execute()
+
+        seen     = set()
+        priority = []
+        rest     = []
+        for row in res.data:
+            a = _row_to_article(row)
+            if a["title"] in seen:
+                continue
+            seen.add(a["title"])
+            if plant_key and a["plant_key"] == plant_key:
+                priority.append(a)
+            else:
+                rest.append(a)
+
+        return (priority + rest)[:top_k]
     except Exception as e:
-        print(f"ChromaDB no disponible: {e}")
+        print(f"Supabase no disponible: {e}")
         return []
 
 def format_context(articles):
