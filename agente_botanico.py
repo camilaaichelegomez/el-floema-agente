@@ -968,8 +968,9 @@ def main():
             print("Flask no instalado. Ejecuta: pip install flask")
             sys.exit(1)
         app = create_app(client)
-        print(f"\nInterfaz web en http://localhost:{args.port}\n")
-        app.run(host="0.0.0.0", port=args.port, debug=False)
+        port = int(os.environ.get("PORT", args.port))
+        print(f"\nInterfaz web en http://localhost:{port}\n")
+        app.run(host="0.0.0.0", port=port, debug=False)
     elif args.question:
         articles = search_articles(args.question)
         response = ask_gemini(client, args.question, articles, [])
