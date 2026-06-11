@@ -24,12 +24,6 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from sentence_transformers import SentenceTransformer
-except ImportError:
-    print("Ejecuta: pip install sentence-transformers")
-    sys.exit(1)
-
-try:
     from supabase import create_client as _supabase_create_client
 except ImportError:
     print("Ejecuta: pip install supabase")
@@ -51,10 +45,10 @@ except ImportError:
 
 _cache = {}
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://powpibehemondwobngxh.supabase.co")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")
-EMBED_MODEL  = "paraphrase-multilingual-MiniLM-L12-v2"
-GEMINI_MODEL = "gemini-2.5-flash"
+SUPABASE_URL  = os.environ.get("SUPABASE_URL", "https://powpibehemondwobngxh.supabase.co")
+SUPABASE_KEY  = os.environ.get("SUPABASE_KEY", "")
+EMBED_MODEL   = "text-embedding-004"
+GEMINI_MODEL  = "gemini-2.5-flash"
 GCP_PROJECT  = "gen-lang-client-0826649426"
 GCP_LOCATION = "us-central1"
 TOP_K        = 6
@@ -108,14 +102,21 @@ def get_credentials():
         print(f"ERROR credenciales: {e}")
         sys.exit(1)
 
-_embed_model    = None
+_gemini_client   = None
 _supabase_client = None
 
-def _get_embed_model():
-    global _embed_model
-    if _embed_model is None:
-        _embed_model = SentenceTransformer(EMBED_MODEL)
-    return _embed_model
+def _get_gemini_client():
+    global _gemini_client
+    if _gemini_client is None:
+        credentials = get_credentials()
+        _gemini_client = genai.Client(
+            vertexai=True,
+            project=GCP_PROJECT,
+            location=GCP_LOCATION,
+            credentials=credentials,
+        )
+        print(f"Gemini autenticado | modelo: {GEMINI_MODEL}")
+    return _gemini_client
 
 def _get_supabase():
     global _supabase_client
@@ -155,9 +156,12 @@ def _row_to_article(row):
 
 def search_articles(query, top_k=TOP_K):
     try:
-        model     = _get_embed_model()
+        result    = _get_gemini_client().models.embed_content(
+            model=EMBED_MODEL,
+            contents=query,
+        )
+        embedding = result.embeddings[0].values
         client    = _get_supabase()
-        embedding = model.encode([query])[0].tolist()
         plant_key = _detect_plant_key(query)
 
         # Request extra results so we can prioritize plant_key matches client-side
@@ -233,14 +237,14 @@ REGLAS OBLIGATORIAS:
 - Responde en español, con tono cálido, educativo y riguroso — como un médico integrativo que enseña, no que prescribe
 - Máximo 800 palabras para dar respuestas completas y ricas"""
 
-def ask_gemini(client, question, articles, history):
+def ask_gemini(question, articles, history):
     context = format_context(articles) if articles else "(Sin articulos relevantes)"
     history_block = ""
     for turn in history[-4:]:
         history_block += f"Usuario: {turn['user']}\nAgente: {turn['assistant']}\n"
     prompt = f"HISTORIAL:\n{history_block}\nPREGUNTA: {question}\n\nEVIDENCIA CIENTIFICA:\n{context}\n\nResponde integrando la evidencia, citando con [N]."
     try:
-        response = client.models.generate_content(
+        response = _get_gemini_client().models.generate_content(
             model=GEMINI_MODEL,
             contents=prompt,
             config=types.GenerateContentConfig(
@@ -857,7 +861,7 @@ async function sendMessage() {
 }
 """
 
-def create_app(gemini_client):
+def create_app():
     app = Flask(__name__)
 
     @app.route("/")
@@ -879,7 +883,7 @@ def create_app(gemini_client):
         if cache_key in _cache:
             return jsonify(_cache[cache_key])
         articles = search_articles(question)
-        response = ask_gemini(gemini_client, question, articles, history)
+        response = ask_gemini(question, articles, history)
         result = {
             "response":       response,
             "sources_count":  len(articles),
@@ -918,9 +922,9 @@ def create_app(gemini_client):
 
     return app
 
-def chat_loop(client):
+def chat_loop():
     print("\nAgente Botanico El Floema")
-    print(f"Modelo: {GEMINI_MODEL} | RAG: {_get_collection().count()} articulos\n")
+    print(f"Modelo: {GEMINI_MODEL}\n")
     history = []
     while True:
         try:
@@ -936,7 +940,7 @@ def chat_loop(client):
         print("\nBuscando en la biblioteca...")
         articles = search_articles(user_input)
         print(f"Consultando {GEMINI_MODEL}...\n")
-        response = ask_gemini(client, user_input, articles, history)
+        response = ask_gemini(user_input, articles, history)
         print("-" * 60)
         print(response)
         print("-" * 60)
@@ -953,31 +957,21 @@ def main():
     parser.add_argument("--port", type=int, default=5000)
     args = parser.parse_args()
 
-    credentials = get_credentials()
-    print(f"Autenticado | modelo: {GEMINI_MODEL}")
-
-    client = genai.Client(
-        vertexai=True,
-        project=GCP_PROJECT,
-        location=GCP_LOCATION,
-        credentials=credentials,
-    )
-
     if args.web:
         if not FLASK_AVAILABLE:
             print("Flask no instalado. Ejecuta: pip install flask")
             sys.exit(1)
-        app = create_app(client)
+        app = create_app()
         port = int(os.environ.get("PORT", args.port))
-        print(f"\nInterfaz web en http://localhost:{port}\n")
+        print(f"Interfaz web en http://localhost:{port}")
         app.run(host="0.0.0.0", port=port, debug=False)
     elif args.question:
         articles = search_articles(args.question)
-        response = ask_gemini(client, args.question, articles, [])
+        response = ask_gemini(args.question, articles, [])
         print(response)
         save_to_mongo(args.question, response, articles)
     else:
-        chat_loop(client)
+        chat_loop()
 
 if __name__ == "__main__":
     main()
