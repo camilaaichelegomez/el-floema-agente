@@ -1,0 +1,8 @@
+google-genai
+google-auth
+google-cloud-aiplatform
+chromadb
+sentence-transformers
+pymongo
+flask
+requests

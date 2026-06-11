@@ -44,6 +44,8 @@ try:
 except ImportError:
     FLASK_AVAILABLE = False
 
+_cache = {}
+
 CHROMA_DIR   = Path("biblioteca-cientifica/.chroma_db")
 COLLECTION   = "articulos_botanicos"
 EMBED_MODEL  = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -260,54 +262,532 @@ HTML_PAGE = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Floema — Agente Botanico</title>
+<title>El Floema — Agente Botánico</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#0a1a0d; color:#d4c5a0; font-family:'Crimson Text',Georgia,serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
-  header { text-align:center; padding:40px 20px 20px; border-bottom:1px solid #2a4a2a; width:100%; }
-  header h1 { font-family:'Cinzel',serif; color:#c8a050; font-size:2.2rem; letter-spacing:0.1em; }
-  header p { color:#7a9a7a; font-style:italic; margin-top:8px; font-size:1.05rem; }
-  .chat-container { width:100%; max-width:780px; flex:1; padding:24px 20px; display:flex; flex-direction:column; gap:16px; }
-  .message { padding:16px 20px; border-radius:8px; line-height:1.7; font-size:1.05rem; }
-  .message.user { background:#1a2e1a; border-left:3px solid #c8a050; align-self:flex-end; max-width:85%; }
-  .message.agent { background:#111f13; border-left:3px solid #7a4a8a; align-self:flex-start; max-width:92%; }
-  .message.agent .sources { margin-top:10px; font-size:0.85rem; color:#7a9a7a; font-style:italic; }
-  .input-area { width:100%; max-width:780px; padding:16px 20px 32px; display:flex; gap:12px; }
-  textarea { flex:1; background:#111f13; border:1px solid #2a4a2a; border-radius:8px; color:#d4c5a0; font-family:'Crimson Text',serif; font-size:1.05rem; padding:12px 16px; resize:none; height:56px; outline:none; }
-  textarea:focus { border-color:#c8a050; }
-  button { background:#1a3a1a; border:1px solid #c8a050; color:#c8a050; font-family:'Cinzel',serif; font-size:0.9rem; padding:0 24px; border-radius:8px; cursor:pointer; }
-  button:hover { background:#2a4a2a; }
-  button:disabled { opacity:0.5; cursor:not-allowed; }
-  .loading { display:none; color:#7a9a7a; font-style:italic; padding:8px 20px; font-size:0.95rem; }
-  .loading.visible { display:block; }
-  .welcome { text-align:center; color:#5a7a5a; font-style:italic; padding:40px 20px; font-size:1.1rem; }
-  .tag { display:inline-block; background:#1a2e1a; border:1px solid #2a4a2a; border-radius:20px; padding:4px 14px; margin:4px; font-size:0.88rem; cursor:pointer; color:#9ab89a; }
-  .tag:hover { border-color:#c8a050; color:#c8a050; }
-  .suggestions { text-align:center; padding:0 20px 16px; }
+
+  body {
+    background: #030a04;
+    color: #d4c5a0;
+    font-family: 'Crimson Text', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* Fondo bosque */
+  .bg-forest {
+    position: fixed;
+    inset: 0;
+    background-image: url('/bosque-plantas.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    z-index: 0;
+  }
+  .bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(3,10,4,0.82) 0%,
+      rgba(3,10,4,0.70) 30%,
+      rgba(3,10,4,0.78) 70%,
+      rgba(3,10,4,0.95) 100%
+    );
+    z-index: 1;
+  }
+
+  /* Partículas flotantes */
+  .particles { position:fixed; inset:0; z-index:2; pointer-events:none; overflow:hidden; }
+  .particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: radial-gradient(circle, #c8a050, transparent);
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) translateX(0) scale(0); opacity:0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-10vh) translateX(40px) scale(1.5); opacity:0; }
+  }
+
+  /* Todo el contenido sobre el fondo */
+  header, .chat-wrapper, .suggestions, .loading, .input-wrapper, .footer-note {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Header */
+  header {
+    width: 100%;
+    text-align: center;
+    padding: 50px 20px 36px;
+    border-bottom: 1px solid rgba(200,160,80,0.25);
+    background: linear-gradient(to bottom, rgba(3,10,4,0.6), transparent);
+  }
+
+  /* Ornamento SVG floral superior */
+  .floral-top {
+    display: block;
+    margin: 0 auto 20px;
+    width: 280px;
+    opacity: 0.7;
+    animation: fadeInDown 1.2s ease forwards;
+  }
+
+  @keyframes fadeInDown {
+    from { opacity:0; transform: translateY(-20px); }
+    to   { opacity:0.7; transform: translateY(0); }
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    color: #c8a050;
+    font-size: 4rem;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    text-shadow:
+      0 0 60px rgba(200,160,80,0.5),
+      0 0 20px rgba(200,160,80,0.3),
+      0 2px 4px rgba(0,0,0,0.9);
+    animation: glowIn 1.5s ease forwards;
+    margin-bottom: 8px;
+  }
+
+  @keyframes glowIn {
+    from { opacity:0; text-shadow: none; }
+    to   { opacity:1; text-shadow: 0 0 60px rgba(200,160,80,0.5), 0 0 20px rgba(200,160,80,0.3); }
+  }
+
+  .header-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 14px auto;
+    max-width: 400px;
+  }
+  .header-divider::before, .header-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #c8a050, transparent);
+  }
+  .header-divider span { color: #c8a050; font-size: 0.9rem; }
+
+  header p {
+    color: #9ab89a;
+    font-style: italic;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  .header-tagline {
+    margin-top: 14px;
+    color: #c8a050;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  /* Ornamento floral SVG lateral */
+  .floral-corner {
+    position: fixed;
+    opacity: 0.12;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .floral-corner.tl { top: 0; left: 0; transform: rotate(0deg); width: 220px; }
+  .floral-corner.tr { top: 0; right: 0; transform: rotate(90deg); width: 220px; }
+  .floral-corner.bl { bottom: 0; left: 0; transform: rotate(270deg); width: 180px; }
+  .floral-corner.br { bottom: 0; right: 0; transform: rotate(180deg); width: 180px; }
+
+  /* Chat */
+  .chat-wrapper {
+    width: 100%;
+    max-width: 880px;
+    flex: 1;
+    padding: 0 20px;
+  }
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px 0;
+    min-height: 300px;
+  }
+
+  /* Bienvenida */
+  .welcome {
+    text-align: center;
+    padding: 50px 20px;
+    animation: fadeIn 1s ease 0.5s both;
+  }
+  .welcome-icon { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+  .welcome h2 {
+    font-family: 'Cinzel', serif;
+    color: #c8a050;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 14px;
+    text-shadow: 0 0 20px rgba(200,160,80,0.3);
+  }
+  .welcome p {
+    color: #8aaa8a;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* Mensajes */
+  @keyframes fadeIn {
+    from { opacity:0; transform: translateY(10px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .message {
+    padding: 22px 26px;
+    line-height: 1.85;
+    font-size: 1.08rem;
+    position: relative;
+    animation: fadeIn 0.4s ease;
+    border-radius: 2px;
+  }
+
+  .message.user {
+    background: linear-gradient(135deg, rgba(26,46,26,0.9), rgba(20,36,20,0.9));
+    border: 1px solid rgba(200,160,80,0.35);
+    border-left: 3px solid #c8a050;
+    align-self: flex-end;
+    max-width: 78%;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(200,160,80,0.1);
+  }
+  .message.user::after {
+    content: '✦';
+    position: absolute;
+    top: -9px; right: 20px;
+    color: #c8a050;
+    font-size: 0.75rem;
+    background: rgba(3,10,4,0.9);
+    padding: 0 6px;
+  }
+
+  .message.agent {
+    background: linear-gradient(135deg, rgba(10,18,12,0.92), rgba(8,12,20,0.92));
+    border: 1px solid rgba(122,74,138,0.3);
+    border-left: 3px solid #7a4a8a;
+    align-self: flex-start;
+    max-width: 96%;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(122,74,138,0.1);
+  }
+  .message.agent::after {
+    content: '⬡';
+    position: absolute;
+    top: -9px; left: 20px;
+    color: #7a4a8a;
+    font-size: 0.75rem;
+    background: rgba(3,10,4,0.9);
+    padding: 0 6px;
+  }
+
+  .message.agent h3 {
+    font-family: 'Cinzel', serif;
+    color: #c8a050;
+    font-size: 0.95rem;
+    margin: 18px 0 8px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 10px rgba(200,160,80,0.2);
+  }
+  .message.agent h3:first-child { margin-top: 0; }
+  .message.agent strong { color: #d4b870; }
+  .message.agent em { color: #9ab89a; }
+  .message.agent ul { margin: 8px 0 8px 18px; }
+  .message.agent li { margin-bottom: 5px; }
+  .message.agent hr {
+    border: none;
+    border-top: 1px solid rgba(200,160,80,0.15);
+    margin: 16px 0;
+  }
+
+  .sources {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(200,160,80,0.12);
+    font-size: 0.82rem;
+    color: #5a7a5a;
+    font-style: italic;
+  }
+
+  /* Sugerencias */
+  .suggestions {
+    text-align: center;
+    padding: 8px 20px 16px;
+    width: 100%;
+    max-width: 880px;
+  }
+  .suggestions-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #3a5a3a;
+    margin-bottom: 10px;
+  }
+  .tag {
+    display: inline-block;
+    background: rgba(10,20,10,0.7);
+    border: 1px solid rgba(200,160,80,0.2);
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin: 4px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    color: #7a9a7a;
+    transition: all 0.25s;
+    font-family: 'Crimson Text', serif;
+    font-style: italic;
+    backdrop-filter: blur(4px);
+  }
+  .tag:hover {
+    border-color: #c8a050;
+    color: #c8a050;
+    background: rgba(200,160,80,0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(200,160,80,0.15);
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    color: #5a7a5a;
+    font-style: italic;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 880px;
+  }
+  .loading.visible { display: block; }
+
+  /* Input */
+  .input-wrapper {
+    width: 100%;
+    max-width: 880px;
+    padding: 10px 20px 36px;
+  }
+
+  /* Marco dorado decorativo */
+  .input-frame {
+    position: relative;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(200,160,80,0.4), rgba(122,74,138,0.3), rgba(200,160,80,0.4));
+    border-radius: 4px;
+  }
+  .input-frame::before {
+    content: '❧';
+    position: absolute;
+    left: -24px; top: 50%;
+    transform: translateY(-50%);
+    color: #c8a050;
+    font-size: 1.2rem;
+    opacity: 0.5;
+  }
+  .input-frame::after {
+    content: '❧';
+    position: absolute;
+    right: -24px; top: 50%;
+    transform: translateY(-50%) scaleX(-1);
+    color: #c8a050;
+    font-size: 1.2rem;
+    opacity: 0.5;
+  }
+
+  .input-container {
+    display: flex;
+    gap: 0;
+    background: rgba(5,15,6,0.95);
+    border-radius: 3px;
+    padding: 4px 4px 4px 18px;
+    backdrop-filter: blur(12px);
+  }
+
+  textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #d4c5a0;
+    font-family: 'Crimson Text', serif;
+    font-size: 1.1rem;
+    padding: 14px 0;
+    resize: none;
+    height: 54px;
+    outline: none;
+    line-height: 1.5;
+  }
+  textarea::placeholder { color: #3a5a3a; font-style: italic; }
+
+  button {
+    background: linear-gradient(135deg, #1a3a1a, #2a1a3a);
+    border: none;
+    border-left: 1px solid rgba(200,160,80,0.3);
+    color: #c8a050;
+    font-family: 'Cinzel', serif;
+    font-size: 0.82rem;
+    padding: 0 28px;
+    border-radius: 0 2px 2px 0;
+    cursor: pointer;
+    letter-spacing: 0.12em;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  button:hover {
+    background: linear-gradient(135deg, #2a4a2a, #3a2a4a);
+    color: #e0b860;
+    box-shadow: inset 0 0 20px rgba(200,160,80,0.1);
+  }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .footer-note {
+    text-align: center;
+    color: #2a4a2a;
+    font-size: 0.78rem;
+    padding-bottom: 24px;
+    font-style: italic;
+    position: relative;
+    z-index: 10;
+  }
 </style>
 </head>
 <body>
+
+<!-- Fondo -->
+<div class="bg-forest"></div>
+<div class="bg-overlay"></div>
+
+<!-- Partículas doradas -->
+<div class="particles" id="particles"></div>
+
+<!-- Ornamentos florales en esquinas -->
+<svg class="floral-corner tl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M10,10 Q60,10 60,60 Q60,110 110,110" stroke="#c8a050" stroke-width="1.5"/>
+  <path d="M10,30 Q40,30 50,60 Q60,90 90,100" stroke="#c8a050" stroke-width="1"/>
+  <circle cx="60" cy="60" r="4" fill="#c8a050" opacity="0.8"/>
+  <circle cx="110" cy="110" r="3" fill="#c8a050" opacity="0.6"/>
+  <path d="M55,55 Q65,45 75,55 Q65,65 55,55Z" fill="#c8a050" opacity="0.5"/>
+  <path d="M25,15 Q35,5 45,15 Q35,25 25,15Z" fill="#c8a050" opacity="0.4"/>
+  <path d="M105,105 Q115,95 125,105 Q115,115 105,105Z" fill="#c8a050" opacity="0.4"/>
+  <circle cx="30" cy="30" r="2" fill="#c8a050" opacity="0.4"/>
+  <circle cx="80" cy="80" r="2" fill="#c8a050" opacity="0.4"/>
+</svg>
+
+<svg class="floral-corner tr" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M10,10 Q60,10 60,60 Q60,110 110,110" stroke="#c8a050" stroke-width="1.5"/>
+  <path d="M10,30 Q40,30 50,60 Q60,90 90,100" stroke="#c8a050" stroke-width="1"/>
+  <circle cx="60" cy="60" r="4" fill="#c8a050" opacity="0.8"/>
+  <circle cx="110" cy="110" r="3" fill="#c8a050" opacity="0.6"/>
+  <path d="M55,55 Q65,45 75,55 Q65,65 55,55Z" fill="#c8a050" opacity="0.5"/>
+</svg>
+
+<svg class="floral-corner bl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M10,10 Q60,10 60,60 Q60,110 110,110" stroke="#c8a050" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="4" fill="#c8a050" opacity="0.8"/>
+  <path d="M55,55 Q65,45 75,55 Q65,65 55,55Z" fill="#c8a050" opacity="0.5"/>
+</svg>
+
+<svg class="floral-corner br" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M10,10 Q60,10 60,60 Q60,110 110,110" stroke="#c8a050" stroke-width="1.5"/>
+  <circle cx="60" cy="60" r="4" fill="#c8a050" opacity="0.8"/>
+  <path d="M55,55 Q65,45 75,55 Q65,65 55,55Z" fill="#c8a050" opacity="0.5"/>
+</svg>
+
+<!-- Header -->
 <header>
+  <!-- Ornamento floral SVG en header -->
+  <svg class="floral-top" viewBox="0 0 280 60" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <path d="M140,30 Q120,10 100,20 Q80,30 90,50 Q100,60 120,50 Q130,45 140,30Z" stroke="#c8a050" stroke-width="1" fill="rgba(200,160,80,0.05)"/>
+    <path d="M140,30 Q160,10 180,20 Q200,30 190,50 Q180,60 160,50 Q150,45 140,30Z" stroke="#c8a050" stroke-width="1" fill="rgba(200,160,80,0.05)"/>
+    <circle cx="140" cy="30" r="4" fill="#c8a050" opacity="0.8"/>
+    <circle cx="90" cy="45" r="2.5" fill="#c8a050" opacity="0.5"/>
+    <circle cx="190" cy="45" r="2.5" fill="#c8a050" opacity="0.5"/>
+    <path d="M20,30 L115,30" stroke="#c8a050" stroke-width="0.8" opacity="0.4"/>
+    <path d="M165,30 L260,30" stroke="#c8a050" stroke-width="0.8" opacity="0.4"/>
+    <path d="M20,30 Q10,20 5,30 Q10,40 20,30Z" fill="#c8a050" opacity="0.4"/>
+    <path d="M260,30 Q270,20 275,30 Q270,40 260,30Z" fill="#c8a050" opacity="0.4"/>
+    <circle cx="50" cy="30" r="1.5" fill="#c8a050" opacity="0.3"/>
+    <circle cx="230" cy="30" r="1.5" fill="#c8a050" opacity="0.3"/>
+  </svg>
+
   <h1>El Floema</h1>
-  <p>Agente Botanico · Fitoterapia · Ayurveda · Medicina Tradicional China</p>
+  <div class="header-divider"><span>✦</span></div>
+  <p>Agente Botánico · Fitoterapia · Ayurveda · Medicina Tradicional China · Yoga</p>
+  <div class="header-tagline">Con ciencia, mi magia despierta</div>
 </header>
-<div class="chat-container" id="chat">
-  <div class="welcome">Preguntame sobre plantas medicinales del bosque valdiviano y del mundo.<br>Integro evidencia cientifica con sabiduria ancestral.</div>
+
+<div class="chat-wrapper">
+  <div class="chat-container" id="chat">
+    <div class="welcome">
+      <span class="welcome-icon">🌿</span>
+      <h2>Bienvenida al Grimorio Botánico</h2>
+      <p>Pregúntame sobre plantas, órganos, sistemas del cuerpo o prácticas de bienestar. Integro 6.020 artículos científicos con la sabiduría del Ayurveda, la Medicina Tradicional China y el Yoga.</p>
+    </div>
+  </div>
 </div>
+
 <div class="suggestions">
-  <span class="tag" onclick="setQ('Para que sirve el matico?')">Matico</span>
-  <span class="tag" onclick="setQ('Plantas para el estres')">Estres</span>
-  <span class="tag" onclick="setQ('Que es el maqui y sus propiedades?')">Maqui</span>
-  <span class="tag" onclick="setQ('Plantas antiinflamatorias nativas')">Antiinflamatorias</span>
-  <span class="tag" onclick="setQ('Como usar el boldo?')">Boldo</span>
+  <div class="suggestions-label">✦ Consultas frecuentes ✦</div>
+  <span class="tag" onclick="setQ('Como depurar el higado de forma integral?')">🫀 Hígado</span>
+  <span class="tag" onclick="setQ('Plantas para el estres y la ansiedad')">🧠 Estrés</span>
+  <span class="tag" onclick="setQ('Propiedades del maqui chileno')">🫐 Maqui</span>
+  <span class="tag" onclick="setQ('Como mejorar la digestion con plantas y yoga')">🌱 Digestión</span>
+  <span class="tag" onclick="setQ('Plantas antiinflamatorias del bosque valdiviano')">🌳 Inflamación</span>
+  <span class="tag" onclick="setQ('Para que sirve el matico y como usarlo')">🍃 Matico</span>
+  <span class="tag" onclick="setQ('Como mejorar el sueno con plantas medicinales')">🌙 Sueño</span>
+  <span class="tag" onclick="setQ('Posturas de yoga para el sistema digestivo')">🧘 Yoga</span>
 </div>
-<div class="loading" id="loading">Consultando la biblioteca botanica...</div>
-<div class="input-area">
-  <textarea id="input" placeholder="Pregunta sobre plantas medicinales..."></textarea>
-  <button onclick="sendMessage()" id="btn">Consultar</button>
+
+<div class="loading" id="loading">🌿 Consultando la biblioteca botánica...</div>
+
+<div class="input-wrapper">
+  <div class="input-frame">
+    <div class="input-container">
+      <textarea id="input" placeholder="Pregunta sobre una planta, un órgano, un síntoma..."></textarea>
+      <button onclick="sendMessage()" id="btn">Consultar</button>
+    </div>
+  </div>
 </div>
+
+<div class="footer-note">6.020 artículos científicos · Bosque Valdiviano, Chile</div>
+
 <script src="/static/app.js"></script>
+<script>
+// Partículas doradas
+const container = document.getElementById('particles');
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `
+    left: ${Math.random()*100}%;
+    width: ${Math.random()*3+1}px;
+    height: ${Math.random()*3+1}px;
+    animation-delay: ${Math.random()*15}s;
+    animation-duration: ${Math.random()*20+15}s;
+    opacity: ${Math.random()*0.4+0.1};
+  `;
+  container.appendChild(p);
+}
+</script>
 </body>
 </html>'''
 
@@ -332,7 +812,15 @@ function addMessage(text, role, sources) {
   if (welcome) welcome.remove();
   const div = document.createElement('div');
   div.className = 'message ' + role;
-  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  let html = text
+    .replace(/^#{1,3} (.+)$/gm, '<h3>$1</h3>')
+    .replace(/[*][*](.*?)[*][*]/g, '<strong>$1</strong>')
+    .replace(/[*](.*?)[*]/g, '<em>$1</em>')
+    .replace(/^[-] (.+)$/gm, '<li>$1</li>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/---/g, '<hr>');
+  div.innerHTML = html;
   if (sources) {
     const s = document.createElement('div');
     s.className = 'sources';
@@ -391,14 +879,19 @@ def create_app(gemini_client):
         history  = data.get("history", [])
         if not question:
             return jsonify({"error": "Pregunta vacia"}), 400
+        cache_key = question.strip().lower()
+        if cache_key in _cache:
+            return jsonify(_cache[cache_key])
         articles = search_articles(question)
         response = ask_gemini(gemini_client, question, articles, history)
-        save_to_mongo(question, response, articles, session_id="web")
-        return jsonify({
+        result = {
             "response":       response,
             "sources_count":  len(articles),
             "top_similarity": articles[0]["similarity"] if articles else 0,
-        })
+        }
+        _cache[cache_key] = result
+        save_to_mongo(question, response, articles, session_id="web")
+        return jsonify(result)
 
     @app.route("/health")
     def health():
@@ -408,6 +901,24 @@ def create_app(gemini_client):
             "model":   GEMINI_MODEL,
             "mongodb": col is not None,
         })
+
+    @app.route("/logo.png")
+    def serve_logo():
+        import os
+        from flask import send_file
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpg")
+        return send_file(path, mimetype="image/png")
+
+    @app.route("/bruja.webp")
+    def serve_bruja():
+        import os
+        from flask import send_file
+        import glob
+        folder = os.path.dirname(os.path.abspath(__file__))
+        matches = glob.glob(os.path.join(folder, "Gemini_Generated_Image*"))
+        if matches:
+            return send_file(matches[0])
+        return "not found", 404
 
     return app
 
@@ -457,6 +968,9 @@ def main():
     )
 
     get_mongo_collection()
+    _get_embed_model()
+    _get_collection()
+    print(f"Biblioteca lista: {_get_collection().count()} artículos indexados")
 
     if args.web:
         if not FLASK_AVAILABLE:
