@@ -39,6 +39,7 @@ except ImportError:
 
 try:
     from flask import Flask, request, jsonify, render_template_string, Response
+    from flask_cors import CORS
     FLASK_AVAILABLE = True
 except ImportError:
     FLASK_AVAILABLE = False
@@ -863,6 +864,7 @@ async function sendMessage() {
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     @app.route("/")
     def index():
