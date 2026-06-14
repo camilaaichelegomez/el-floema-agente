@@ -843,6 +843,7 @@ async function sendMessage() {
   btn.disabled = true;
   loading.classList.add('visible');
   try {
+    console.log('Enviando consulta a /ask...');
     const res = await fetch('/ask', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -854,6 +855,7 @@ async function sendMessage() {
     history.push({ user: question, assistant: data.response });
     if (history.length > 10) history = history.slice(-10);
   } catch(e) {
+    console.log('Error:', e);
     addMessage('Error al conectar. Intenta de nuevo.', 'agent', null);
   } finally {
     btn.disabled = false;
