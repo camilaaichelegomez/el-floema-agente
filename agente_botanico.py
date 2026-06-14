@@ -888,9 +888,8 @@ def create_app():
             cache_key = question.strip().lower()
             if cache_key in _cache:
                 return jsonify(_cache[cache_key])
-            # articles = search_articles(question)  # RAG desactivado temporalmente
-            articles = []
-            response = ask_gemini(question, [], history)
+            articles = search_articles(question)
+            response = ask_gemini(question, articles, history)
             result = {
                 "response":       response,
                 "sources_count":  len(articles),
