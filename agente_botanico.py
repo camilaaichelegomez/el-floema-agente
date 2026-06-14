@@ -7,6 +7,7 @@ Gemini 2.5 Flash + Supabase pgvector RAG + MongoDB Atlas + interfaz web
 import argparse
 import os
 import sys
+import traceback
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -878,24 +879,28 @@ def create_app():
 
     @app.route("/ask", methods=["POST"])
     def ask():
-        data     = request.get_json()
-        question = data.get("question", "").strip()
-        history  = data.get("history", [])
-        if not question:
-            return jsonify({"error": "Pregunta vacia"}), 400
-        cache_key = question.strip().lower()
-        if cache_key in _cache:
-            return jsonify(_cache[cache_key])
-        articles = search_articles(question)
-        response = ask_gemini(question, articles, history)
-        result = {
-            "response":       response,
-            "sources_count":  len(articles),
-            "top_similarity": articles[0]["similarity"] if articles else 0,
-        }
-        _cache[cache_key] = result
-        save_to_mongo(question, response, articles, session_id="web")
-        return jsonify(result)
+        try:
+            data     = request.get_json()
+            question = data.get("question", "").strip()
+            history  = data.get("history", [])
+            if not question:
+                return jsonify({"error": "Pregunta vacia"}), 400
+            cache_key = question.strip().lower()
+            if cache_key in _cache:
+                return jsonify(_cache[cache_key])
+            articles = search_articles(question)
+            response = ask_gemini(question, articles, history)
+            result = {
+                "response":       response,
+                "sources_count":  len(articles),
+                "top_similarity": articles[0]["similarity"] if articles else 0,
+            }
+            _cache[cache_key] = result
+            save_to_mongo(question, response, articles, session_id="web")
+            return jsonify(result)
+        except Exception as e:
+            print("ERROR EN /ask:", traceback.format_exc())
+            return jsonify({"error": str(e)}), 500
 
     @app.route("/health")
     def health():
