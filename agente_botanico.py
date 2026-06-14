@@ -8,21 +8,18 @@ import argparse
 import os
 import sys
 import traceback
-from pathlib import Path
 from datetime import datetime, timezone
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 try:
-    from google import genai
-    from google.genai import types
-    import google.auth
-    import google.auth.transport.requests
-    from google.oauth2 import service_account
+    import google.generativeai as genai
 except ImportError:
-    print("Ejecuta: pip install google-genai google-auth")
+    print("Ejecuta: pip install google-generativeai")
     sys.exit(1)
+
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 try:
     from supabase import create_client as _supabase_create_client
@@ -51,11 +48,8 @@ SUPABASE_URL  = os.environ.get("SUPABASE_URL", "https://powpibehemondwobngxh.sup
 SUPABASE_KEY  = os.environ.get("SUPABASE_KEY", "")
 EMBED_MODEL   = "text-embedding-004"
 GEMINI_MODEL  = "gemini-2.5-flash"
-GCP_PROJECT  = "gen-lang-client-0826649426"
-GCP_LOCATION = "us-central1"
 TOP_K        = 6
 MAX_TOKENS   = 16384
-SA_KEY_FILE  = Path("gemini_service_account.json")
 
 MONGO_URI = "mongodb+srv://elfloema:123jaboneS!@cluster0.ymjxhlu.mongodb.net/?appName=Cluster0"
 MONGO_DB  = "elfloema"
@@ -93,32 +87,7 @@ def save_to_mongo(question, response, articles, session_id="web"):
     except Exception as e:
         print(f"Error guardando en MongoDB: {e}")
 
-def get_credentials():
-    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-    if SA_KEY_FILE.exists():
-        return service_account.Credentials.from_service_account_file(str(SA_KEY_FILE), scopes=scopes)
-    try:
-        credentials, _ = google.auth.default(scopes=scopes)
-        return credentials
-    except Exception as e:
-        print(f"ERROR credenciales: {e}")
-        sys.exit(1)
-
-_gemini_client   = None
 _supabase_client = None
-
-def _get_gemini_client():
-    global _gemini_client
-    if _gemini_client is None:
-        credentials = get_credentials()
-        _gemini_client = genai.Client(
-            vertexai=True,
-            project=GCP_PROJECT,
-            location=GCP_LOCATION,
-            credentials=credentials,
-        )
-        print(f"Gemini autenticado | modelo: {GEMINI_MODEL}")
-    return _gemini_client
 
 def _get_supabase():
     global _supabase_client
@@ -158,11 +127,11 @@ def _row_to_article(row):
 
 def search_articles(query, top_k=TOP_K):
     try:
-        result    = _get_gemini_client().models.embed_content(
-            model=EMBED_MODEL,
-            contents=query,
+        result    = genai.embed_content(
+            model=f"models/{EMBED_MODEL}",
+            content=query,
         )
-        embedding = result.embeddings[0].values
+        embedding = result["embedding"]
         client    = _get_supabase()
         plant_key = _detect_plant_key(query)
 
@@ -246,14 +215,10 @@ def ask_gemini(question, articles, history):
         history_block += f"Usuario: {turn['user']}\nAgente: {turn['assistant']}\n"
     prompt = f"HISTORIAL:\n{history_block}\nPREGUNTA: {question}\n\nEVIDENCIA CIENTIFICA:\n{context}\n\nResponde integrando la evidencia, citando con [N]."
     try:
-        response = _get_gemini_client().models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_PROMPT,
-                max_output_tokens=MAX_TOKENS,
-                temperature=0.7,
-            ),
+        model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT)
+        response = model.generate_content(
+            prompt,
+            generation_config={"max_output_tokens": MAX_TOKENS, "temperature": 0.7},
         )
         return response.text.strip()
     except Exception as e:

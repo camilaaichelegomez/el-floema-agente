@@ -1,6 +1,4 @@
-google-genai
-google-auth
-google-cloud-aiplatform
+google-generativeai
 supabase
 pymongo
 flask
