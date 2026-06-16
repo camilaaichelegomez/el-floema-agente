@@ -1,0 +1,9 @@
+gemini_service_account.json
+biblioteca-belleza/
+biblioteca-cientifica/
+__pycache__/
+*.pyc
+*.pyo
+.env
+subir_progreso.txt
+subir_belleza_progreso.txt
