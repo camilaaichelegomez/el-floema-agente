@@ -171,6 +171,8 @@ def format_context(articles):
         lines.append(f"[{i}] {a['source']} | {a['plant_key']} | sim:{a['similarity']}\n    {cita}\n    {a['snippet']}\n")
     return "\n".join(lines)
 
+SYSTEM_PROMPT_BELLEZA = """Eres Floema, asesora de belleza botánica de El Floema. Eres experta en rutinas de cuidado de piel y cabello con plantas nativas, cosmética natural, yoga facial, masaje facial, drenaje linfático y cómo la alimentación afecta la piel. Hablas en español con tono cálido y científico. No das diagnósticos médicos ni recetas de tratamientos — solo orientación cosmética y de bienestar."""
+
 SYSTEM_PROMPT = """Eres un guía de medicina integrativa y botánica para El Floema, una plataforma de conocimiento sobre plantas medicinales y salud holística. Tu misión es EDUCAR — no solo decir qué hacer, sino explicar el PORQUÉ detrás de cada recomendación, para que la persona comprenda su cuerpo y tome decisiones informadas.
 
 Tu conocimiento integra de forma profunda:
@@ -219,6 +221,21 @@ def ask_gemini(question, articles, history):
         response = model.generate_content(
             prompt,
             generation_config={"max_output_tokens": MAX_TOKENS, "temperature": 0.7},
+        )
+        return response.text.strip()
+    except Exception as e:
+        return f"[Error Gemini: {e}]"
+
+def ask_gemini_belleza(question, history):
+    history_block = ""
+    for turn in history[-6:]:
+        history_block += f"Usuario: {turn['user']}\nFloema: {turn['assistant']}\n"
+    prompt = f"{history_block}Usuario: {question}" if history_block else question
+    try:
+        model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT_BELLEZA)
+        response = model.generate_content(
+            prompt,
+            generation_config={"max_output_tokens": 1024, "temperature": 0.75},
         )
         return response.text.strip()
     except Exception as e:
@@ -865,6 +882,20 @@ def create_app():
             return jsonify(result)
         except Exception as e:
             print("ERROR EN /ask:", traceback.format_exc())
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/ask-belleza", methods=["POST"])
+    def ask_belleza():
+        try:
+            data     = request.get_json()
+            question = data.get("question", "").strip()
+            history  = data.get("history", [])
+            if not question:
+                return jsonify({"error": "Pregunta vacia"}), 400
+            response = ask_gemini_belleza(question, history)
+            return jsonify({"response": response})
+        except Exception as e:
+            print("ERROR EN /ask-belleza:", traceback.format_exc())
             return jsonify({"error": str(e)}), 500
 
     @app.route("/health")
