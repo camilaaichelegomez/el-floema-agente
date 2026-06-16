@@ -40,3 +40,43 @@ $$;
 create index if not exists articulos_embedding_hnsw
   on articulos_botanicos
   using hnsw (embedding vector_cosine_ops);
+
+-- ── BELLEZA ────────────────────────────────────────────────────────────────────
+
+create or replace function buscar_articulos_belleza(
+  query_embedding vector(768),
+  match_count     int default 6
+)
+returns table (
+  id         bigint,
+  title      text,
+  authors    text,
+  year       text,
+  journal    text,
+  source     text,
+  plant_key  text,
+  doi        text,
+  snippet    text,
+  similarity float
+)
+language sql stable
+as $$
+  select
+    id,
+    title,
+    authors,
+    year,
+    journal,
+    source,
+    plant_key,
+    doi,
+    snippet,
+    1 - (embedding <=> query_embedding) as similarity
+  from articulos_belleza
+  order by embedding <=> query_embedding
+  limit match_count;
+$$;
+
+create index if not exists articulos_belleza_embedding_hnsw
+  on articulos_belleza
+  using hnsw (embedding vector_cosine_ops);

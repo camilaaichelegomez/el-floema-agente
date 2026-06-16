@@ -171,6 +171,69 @@ def format_context(articles):
         lines.append(f"[{i}] {a['source']} | {a['plant_key']} | sim:{a['similarity']}\n    {cita}\n    {a['snippet']}\n")
     return "\n".join(lines)
 
+_BELLEZA_TOPIC_ALIASES = {
+    "piel sensible": "sensitive_skin_natural_cosmetics",
+    "sensible":      "sensitive_skin_natural_cosmetics",
+    "acné":          "diet_inflammation_acne",
+    "acne":          "diet_inflammation_acne",
+    "yoga facial":   "face_yoga_skin_aging",
+    "masaje facial": "facial_massage_lymphatic_drainage",
+    "drenaje":       "facial_massage_lymphatic_drainage",
+    "linfático":     "facial_massage_lymphatic_drainage",
+    "cabello":       "natural_hair_care_plant_extracts",
+    "pelo":          "natural_hair_care_plant_extracts",
+    "omega":         "omega_fatty_acids_skin_barrier",
+    "barrera":       "skin_barrier_function",
+    "microbioma":    "scalp_microbiome_hair_loss",
+    "caída":         "scalp_microbiome_hair_loss",
+    "antioxidante":  "antioxidants_skin_aging",
+    "envejecimiento":"antioxidants_skin_aging",
+    "anti-edad":     "antioxidants_skin_aging",
+    "intestino":     "gut_skin_axis_diet",
+    "digestión":     "gut_skin_axis_diet",
+}
+
+def _detect_belleza_topic(query):
+    q = query.lower()
+    for alias, key in _BELLEZA_TOPIC_ALIASES.items():
+        if alias in q:
+            return key
+    return None
+
+def search_belleza_articles(query, top_k=TOP_K):
+    try:
+        result    = genai.embed_content(
+            model=f"models/{EMBED_MODEL}",
+            content=query,
+        )
+        embedding = result["embedding"]
+        client    = _get_supabase()
+        topic_key = _detect_belleza_topic(query)
+
+        fetch_count = top_k * 2 if topic_key else top_k
+        res = client.rpc("buscar_articulos_belleza", {
+            "query_embedding": embedding,
+            "match_count": fetch_count,
+        }).execute()
+
+        seen     = set()
+        priority = []
+        rest     = []
+        for row in res.data:
+            a = _row_to_article(row)
+            if a["title"] in seen:
+                continue
+            seen.add(a["title"])
+            if topic_key and a["plant_key"] == topic_key:
+                priority.append(a)
+            else:
+                rest.append(a)
+
+        return (priority + rest)[:top_k]
+    except Exception as e:
+        print(f"Supabase belleza no disponible: {e}")
+        return []
+
 SYSTEM_PROMPT_BELLEZA = """Eres Floema, asesora de belleza botánica de El Floema. Eres experta en rutinas de cuidado de piel y cabello con plantas nativas, cosmética natural, yoga facial, masaje facial, drenaje linfático y cómo la alimentación afecta la piel. Hablas en español con tono cálido y científico. No das diagnósticos médicos ni recetas de tratamientos — solo orientación cosmética y de bienestar."""
 
 SYSTEM_PROMPT = """Eres un guía de medicina integrativa y botánica para El Floema, una plataforma de conocimiento sobre plantas medicinales y salud holística. Tu misión es EDUCAR — no solo decir qué hacer, sino explicar el PORQUÉ detrás de cada recomendación, para que la persona comprenda su cuerpo y tome decisiones informadas.
@@ -226,11 +289,14 @@ def ask_gemini(question, articles, history):
     except Exception as e:
         return f"[Error Gemini: {e}]"
 
-def ask_gemini_belleza(question, history):
+def ask_gemini_belleza(question, articles, history):
+    context = format_context(articles) if articles else "(Sin evidencia científica disponible)"
     history_block = ""
     for turn in history[-6:]:
         history_block += f"Usuario: {turn['user']}\nFloema: {turn['assistant']}\n"
-    prompt = f"{history_block}Usuario: {question}" if history_block else question
+    prompt = (
+        f"HISTORIAL:\n{history_block}\n" if history_block else ""
+    ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde integrando la evidencia cuando sea relevante, citando con [N]."
     try:
         model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT_BELLEZA)
         response = model.generate_content(
@@ -892,8 +958,13 @@ def create_app():
             history  = data.get("history", [])
             if not question:
                 return jsonify({"error": "Pregunta vacia"}), 400
-            response = ask_gemini_belleza(question, history)
-            return jsonify({"response": response})
+            articles = search_belleza_articles(question)
+            response = ask_gemini_belleza(question, articles, history)
+            return jsonify({
+                "response":       response,
+                "sources_count":  len(articles),
+                "top_similarity": articles[0]["similarity"] if articles else 0,
+            })
         except Exception as e:
             print("ERROR EN /ask-belleza:", traceback.format_exc())
             return jsonify({"error": str(e)}), 500
