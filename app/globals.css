@@ -1,0 +1,1431 @@
+/* --- PLANT PROPERTY TAGS --- */
+.plant-prop-tag {
+  font-family: var(--font-grimoire);
+  font-size: 0.48rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 2rem;
+  padding: 0.15rem 0.55rem;
+  margin: 0 0.12rem 0.12rem 0;
+  display: inline-block;
+  border: 1.5px solid transparent;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.plant-prop-tag.odd {
+  background: #5a2d6b;
+  color: #d4c4a0;
+}
+.plant-prop-tag.even {
+  background: rgba(200,160,80,0.2);
+  color: #c8a050;
+  border-color: #c8a050;
+}
+
+/* --- PLANT CARD DECORATIVE DOTS --- */
+.planta-card__dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7a4a8a;
+  z-index: 2;
+}
+.planta-card__dot.tl { top: 8px; left: 8px; }
+.planta-card__dot.tr { top: 8px; right: 8px; }
+.planta-card__dot.bl { bottom: 8px; left: 8px; }
+.planta-card__dot.br { bottom: 8px; right: 8px; }
+
+/* --- PLANT CARD HOVER GRADIENT --- */
+.planta-card:hover {
+  border-color: #7a4a8a !important;
+  background: linear-gradient(120deg, #1a0d2e 0%, #152515 100%);
+}
+
+/* --- SECTION TITLES --- */
+.section-title,
+h2.section-title,
+.plantas-section__header .section-title,
+.plantas-section__header h2,
+.plantas-section__header .section-label-text {
+  color: #e8c070 !important;
+}
+
+/* --- BOSQUE AL FRASCO SECTION --- */
+.bosque-frasco-section {
+  background: linear-gradient(135deg, #0d1a0d, #1a0d2e) !important;
+}
+
+/* --- ACCORDION ACTIVE --- */
+.accordion-item.active {
+  border-color: #7a4a8a !important;
+}
+.accordion-arrow.active {
+  color: #7a4a8a !important;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── VARIABLES ──────────────────────────────────────────── */
+:root {
+  --bg-primary:   #0d1a0d;
+  --bg-secondary: #1a2e1a;
+  --bg-card:      #152515;
+  --bg-purple:    #2a1535;
+  --color-gold:       #c8a050;
+  --color-gold-light: #e8c070;
+  --color-cream:  #d4c4a0;
+  --color-purple:       #7a4a8a;
+  --color-purple-light: #9a6aaa;
+  --color-purple-dark:  #5a2d6b;
+  --color-green:  #3d5228;
+  --font-grimoire: var(--font-cinzel), 'Cinzel', serif;
+  --font-body:     var(--font-crimson), 'Crimson Text', serif;
+}
+
+/* ── RESET & BASE ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-grimoire);
+  color: var(--color-gold);
+  letter-spacing: 0.05em;
+}
+
+a {
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+a:hover { color: var(--color-gold-light); }
+
+/* ── ANIMATIONS ─────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.8; }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(200, 160, 80, 0.15); }
+  50%       { box-shadow: 0 0 28px rgba(200, 160, 80, 0.35); }
+}
+
+/* ── NAVBAR ─────────────────────────────────────────────── */
+.navbar-grimorio {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(14, 26, 14, 0);
+  border-bottom: 1px solid rgba(200, 160, 80, 0);
+  backdrop-filter: blur(0px);
+  transition:
+    background 0.5s ease,
+    border-color 0.5s ease,
+    backdrop-filter 0.5s ease;
+}
+.navbar-grimorio.scrolled {
+  background: rgba(14, 26, 14, 0.94);
+  border-bottom: 1px solid rgba(200, 160, 80, 0.22);
+  backdrop-filter: blur(16px);
+}
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2.5rem;
+  min-height: 72px;
+}
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+}
+.navbar-logo img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 160, 80, 0.3);
+}
+.navbar-title {
+  font-family: var(--font-grimoire);
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  opacity: 0.85;
+}
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+.navbar-links a {
+  font-family: var(--font-grimoire);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  opacity: 0.7;
+  transition: color 0.3s, opacity 0.3s;
+}
+.navbar-links a:hover {
+  color: var(--color-gold);
+  opacity: 1;
+}
+.navbar-burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.navbar-burger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--color-gold);
+  transition: transform 0.3s, opacity 0.3s;
+}
+@media (max-width: 768px) {
+  .navbar-burger { display: flex; }
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 72px; left: 0; right: 0;
+    flex-direction: column;
+    gap: 1.2rem;
+    background: rgba(12, 20, 12, 0.98);
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid rgba(200, 160, 80, 0.15);
+    backdrop-filter: blur(16px);
+  }
+  .navbar-links.open { display: flex; }
+}
+
+/* ── PARALLAX HERO ──────────────────────────────────────── */
+.parallax-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.parallax-hero__bg {
+  position: absolute;
+  inset: -20%;
+  will-change: transform;
+  background-color: var(--bg-primary); /* fallback while image loads */
+  /* background-image, background-size, background-position set via inline styles */
+}
+.hero-gold-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.parallax-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 20, 10, 0.65);
+  z-index: 1;
+  pointer-events: none;
+}
+.parallax-hero__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    /* Edge vignette — corners and sides */
+    radial-gradient(ellipse at center, transparent 25%, rgba(8, 16, 8, 0.72) 100%),
+    /* Top fade — blends with navbar */
+    linear-gradient(to bottom, rgba(8, 16, 8, 0.55) 0%, transparent 18%),
+    /* Bottom fade — blends into next section */
+    linear-gradient(to top, rgba(8, 16, 8, 0.95) 0%, transparent 28%),
+    /* Purple accent bottom corners */
+    radial-gradient(ellipse 65% 30% at 85% 100%, rgba(42, 21, 53, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 25% at 12% 100%, rgba(42, 21, 53, 0.18) 0%, transparent 55%);
+  z-index: 3;
+  pointer-events: none;
+}
+.parallax-hero__content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7rem 2rem 5rem;
+  max-width: 900px;
+  width: 100%;
+}
+.parallax-hero__logo-wrap {
+  margin-bottom: 2.2rem;
+}
+.parallax-hero__logo {
+  border-radius: 50%;
+  border: 1.5px solid rgba(200, 160, 80, 0.4);
+  box-shadow:
+    0 0 40px rgba(200, 160, 80, 0.12),
+    0 0 80px rgba(200, 160, 80, 0.06);
+}
+.parallax-hero__title {
+  font-family: var(--font-grimoire);
+  font-size: clamp(3.5rem, 11vw, 8rem);
+  color: var(--color-gold);
+  letter-spacing: 0.24em;
+  text-shadow:
+    0 0 80px rgba(200, 160, 80, 0.3),
+    0 0 160px rgba(200, 160, 80, 0.12),
+    0 2px 12px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+  margin-bottom: 0;
+}
+.parallax-hero__divider {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: clamp(200px, 38vw, 380px);
+  margin: 2rem 0 1.8rem;
+}
+.parallax-hero__divider-line {
+  flex: 1;
+  height: 1px;
+  display: block;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.5));
+}
+.parallax-hero__divider-line:last-child {
+  background: linear-gradient(to left, transparent, rgba(200, 160, 80, 0.5));
+}
+.parallax-hero__divider-symbol {
+  color: var(--color-gold);
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.parallax-hero__tagline {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.5vw, 1.55rem);
+  color: var(--color-cream);
+  opacity: 0.75;
+  letter-spacing: 0.06em;
+  margin-bottom: 2.8rem;
+}
+.parallax-hero__cta {
+  display: inline-block;
+  font-family: var(--font-grimoire);
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--bg-primary);
+  background: var(--color-gold);
+  border: none;
+  padding: 1rem 3rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0% 50%);
+}
+.parallax-hero__cta:hover {
+  background: var(--color-gold-light);
+  color: var(--bg-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 40px rgba(200, 160, 80, 0.25);
+}
+.parallax-hero__bottom-deco {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 3rem;
+  width: clamp(120px, 20vw, 220px);
+  opacity: 0.3;
+}
+.parallax-hero__deco-line {
+  flex: 1;
+  height: 1px;
+  display: block;
+  background: var(--color-gold);
+}
+.parallax-hero__deco-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  flex-shrink: 0;
+}
+
+/* ── SECTION COMMONS ────────────────────────────────────── */
+.section-title {
+  font-family: var(--font-grimoire);
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  color: var(--color-gold);
+  letter-spacing: 0.14em;
+  text-align: center;
+}
+.section-label-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0.38;
+  margin-bottom: 0.75rem;
+}
+.section-label-line {
+  flex: 1;
+  height: 1px;
+  display: block;
+}
+.section-label-line:first-child {
+  background: linear-gradient(to right, transparent, var(--color-gold));
+}
+.section-label-line:last-child {
+  background: linear-gradient(to left, transparent, var(--color-gold));
+}
+.section-label-text {
+  font-family: var(--font-grimoire);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  white-space: nowrap;
+}
+
+/* ── SECTION DIVIDER (BEM) ──────────────────────────────── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2.5rem 3rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.section-divider__line {
+  flex: 1;
+  height: 1px;
+  display: block;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.3));
+}
+.section-divider__line:last-child {
+  background: linear-gradient(to left, transparent, rgba(200, 160, 80, 0.3));
+}
+.section-divider__glyph {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+/* ── PLANTAS SECTION ────────────────────────────────────── */
+.plantas-section {
+  padding: clamp(4rem, 7vh, 7rem) clamp(1.5rem, 6vw, 5rem);
+  background: var(--bg-secondary);
+  position: relative;
+}
+.plantas-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.18), transparent);
+}
+.plantas-section__header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.plantas-section__subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--color-cream);
+  opacity: 0.45;
+  margin-top: 0.6rem;
+  letter-spacing: 0.05em;
+}
+.plantas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.planta-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 160, 80, 0.18);
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  cursor: default;
+  position: relative;
+}
+.planta-card::before,
+.planta-card::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: rgba(200, 160, 80, 0.45);
+  border-style: solid;
+  z-index: 1;
+  transition: border-color 0.4s ease;
+}
+.planta-card::before { top: 7px; left: 7px; border-width: 1px 0 0 1px; }
+.planta-card::after  { bottom: 7px; right: 7px; border-width: 0 1px 1px 0; }
+.planta-card:hover {
+  border-color: rgba(122, 74, 138, 0.6);
+  transform: translateY(-8px);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(122, 74, 138, 0.12);
+}
+.planta-card:hover::before,
+.planta-card:hover::after {
+  border-color: rgba(154, 106, 170, 0.8);
+}
+.planta-card__img {
+  height: 190px;
+  background: linear-gradient(145deg, #112011 0%, #1a3520 50%, #0e1a0e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(200, 160, 80, 0.1);
+  position: relative;
+}
+.planta-card__img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(200, 160, 80, 0.05) 0%, transparent 70%);
+}
+.planta-card__body {
+  padding: 1.6rem 1.8rem 2rem;
+}
+.planta-card__name {
+  font-family: var(--font-grimoire);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.35rem;
+}
+.planta-card__lat {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--color-cream);
+  opacity: 0.4;
+  margin-bottom: 0.85rem;
+}
+.planta-card__desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-cream);
+  opacity: 0.68;
+  line-height: 1.65;
+}
+
+/* ── NAV CARDS (Biblioteca + Grimorio) ──────────────────── */
+.nav-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 160, 80, 0.18);
+  padding: 3rem 1.75rem;
+  cursor: pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  overflow: hidden;
+  text-decoration: none;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  --cursor-x: 50%;
+  --cursor-y: 50%;
+}
+.nav-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 130px at var(--cursor-x) var(--cursor-y),
+    rgba(200, 160, 80, 0.08) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.nav-card:hover {
+  border-color: rgba(122, 74, 138, 0.55);
+  transform: translateY(-6px);
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.55),
+    0 0 28px rgba(122, 74, 138, 0.15);
+}
+.nav-card:hover::before { opacity: 1; }
+.nav-card-icon {
+  margin-bottom: 1.6rem;
+  color: var(--color-gold);
+  display: block;
+}
+.nav-card-icon svg {
+  height: 80px;
+  width: auto;
+  opacity: 0.9;
+  display: block;
+  margin: 0 auto;
+}
+.nav-card-title {
+  font-family: var(--font-grimoire);
+  font-size: 1rem;
+  letter-spacing: 0.28em;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  display: block;
+  line-height: 1.3;
+}
+.nav-card-subtitle {
+  display: none;
+}
+
+/* Gem corners (Grimorio cards) */
+.nav-card-gem {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--color-purple);
+  border-radius: 50%;
+  opacity: 0.55;
+  box-shadow: 0 0 8px rgba(122, 74, 138, 0.5);
+  transition: opacity 0.4s ease, box-shadow 0.4s ease;
+}
+.nav-card:hover .nav-card-gem {
+  opacity: 0.85;
+  box-shadow: 0 0 14px rgba(122, 74, 138, 0.7);
+}
+.nav-card-gem.tl { top: 9px;    left: 9px; }
+.nav-card-gem.tr { top: 9px;    right: 9px; }
+.nav-card-gem.bl { bottom: 9px; left: 9px; }
+.nav-card-gem.br { bottom: 9px; right: 9px; }
+
+/* ── TOAST ──────────────────────────────────────────────── */
+.proximamente-toast {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(17, 29, 17, 0.97);
+  border: 1px solid rgba(200, 160, 80, 0.32);
+  padding: 0.85rem 2.2rem;
+  font-family: var(--font-grimoire);
+  font-size: 0.68rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  backdrop-filter: blur(14px);
+  animation: fadeInUp 0.3s ease;
+  white-space: nowrap;
+}
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+.site-footer {
+  background: #090f09;
+  padding: 4.5rem 2rem 3rem;
+  text-align: center;
+  border-top: 1px solid rgba(200, 160, 80, 0.1);
+  position: relative;
+}
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.35), transparent);
+}
+.footer-logo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 160, 80, 0.22);
+  opacity: 0.65;
+  margin-bottom: 1.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.footer-tagline {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-cream);
+  opacity: 0.38;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.06em;
+}
+.footer-handle {
+  font-family: var(--font-grimoire);
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  color: var(--color-gold);
+  opacity: 0.3;
+  text-transform: uppercase;
+}
+
+/* ── PLANTAS MEDICINALES — sección home ─────────────────── */
+.plantas-med-section {
+  background: var(--bg-primary);
+  padding: clamp(4rem, 7vh, 7rem) clamp(1.5rem, 5vw, 5rem);
+  position: relative;
+}
+.plantas-med-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.15), transparent);
+}
+.plantas-med-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.plantas-med-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-cream);
+  opacity: 0.45;
+  margin-top: 0.6rem;
+  letter-spacing: 0.05em;
+}
+.plantas-med-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1.1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+/* Card — forma orgánica redondeada */
+.plantas-med-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  padding: 1.8rem 1rem 1.6rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 160, 80, 0.16);
+  border-radius: 1.25rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+.plantas-med-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(200, 160, 80, 0.06) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.plantas-med-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  border-color: rgba(200, 160, 80, 0.48);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(200, 160, 80, 0.07);
+  background: #131f13;
+}
+.plantas-med-card:hover::before { opacity: 1; }
+.plantas-med-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  opacity: 0.9;
+}
+.plantas-med-card__nombre {
+  font-family: var(--font-grimoire);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  line-height: 1.2;
+  display: block;
+}
+.plantas-med-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+}
+.plantas-med-tag {
+  font-family: var(--font-grimoire);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  border: 1px solid rgba(200, 160, 80, 0.28);
+  border-radius: 2rem;
+  padding: 0.18rem 0.5rem;
+  opacity: 0.7;
+  display: inline-block;
+  white-space: nowrap;
+}
+.plantas-med-footer {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+.plantas-med-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-grimoire);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  opacity: 0.55;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(200, 160, 80, 0.25);
+  padding-bottom: 0.2rem;
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+.plantas-med-cta:hover {
+  opacity: 1;
+  color: var(--color-gold);
+  border-color: rgba(200, 160, 80, 0.6);
+}
+.plantas-med-cta__arrow {
+  transition: transform 0.3s ease;
+}
+.plantas-med-cta:hover .plantas-med-cta__arrow {
+  transform: translateX(4px);
+}
+
+/* ── KNOWLEDGE CARDS — compact 5-col overrides ──────────── */
+
+/* Reduce padding so 5 cards fit comfortably in one row */
+.knowledge-card {
+  padding: 2rem 0.85rem !important;
+}
+/* Smaller title text to fit long names on one line */
+.knowledge-card .nav-card-title {
+  font-size: 0.62rem !important;
+  letter-spacing: 0.12em !important;
+  line-height: 1.4 !important;
+}
+/* Slightly smaller icon */
+.knowledge-card .nav-card-icon svg {
+  height: 64px !important;
+}
+
+/* ── GRIMORIO CARDS — ventanas góticas ──────────────────── */
+
+/* Arco apuntado en la parte superior */
+.grimorio-card {
+  border-top-left-radius:  48% 22%;
+  border-top-right-radius: 48% 22%;
+  border-bottom-left-radius:  0;
+  border-bottom-right-radius: 0;
+  padding-top: 3.5rem;
+}
+
+/* Alturas alternadas — ritmo visual */
+.grimorio-cards-list > li:nth-child(odd)  .grimorio-card { min-height: 400px; }
+.grimorio-cards-list > li:nth-child(even) .grimorio-card { min-height: 340px; }
+
+/* Borde dorado que recorre el perímetro al hacer hover */
+.grimorio-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1.5px solid var(--color-gold);
+  border-radius: inherit;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity   0.25s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+.grimorio-card:hover::after {
+  opacity: 0.55;
+  transform: scaleY(1);
+}
+
+/* Las gemas brillan más en hover (refuerzo del estado) */
+.grimorio-card:hover .nav-card-gem {
+  animation: gemPulse 1.4s ease-in-out infinite;
+}
+@keyframes gemPulse {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 8px rgba(122, 74, 138, 0.5); }
+  50%       { opacity: 1;    box-shadow: 0 0 18px rgba(122, 74, 138, 0.85); }
+}
+
+/* ── KNOWLEDGE CARDS — página de libro doblada ───────────── */
+
+/* Esquina cortada en diagonal — dog-ear de libro antiguo */
+.knowledge-card::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 26px 26px 0 0;
+  border-color: var(--bg-primary) transparent transparent transparent;
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(-1px 1px 2px rgba(200, 160, 80, 0.22));
+  transition: border-width 0.28s ease;
+}
+/* La esquina crece sutilmente al hacer hover */
+.knowledge-card:hover::after {
+  border-width: 34px 34px 0 0;
+}
+
+/* ── INTERIOR PAGES ─────────────────────────────────────── */
+.parchment-bg {
+  background: var(--bg-primary);
+}
+.grain-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+}
+.grimoire-entrance {
+  /* inner border frame used in biblioteca pages */
+}
+
+/* ── DEL BOSQUE AL FRASCO — libro layout ────────────────────── */
+
+.libro-section {
+  position: relative;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+.libro-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.15), transparent);
+}
+
+.libro-inner {
+  display: grid;
+  grid-template-columns: 2fr 40px 3fr;
+  min-height: 560px;
+}
+
+/* ─ Left page ─ */
+.libro-left {
+  background: #122012;
+  padding: clamp(3.5rem, 7vw, 5.5rem) clamp(2rem, 4vw, 3.5rem) clamp(3.5rem, 7vw, 5.5rem) clamp(1.5rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.libro-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.4rem;
+  opacity: 0.4;
+}
+.libro-eyebrow__line {
+  display: block;
+  width: 36px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-gold));
+  flex-shrink: 0;
+}
+.libro-eyebrow__text {
+  font-family: var(--font-grimoire);
+  font-size: 0.55rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  white-space: nowrap;
+}
+
+.libro-titulo {
+  font-family: var(--font-grimoire);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  color: var(--color-gold);
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  font-weight: 700;
+  margin-bottom: 1.6rem;
+  text-shadow: 0 0 50px rgba(200, 160, 80, 0.18);
+}
+
+.libro-rule {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, rgba(200, 160, 80, 0.28), transparent);
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+}
+
+.libro-bloque {
+  margin-bottom: 1.8rem;
+}
+.libro-bloque:last-child { margin-bottom: 0; }
+
+.libro-bloque__titulo {
+  font-family: var(--font-grimoire);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 0.35rem;
+  opacity: 0.85;
+}
+.libro-bloque__texto {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--color-cream);
+  opacity: 0.5;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─ Vertical separator ─ */
+.libro-sep {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.libro-sep::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  bottom: 8%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(200, 160, 80, 0.3) 20%,
+    rgba(200, 160, 80, 0.3) 80%,
+    transparent 100%
+  );
+}
+.libro-sep__ornament {
+  position: relative;
+  z-index: 1;
+  font-size: 0.65rem;
+  color: rgba(200, 160, 80, 0.5);
+  line-height: 1;
+}
+
+/* ─ Right page ─ */
+.libro-right {
+  background: var(--bg-primary);
+  padding: clamp(3.5rem, 7vw, 5.5rem) clamp(1.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem) clamp(2rem, 3vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vh, 3rem);
+}
+
+.libro-plantas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 0.8rem;
+}
+
+.libro-planta-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.55rem;
+  padding: 1.1rem 0.6rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(200, 160, 80, 0.13);
+  border-radius: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+.libro-planta-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(200, 160, 80, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+.libro-planta-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  opacity: 0.85;
+}
+.libro-planta-card__icon svg {
+  height: 44px;
+  width: auto;
+  display: block;
+}
+.libro-planta-card__nombre {
+  font-family: var(--font-grimoire);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  display: block;
+  line-height: 1.2;
+}
+.libro-planta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  justify-content: center;
+}
+.libro-planta-tag {
+  font-family: var(--font-grimoire);
+  font-size: 0.42rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  border: 1px solid rgba(200, 160, 80, 0.2);
+  border-radius: 2rem;
+  padding: 0.12rem 0.38rem;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.libro-cta-wrap {
+  margin-top: auto;
+  text-align: right;
+}
+.libro-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-grimoire);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  opacity: 0.55;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(200, 160, 80, 0.22);
+  padding-bottom: 0.15rem;
+  transition: opacity 0.3s, border-color 0.3s;
+}
+.libro-cta:hover {
+  opacity: 1;
+  color: var(--color-gold);
+  border-color: rgba(200, 160, 80, 0.55);
+}
+.libro-cta__arrow { transition: transform 0.3s; }
+.libro-cta:hover .libro-cta__arrow { transform: translateX(4px); }
+
+/* Mobile: stack vertically */
+@media (max-width: 768px) {
+  .libro-inner {
+    grid-template-columns: 1fr;
+  }
+  .libro-sep {
+    height: 36px;
+  }
+  .libro-sep::before {
+    top: 50%;
+    bottom: auto;
+    left: 8%;
+    right: 8%;
+    width: auto;
+    height: 1px;
+    transform: translateY(-50%);
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(200, 160, 80, 0.3) 20%,
+      rgba(200, 160, 80, 0.3) 80%,
+      transparent 100%
+    );
+  }
+  .libro-cta-wrap { text-align: center; }
+}
+
+/* ── LA BOTICA ───────────────────────────────────────────────── */
+
+.botica-section {
+  position: relative;
+  background: #070e07;
+  padding: clamp(5.5rem, 10vh, 9rem) clamp(1.5rem, 5vw, 5rem);
+  overflow: hidden;
+}
+
+.botica-aura {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 100% 55% at 50% 0%,  rgba(200, 160, 80, 0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 50%  50% at 15% 85%, rgba(122, 74,  138, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 45%  50% at 85% 85%, rgba(61,  82,  40,  0.09) 0%, transparent 55%);
+}
+
+.botica-bg-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-grimoire);
+  font-size: clamp(8rem, 22vw, 22rem);
+  color: rgba(200, 160, 80, 0.022);
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.botica-header {
+  text-align: center;
+  margin-bottom: clamp(3rem, 6vh, 5rem);
+  position: relative;
+  z-index: 1;
+}
+.botica-titulo {
+  font-family: var(--font-grimoire);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  color: var(--color-gold);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 0.85rem;
+  text-shadow:
+    0 0 80px  rgba(200, 160, 80, 0.38),
+    0 0 160px rgba(200, 160, 80, 0.14),
+    0 3px 12px rgba(0, 0, 0, 0.9);
+}
+.botica-subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--color-cream);
+  opacity: 0.42;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.botica-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: clamp(1rem, 2vw, 1.75rem);
+  max-width: 1160px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─ Product card ─ */
+.botica-card {
+  background: #111c11;
+  border: 1px solid rgba(200, 160, 80, 0.2);
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Corner brackets */
+.botica-card::before,
+.botica-card::after {
+  content: '';
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-style: solid;
+  z-index: 2;
+  transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
+}
+.botica-card::before {
+  top: -1px; left: -1px;
+  border-width: 1.5px 0 0 1.5px;
+  border-color: rgba(200, 160, 80, 0.35);
+}
+.botica-card::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 1.5px 1.5px 0;
+  border-color: rgba(200, 160, 80, 0.35);
+}
+.botica-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(200, 160, 80, 0.5);
+  box-shadow:
+    0 32px 70px rgba(0, 0, 0, 0.75),
+    0 0 40px rgba(200, 160, 80, 0.1),
+    inset 0 1px 0 rgba(200, 160, 80, 0.1);
+}
+.botica-card:hover::before,
+.botica-card:hover::after {
+  width: 44px;
+  height: 44px;
+  border-color: rgba(200, 160, 80, 0.75);
+}
+
+/* Image area */
+.botica-card__img {
+  height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-bottom: 1px solid rgba(200, 160, 80, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: filter 0.4s ease;
+}
+.botica-card:hover .botica-card__img { filter: brightness(1.1); }
+
+.botica-card__glyph {
+  font-size: 3.2rem;
+  color: rgba(200, 160, 80, 0.22);
+  line-height: 1;
+  transition: color 0.4s ease, transform 0.4s ease;
+}
+.botica-card:hover .botica-card__glyph {
+  color: rgba(200, 160, 80, 0.4);
+  transform: scale(1.1);
+}
+.botica-card__vol {
+  font-family: var(--font-grimoire);
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(200, 160, 80, 0.35);
+}
+
+/* Body */
+.botica-card__body {
+  padding: 1.4rem 1.6rem 1.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+.botica-card__subtitulo {
+  font-family: var(--font-grimoire);
+  font-size: 0.52rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(200, 160, 80, 0.45);
+  margin: 0 0 0.1rem;
+}
+.botica-card__nombre {
+  font-family: var(--font-grimoire);
+  font-size: 0.88rem;
+  color: var(--color-cream);
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  margin: 0;
+}
+.botica-card__desc {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: rgba(212, 196, 160, 0.4);
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+.botica-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(200, 160, 80, 0.1);
+  flex-wrap: wrap;
+}
+.botica-card__precio {
+  font-family: var(--font-grimoire);
+  font-size: 0.92rem;
+  color: var(--color-gold);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.botica-card__btn {
+  font-family: var(--font-grimoire);
+  font-size: 0.52rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(200, 160, 80, 0.45);
+  padding: 0.48rem 0.95rem;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
+  white-space: nowrap;
+}
+.botica-card__btn:hover {
+  background: rgba(200, 160, 80, 0.12);
+  border-color: rgba(200, 160, 80, 0.75);
+  transform: translateY(-1px);
+}
+.botica-card__btn--added {
+  color: var(--color-gold-light);
+  border-color: rgba(232, 200, 120, 0.6);
+  background: rgba(200, 160, 80, 0.08);
+}
+
+.botica-footer-deco {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(200, 160, 80, 0.12), transparent);
+  max-width: 500px;
+  margin: clamp(3.5rem, 7vh, 6rem) auto 0;
+  position: relative;
+  z-index: 1;
+}
