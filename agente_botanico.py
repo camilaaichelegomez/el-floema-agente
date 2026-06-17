@@ -9,6 +9,7 @@ import os
 import sys
 import traceback
 from datetime import datetime, timezone
+from pathlib import Path
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -20,6 +21,15 @@ except ImportError:
     sys.exit(1)
 
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+
+try:
+    from google import genai as _genai_vertex
+    from google.oauth2 import service_account
+    import google.auth
+    VERTEX_AVAILABLE = True
+except ImportError:
+    print("Ejecuta: pip install google-genai google-auth")
+    VERTEX_AVAILABLE = False
 
 try:
     from supabase import create_client as _supabase_create_client
@@ -50,6 +60,31 @@ EMBED_MODEL   = "text-embedding-004"
 GEMINI_MODEL  = "gemini-2.5-flash"
 TOP_K        = 6
 MAX_TOKENS   = 16384
+
+SA_KEY_FILE  = Path("gemini_service_account.json")
+GCP_PROJECT  = "gen-lang-client-0826649426"
+GCP_LOCATION = "us-central1"
+
+_embed_client = None
+
+def _get_embed_client():
+    global _embed_client
+    if _embed_client is None:
+        scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+        if SA_KEY_FILE.exists():
+            creds = service_account.Credentials.from_service_account_file(
+                str(SA_KEY_FILE), scopes=scopes
+            )
+        else:
+            creds, _ = google.auth.default(scopes=scopes)
+        _embed_client = _genai_vertex.Client(
+            vertexai=True, project=GCP_PROJECT, location=GCP_LOCATION, credentials=creds
+        )
+    return _embed_client
+
+def _embed(text: str) -> list:
+    response = _get_embed_client().models.embed_content(model=EMBED_MODEL, contents=text)
+    return list(response.embeddings[0].values)
 
 MONGO_URI = "mongodb+srv://elfloema:123jaboneS!@cluster0.ymjxhlu.mongodb.net/?appName=Cluster0"
 MONGO_DB  = "elfloema"
@@ -127,11 +162,7 @@ def _row_to_article(row):
 
 def search_articles(query, top_k=TOP_K):
     try:
-        result    = genai.embed_content(
-            model=f"models/{EMBED_MODEL}",
-            content=query,
-        )
-        embedding = result["embedding"]
+        embedding = _embed(query)
         client    = _get_supabase()
         plant_key = _detect_plant_key(query)
 
@@ -256,11 +287,7 @@ def _detect_formulacion_topic(query):
 
 def search_belleza_articles(query, top_k=TOP_K):
     try:
-        result    = genai.embed_content(
-            model=f"models/{EMBED_MODEL}",
-            content=query,
-        )
-        embedding = result["embedding"]
+        embedding = _embed(query)
         client    = _get_supabase()
         topic_key = _detect_belleza_topic(query)
 
@@ -365,11 +392,7 @@ def ask_gemini_belleza(question, articles, history):
 
 def search_formulacion_articles(query, top_k=TOP_K):
     try:
-        result    = genai.embed_content(
-            model=f"models/{EMBED_MODEL}",
-            content=query,
-        )
-        embedding = result["embedding"]
+        embedding = _embed(query)
         client    = _get_supabase()
         topic_key = _detect_formulacion_topic(query)
 
