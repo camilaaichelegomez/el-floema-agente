@@ -51,10 +51,13 @@ export default function BellezaPage() {
     setLoading(true);
 
     try {
-      const history = newMessages.slice(0, -1).map((m) => ({
-        role: m.role,
-        parts: [{ text: m.content }],
-      }));
+      const prevMessages = newMessages.slice(0, -1);
+      const history: { user: string; assistant: string }[] = [];
+      for (let i = 0; i + 1 < prevMessages.length; i += 2) {
+        if (prevMessages[i].role === "user" && prevMessages[i + 1].role === "model") {
+          history.push({ user: prevMessages[i].content, assistant: prevMessages[i + 1].content });
+        }
+      }
 
       const res = await fetch("https://el-floema-agente.onrender.com/ask-belleza", {
         method: "POST",
