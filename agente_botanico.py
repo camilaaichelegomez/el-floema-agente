@@ -394,7 +394,9 @@ def search_formulacion_articles(query, top_k=TOP_K):
 
         return (priority + rest)[:top_k]
     except Exception as e:
+        import traceback
         print(f"Supabase formulacion no disponible: {e}")
+        print(traceback.format_exc())
         return []
 
 def ask_gemini_formulacion(question, articles, history):
