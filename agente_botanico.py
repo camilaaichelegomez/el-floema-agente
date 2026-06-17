@@ -15,21 +15,13 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 try:
-    import google.generativeai as genai
-except ImportError:
-    print("Ejecuta: pip install google-generativeai")
-    sys.exit(1)
-
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-
-try:
-    from google import genai as _genai_vertex
+    from google import genai
+    from google.genai import types as genai_types
     from google.oauth2 import service_account
     import google.auth
-    VERTEX_AVAILABLE = True
 except ImportError:
     print("Ejecuta: pip install google-genai google-auth")
-    VERTEX_AVAILABLE = False
+    sys.exit(1)
 
 try:
     from supabase import create_client as _supabase_create_client
@@ -65,11 +57,11 @@ SA_KEY_FILE  = Path("gemini_service_account.json")
 GCP_PROJECT  = "gen-lang-client-0826649426"
 GCP_LOCATION = "us-central1"
 
-_embed_client = None
+_gemini_client = None
 
-def _get_embed_client():
-    global _embed_client
-    if _embed_client is None:
+def _get_gemini_client():
+    global _gemini_client
+    if _gemini_client is None:
         scopes = ["https://www.googleapis.com/auth/cloud-platform"]
         if SA_KEY_FILE.exists():
             creds = service_account.Credentials.from_service_account_file(
@@ -77,13 +69,13 @@ def _get_embed_client():
             )
         else:
             creds, _ = google.auth.default(scopes=scopes)
-        _embed_client = _genai_vertex.Client(
+        _gemini_client = genai.Client(
             vertexai=True, project=GCP_PROJECT, location=GCP_LOCATION, credentials=creds
         )
-    return _embed_client
+    return _gemini_client
 
 def _embed(text: str) -> list:
-    response = _get_embed_client().models.embed_content(model=EMBED_MODEL, contents=text)
+    response = _get_gemini_client().models.embed_content(model=EMBED_MODEL, contents=text)
     return list(response.embeddings[0].values)
 
 MONGO_URI = "mongodb+srv://elfloema:123jaboneS!@cluster0.ymjxhlu.mongodb.net/?appName=Cluster0"
@@ -363,10 +355,14 @@ def ask_gemini(question, articles, history):
         history_block += f"Usuario: {turn['user']}\nAgente: {turn['assistant']}\n"
     prompt = f"HISTORIAL:\n{history_block}\nPREGUNTA: {question}\n\nEVIDENCIA CIENTIFICA:\n{context}\n\nResponde integrando la evidencia, citando con [N]."
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT)
-        response = model.generate_content(
-            prompt,
-            generation_config={"max_output_tokens": MAX_TOKENS, "temperature": 0.7},
+        response = _get_gemini_client().models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                max_output_tokens=MAX_TOKENS,
+                temperature=0.7,
+            ),
         )
         return response.text.strip()
     except Exception as e:
@@ -381,10 +377,14 @@ def ask_gemini_belleza(question, articles, history):
         f"HISTORIAL:\n{history_block}\n" if history_block else ""
     ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde integrando la evidencia cuando sea relevante, citando con [N]."
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT_BELLEZA)
-        response = model.generate_content(
-            prompt,
-            generation_config={"max_output_tokens": 1024, "temperature": 0.75},
+        response = _get_gemini_client().models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT_BELLEZA,
+                max_output_tokens=1024,
+                temperature=0.75,
+            ),
         )
         return response.text.strip()
     except Exception as e:
@@ -431,10 +431,14 @@ def ask_gemini_formulacion(question, articles, history):
         f"HISTORIAL:\n{history_block}\n" if history_block else ""
     ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde con precisión técnica, citando evidencia con [N] cuando esté disponible."
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT_FORMULACION)
-        response = model.generate_content(
-            prompt,
-            generation_config={"max_output_tokens": 1024, "temperature": 0.7},
+        response = _get_gemini_client().models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT_FORMULACION,
+                max_output_tokens=1024,
+                temperature=0.7,
+            ),
         )
         return response.text.strip()
     except Exception as e:
