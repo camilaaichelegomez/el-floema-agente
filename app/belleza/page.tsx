@@ -63,9 +63,11 @@ export default function BellezaPage() {
       });
 
       const data = await res.json();
-      const answer = data.answer ?? data.error ?? "No se pudo obtener respuesta.";
+      if (!res.ok) console.error("/ask-belleza error:", res.status, data);
+      const answer = data.response ?? data.error ?? "No se pudo obtener respuesta.";
       setMessages((prev) => [...prev, { role: "model", content: answer }]);
-    } catch {
+    } catch (err) {
+      console.error("/ask-belleza fetch error:", err);
       setMessages((prev) => [
         ...prev,
         { role: "model", content: "Hubo un error de conexión. Por favor intenta de nuevo." },
