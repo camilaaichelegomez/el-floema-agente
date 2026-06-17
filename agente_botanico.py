@@ -53,7 +53,7 @@ GEMINI_MODEL  = "gemini-2.5-flash"
 TOP_K        = 6
 MAX_TOKENS   = 16384
 
-SA_KEY_FILE  = Path("gemini_service_account.json")
+SA_KEY_FILE  = Path(__file__).parent / "gemini_service_account.json"
 GCP_PROJECT  = "gen-lang-client-0826649426"
 GCP_LOCATION = "us-central1"
 
