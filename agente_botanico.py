@@ -62,8 +62,13 @@ _gemini_client = None
 def _get_gemini_client():
     global _gemini_client
     if _gemini_client is None:
+        import json as _json
         scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-        if SA_KEY_FILE.exists():
+        credentials_json = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+        if credentials_json:
+            info = _json.loads(credentials_json)
+            creds = service_account.Credentials.from_service_account_info(info, scopes=scopes)
+        elif SA_KEY_FILE.exists():
             creds = service_account.Credentials.from_service_account_file(
                 str(SA_KEY_FILE), scopes=scopes
             )
