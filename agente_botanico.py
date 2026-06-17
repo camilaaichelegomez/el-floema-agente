@@ -200,6 +200,60 @@ def _detect_belleza_topic(query):
             return key
     return None
 
+_FORMULACION_TOPIC_ALIASES = {
+    "shampoo sólido":        "solid_shampoo_syndet_bar",
+    "shampoo solido":        "solid_shampoo_syndet_bar",
+    "syndet":                "solid_shampoo_syndet_bar",
+    "shampoo":               "shampoo_formulation_surfactants",
+    "surfactante":           "shampoo_formulation_surfactants",
+    "crema":                 "cream_emulsion_cosmetic",
+    "emulsión":              "cream_emulsion_cosmetic",
+    "emulsion":              "cream_emulsion_cosmetic",
+    "emulsionante":          "emulsifiers_natural_cosmetics",
+    "emulsificante":         "emulsifiers_natural_cosmetics",
+    "ungüento":              "ointment_pomade_topical",
+    "unguento":              "ointment_pomade_topical",
+    "pomada":                "ointment_pomade_topical",
+    "sérum":                 "serum_active_ingredients_skin",
+    "serum":                 "serum_active_ingredients_skin",
+    "activo":                "serum_active_ingredients_skin",
+    "penetración":           "skin_penetration_active_ingredients",
+    "penetracion":           "skin_penetration_active_ingredients",
+    "mantequilla":           "body_butter_natural",
+    "loción":                "body_lotion_moisturizer",
+    "locion":                "body_lotion_moisturizer",
+    "hidratante":            "body_lotion_moisturizer",
+    "exfoliante":            "body_scrub_exfoliant",
+    "scrub":                 "body_scrub_exfoliant",
+    "limpiador facial":      "facial_cleanser_syndet",
+    "limpiador":             "facial_cleanser_syndet",
+    "antiedad":              "facial_cream_antiaging",
+    "anti-edad":             "facial_cream_antiaging",
+    "antienvejecimiento":    "facial_cream_antiaging",
+    "acondicionador":        "hair_conditioner_ingredients",
+    "mascarilla capilar":    "hair_treatment_mask_conditioning",
+    "mascarilla":            "hair_treatment_mask_conditioning",
+    "conservante":           "natural_preservatives_cosmetics",
+    "preservante":           "natural_preservatives_cosmetics",
+    "extracto":              "plant_extracts_cosmetic_efficacy",
+    "sales de baño":         "bath_salts_minerals_skin",
+    "sales":                 "bath_salts_minerals_skin",
+    "baño de espuma":        "bath_foam_bubble_bath",
+    "espuma de baño":        "bath_foam_bubble_bath",
+    "jabón":                 "soap_cold_process_natural",
+    "jabon":                 "soap_cold_process_natural",
+    "espesante":             "thickeners_rheology_cosmetics",
+    "reología":              "thickeners_rheology_cosmetics",
+    "reologia":              "thickeners_rheology_cosmetics",
+}
+
+def _detect_formulacion_topic(query):
+    q = query.lower()
+    for alias, key in _FORMULACION_TOPIC_ALIASES.items():
+        if alias in q:
+            return key
+    return None
+
 def search_belleza_articles(query, top_k=TOP_K):
     try:
         result    = genai.embed_content(
@@ -235,6 +289,8 @@ def search_belleza_articles(query, top_k=TOP_K):
         return []
 
 SYSTEM_PROMPT_BELLEZA = """Eres Floema, asesora de belleza botánica de El Floema. Eres experta en rutinas de cuidado de piel y cabello con plantas nativas, cosmética natural, yoga facial, masaje facial, drenaje linfático y cómo la alimentación afecta la piel. Hablas en español con tono cálido y científico. No das diagnósticos médicos ni recetas de tratamientos — solo orientación cosmética y de bienestar."""
+
+SYSTEM_PROMPT_FORMULACION = """Eres Floema, asistente de formulación cosmética experta. Ayudas a Camila a formular sus propios productos: shampoos sólidos, syndets faciales, cremas, ungüentos, mantequillas corporales, sérums, sales de baño, jabones. Conoces ingredientes, porcentajes seguros, fases de emulsión, conservantes naturales, emulsionantes, y compatibilidad de activos. Respondes con precisión técnica de formuladora profesional, citando evidencia cuando esté disponible. Esta herramienta es de uso personal e interno, no para consumidores finales."""
 
 SYSTEM_PROMPT = """Eres un guía de medicina integrativa y botánica para El Floema, una plataforma de conocimiento sobre plantas medicinales y salud holística. Tu misión es EDUCAR — no solo decir qué hacer, sino explicar el PORQUÉ detrás de cada recomendación, para que la persona comprenda su cuerpo y tome decisiones informadas.
 
@@ -302,6 +358,58 @@ def ask_gemini_belleza(question, articles, history):
         response = model.generate_content(
             prompt,
             generation_config={"max_output_tokens": 1024, "temperature": 0.75},
+        )
+        return response.text.strip()
+    except Exception as e:
+        return f"[Error Gemini: {e}]"
+
+def search_formulacion_articles(query, top_k=TOP_K):
+    try:
+        result    = genai.embed_content(
+            model=f"models/{EMBED_MODEL}",
+            content=query,
+        )
+        embedding = result["embedding"]
+        client    = _get_supabase()
+        topic_key = _detect_formulacion_topic(query)
+
+        fetch_count = top_k * 2 if topic_key else top_k
+        res = client.rpc("buscar_articulos_formulacion", {
+            "query_embedding": embedding,
+            "match_count": fetch_count,
+        }).execute()
+
+        seen     = set()
+        priority = []
+        rest     = []
+        for row in res.data:
+            a = _row_to_article(row)
+            if a["title"] in seen:
+                continue
+            seen.add(a["title"])
+            if topic_key and a["plant_key"] == topic_key:
+                priority.append(a)
+            else:
+                rest.append(a)
+
+        return (priority + rest)[:top_k]
+    except Exception as e:
+        print(f"Supabase formulacion no disponible: {e}")
+        return []
+
+def ask_gemini_formulacion(question, articles, history):
+    context = format_context(articles) if articles else "(Sin evidencia científica disponible)"
+    history_block = ""
+    for turn in history[-6:]:
+        history_block += f"Usuario: {turn['user']}\nFloema: {turn['assistant']}\n"
+    prompt = (
+        f"HISTORIAL:\n{history_block}\n" if history_block else ""
+    ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde con precisión técnica, citando evidencia con [N] cuando esté disponible."
+    try:
+        model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=SYSTEM_PROMPT_FORMULACION)
+        response = model.generate_content(
+            prompt,
+            generation_config={"max_output_tokens": 1024, "temperature": 0.7},
         )
         return response.text.strip()
     except Exception as e:
@@ -967,6 +1075,25 @@ def create_app():
             })
         except Exception as e:
             print("ERROR EN /ask-belleza:", traceback.format_exc())
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/ask-formulacion", methods=["POST"])
+    def ask_formulacion():
+        try:
+            data     = request.get_json()
+            question = data.get("question", "").strip()
+            history  = data.get("history", [])
+            if not question:
+                return jsonify({"error": "Pregunta vacia"}), 400
+            articles = search_formulacion_articles(question)
+            response = ask_gemini_formulacion(question, articles, history)
+            return jsonify({
+                "response":       response,
+                "sources_count":  len(articles),
+                "top_similarity": articles[0]["similarity"] if articles else 0,
+            })
+        except Exception as e:
+            print("ERROR EN /ask-formulacion:", traceback.format_exc())
             return jsonify({"error": str(e)}), 500
 
     @app.route("/health")
