@@ -42,6 +42,8 @@ export default function Navbar() {
           <li><Link href="/recetas"      onClick={close}>Recetas</Link></li>
           <li><Link href="/blog"         onClick={close}>Blog</Link></li>
           <li><Link href="/belleza"      onClick={close}>Belleza</Link></li>
+          <li><Link href="/formulacion"  onClick={close}>Formulación</Link></li>
+          <li><Link href="/agente"       onClick={close}>Agente</Link></li>
         </ul>
       </div>
     </nav>
