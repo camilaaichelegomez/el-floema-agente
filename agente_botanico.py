@@ -441,7 +441,7 @@ def ask_gemini_formulacion(question, articles, history):
             contents=prompt,
             config=genai_types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT_FORMULACION,
-                max_output_tokens=1024,
+                max_output_tokens=2048,
                 temperature=0.7,
             ),
         )
