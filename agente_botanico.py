@@ -391,6 +391,11 @@ def ask_gemini_belleza(question, articles, history):
                 temperature=0.75,
             ),
         )
+        try:
+            finish_reason = response.candidates[0].finish_reason
+        except Exception:
+            finish_reason = "unknown"
+        print(f"[belleza] finish_reason={finish_reason} tokens~{len(response.text)//4}")
         return response.text.strip()
     except Exception as e:
         return f"[Error Gemini: {e}]"
