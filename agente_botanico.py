@@ -444,16 +444,25 @@ def ask_gemini_formulacion(question, articles, history):
     prompt = (
         f"HISTORIAL:\n{history_block}\n" if history_block else ""
     ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde con precisión técnica, citando evidencia con [N] cuando esté disponible."
+    sys_tokens    = len(SYSTEM_PROMPT_FORMULACION) // 4
+    ctx_tokens    = len(context) // 4
+    prompt_tokens = len(prompt) // 4
+    print(f"[formulacion] prompt_tokens~ system={sys_tokens} rag={ctx_tokens} prompt={prompt_tokens} total={sys_tokens+prompt_tokens}", flush=True)
     try:
         response = _get_gemini_client().models.generate_content(
             model=GEMINI_MODEL,
             contents=prompt,
             config=genai_types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT_FORMULACION,
-                max_output_tokens=2048,
+                max_output_tokens=4096,
                 temperature=0.7,
             ),
         )
+        try:
+            finish_reason = response.candidates[0].finish_reason
+        except Exception:
+            finish_reason = "unknown"
+        print(f"[formulacion] finish_reason={finish_reason} output_tokens~{len(response.text)//4}", flush=True)
         return response.text.strip()
     except Exception as e:
         return f"[Error Gemini: {e}]"
