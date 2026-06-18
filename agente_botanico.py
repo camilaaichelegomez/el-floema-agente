@@ -381,6 +381,10 @@ def ask_gemini_belleza(question, articles, history):
     prompt = (
         f"HISTORIAL:\n{history_block}\n" if history_block else ""
     ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde integrando la evidencia cuando sea relevante, citando con [N]."
+    sys_tokens   = len(SYSTEM_PROMPT_BELLEZA) // 4
+    ctx_tokens   = len(context) // 4
+    prompt_tokens = len(prompt) // 4
+    print(f"[belleza] prompt_tokens~ system={sys_tokens} rag={ctx_tokens} prompt={prompt_tokens} total={sys_tokens+prompt_tokens}", flush=True)
     try:
         response = _get_gemini_client().models.generate_content(
             model=GEMINI_MODEL,
@@ -395,7 +399,7 @@ def ask_gemini_belleza(question, articles, history):
             finish_reason = response.candidates[0].finish_reason
         except Exception:
             finish_reason = "unknown"
-        print(f"[belleza] finish_reason={finish_reason} tokens~{len(response.text)//4}", flush=True)
+        print(f"[belleza] finish_reason={finish_reason} output_tokens~{len(response.text)//4}", flush=True)
         return response.text.strip()
     except Exception as e:
         return f"[Error Gemini: {e}]"
