@@ -387,7 +387,7 @@ def ask_gemini_belleza(question, articles, history):
             contents=prompt,
             config=genai_types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT_BELLEZA,
-                max_output_tokens=2048,
+                max_output_tokens=800,
                 temperature=0.75,
             ),
         )
