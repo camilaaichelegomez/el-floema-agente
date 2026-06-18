@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import { ParallaxHero } from "@/components/ParallaxHero";
+import { AgentesIA } from "@/components/AgentesIA";
 import { PlantasMedicinalesSection } from "@/components/PlantasMedicinalesSection";
 import { KnowledgeCards } from "@/components/KnowledgeCards";
 import { SectionDivider } from "@/components/SectionDivider";
@@ -11,6 +12,7 @@ export default function Home() {
     <>
       <Navbar />
       <ParallaxHero />
+      <AgentesIA />
       <PlantasMedicinalesSection />
       <section style={{ background: "var(--bg-primary)" }}>
         <KnowledgeCards />
