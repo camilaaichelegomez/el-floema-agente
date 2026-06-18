@@ -156,7 +156,7 @@ export function ParallaxHero() {
           className="parallax-hero__bottom-deco"
           aria-hidden="true"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
+          animate={{ opacity: 0.6 }}
           transition={{ duration: 1.2, delay: 0.65, ease: "easeOut" }}
         >
           <span className="parallax-hero__deco-line" />

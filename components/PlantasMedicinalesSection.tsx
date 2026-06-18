@@ -52,10 +52,10 @@ function PanelContenido({ id }: { id: string }) {
   const baseParrafo: React.CSSProperties = {
     fontFamily: "var(--font-body)",
     fontStyle: "italic",
-    fontSize: "0.88rem",
+    fontSize: "1.05rem",
     color: CREAM,
     opacity: 0.55,
-    lineHeight: 1.65,
+    lineHeight: 1.75,
     margin: 0,
   };
 
@@ -121,10 +121,10 @@ function PanelContenido({ id }: { id: string }) {
               style={{
                 fontFamily: "var(--font-body)",
                 fontStyle: "italic",
-                fontSize: "0.8rem",
+                fontSize: "1.05rem",
                 color: CREAM,
                 opacity: 0.45,
-                lineHeight: 1.55,
+                lineHeight: 1.75,
                 margin: 0,
               }}
             >
@@ -166,9 +166,12 @@ function AccordionItem({
       className={`accordion-item${isOpen ? " active" : ""}`}
       style={{
         border: `1px solid ${isOpen ? "#7a4a8a" : "rgba(200,160,80,0.12)"}`,
+        borderLeft: isOpen ? "2px solid var(--color-gold)" : "2px solid rgba(200,160,80,0.4)",
         borderRadius: "0.5rem",
         overflow: "hidden",
-        transition: "border-color 0.3s",
+        transition: "border-color 0.3s, border-left-color 0.3s",
+        background: isOpen ? "transparent" : "rgba(200,160,80,0.04)",
+        paddingLeft: isOpen ? undefined : "1rem",
       }}
     >
       <button
@@ -302,6 +305,10 @@ function PlantCard({ planta, index }: { planta: Planta; index: number }) {
             color: GOLD,
             display: "block",
             lineHeight: 1.2,
+            borderBottom: "1px solid rgba(200,160,80,0.12)",
+            paddingBottom: "0.35rem",
+            width: "100%",
+            textAlign: "center",
           }}
         >
           {planta.nombre}
@@ -316,14 +323,15 @@ function PlantCard({ planta, index }: { planta: Planta; index: number }) {
             justifyContent: "center",
           }}
         >
-          {planta.propiedades.slice(0, 2).map((prop, idx) => (
-            <span
-              key={prop}
-              className={`plant-prop-tag ${idx % 2 === 0 ? "odd" : "even"}`}
-            >
-              {prop}
-            </span>
-          ))}
+          {planta.propiedades.slice(0, 2).map((prop) => {
+            const purpleProps = new Set(["sedante","hemostático","emenagogo","antiespasmódico"]);
+            const cls = purpleProps.has(prop.toLowerCase()) ? "odd" : "even";
+            return (
+              <span key={prop} className={`plant-prop-tag ${cls}`}>
+                {prop}
+              </span>
+            );
+          })}
         </span>
         {/* puntos decorativos morados */}
         <span className="planta-card__dot tl" />

@@ -70,13 +70,14 @@ function ProductCard({
       style={{
         background: "#0f1a0f",
         border: `1px solid ${hovered ? "rgba(122,74,138,0.65)" : "rgba(200,160,80,0.18)"}`,
+        borderRadius: "4px",
         overflow: "hidden",
         position: "relative",
         display: "flex",
         flexDirection: "column",
         boxShadow: hovered
           ? "0 32px 70px rgba(0,0,0,0.8), 0 0 40px rgba(122,74,138,0.18), inset 0 1px 0 rgba(122,74,138,0.08)"
-          : "none",
+          : "0 4px 24px rgba(0,0,0,0.4), inset 0 1px rgba(200,160,80,0.06)",
         transition: "border-color 0.4s, box-shadow 0.4s",
       }}
     >
@@ -128,7 +129,7 @@ function ProductCard({
           borderBottom: "1px solid rgba(200,160,80,0.08)",
           position: "relative",
           overflow: "hidden",
-          background: `radial-gradient(ellipse 70% 60% at 50% 55%, ${producto.accent} 0%, transparent 70%), linear-gradient(160deg, #0f200f 0%, #0b160b 100%)`,
+          background: `radial-gradient(ellipse 70% 60% at 50% 55%, ${producto.accent} 0%, transparent 70%), linear-gradient(135deg, #152515 0%, #0d1a0d 100%)`,
           filter: hovered ? "brightness(1.1)" : "brightness(1)",
           transition: "filter 0.4s",
         }}
@@ -175,11 +176,13 @@ function ProductCard({
           <p
             style={{
               fontFamily: "var(--font-grimoire)",
-              fontSize: "0.5rem",
-              letterSpacing: "0.16em",
+              fontSize: "0.62rem",
+              letterSpacing: "0.2em",
               textTransform: "uppercase",
               color: "rgba(154,106,170,0.7)",
               margin: "0 0 0.2rem",
+              borderBottom: "1px solid rgba(200,160,80,0.2)",
+              paddingBottom: "0.4rem",
             }}
           >
             {producto.categoria}
@@ -243,13 +246,13 @@ function ProductCard({
             }}
             style={{
               fontFamily: "var(--font-grimoire)",
-              fontSize: "0.52rem",
+              fontSize: "0.68rem",
               letterSpacing: "0.16em",
               textTransform: "uppercase",
               color: added ? GOLD_LIGHT : GOLD,
               background: added ? "rgba(200,160,80,0.08)" : "transparent",
               border: `1px solid ${added ? "rgba(232,200,120,0.6)" : "rgba(200,160,80,0.45)"}`,
-              padding: "0.48rem 0.95rem",
+              padding: "0.6rem 1.2rem",
               cursor: "pointer",
               whiteSpace: "nowrap",
               transition: "background 0.25s, border-color 0.25s, color 0.25s",
@@ -269,7 +272,7 @@ export function LaBotica() {
       style={{
         position: "relative",
         background: "#060b06",
-        padding: "clamp(5.5rem,10vh,9rem) clamp(1.5rem,5vw,5rem)",
+        padding: "clamp(5.5rem,10vh,9rem) clamp(1.5rem,5vw,5rem) clamp(3rem,5vh,5rem)",
         overflow: "hidden",
         borderTop: "1px solid rgba(122,74,138,0.18)",
       }}
@@ -404,7 +407,7 @@ export function LaBotica() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
           gap: "clamp(1rem,2vw,1.75rem)",
           maxWidth: 1160,
           margin: "0 auto",
@@ -428,7 +431,7 @@ export function LaBotica() {
           background:
             "linear-gradient(to right, transparent, rgba(200,160,80,0.12), transparent)",
           maxWidth: 500,
-          margin: "clamp(3.5rem,7vh,6rem) auto 0",
+          margin: "clamp(2rem,4vh,3.5rem) auto 0",
           position: "relative",
           zIndex: 1,
         }}

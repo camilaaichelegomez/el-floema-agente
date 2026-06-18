@@ -197,10 +197,13 @@ export function NavCards() {
               <span className="nav-card-gem tr" aria-hidden="true" />
               <span className="nav-card-gem bl" aria-hidden="true" />
               <span className="nav-card-gem br" aria-hidden="true" />
-              <span className="nav-card-icon">
-                <Icon />
-              </span>
-              <span className="nav-card-title">{label}</span>
+              <span className="grimorio-card-gradient" aria-hidden="true" />
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", alignItems: "center", position: "relative", zIndex: 2 }}>
+                <span className="nav-card-icon">
+                  <Icon />
+                </span>
+                <span className="nav-card-title">{label}</span>
+              </div>
             </a>
           </motion.li>
         ))}

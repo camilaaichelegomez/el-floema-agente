@@ -4,7 +4,7 @@ const AGENTES = [
   {
     href: "/agente",
     icon: (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 44, height: 44 }}>
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34 }}>
         <path d="M24 6C24 6 10 14 10 26C10 33.7 16.3 40 24 40C31.7 40 38 33.7 38 26C38 14 24 6Z" stroke="#c8a050" strokeWidth="1.5" fill="rgba(200,160,80,0.06)"/>
         <path d="M24 40V22" stroke="#c8a050" strokeWidth="1.5" strokeLinecap="round"/>
         <path d="M24 28C24 28 18 24 16 18" stroke="#c8a050" strokeWidth="1.2" strokeLinecap="round"/>
@@ -16,12 +16,12 @@ const AGENTES = [
     descripcion: "Consulta sobre plantas medicinales, fitoterapia, Ayurveda y Medicina Tradicional China",
     etiqueta: "6.029 artículos científicos",
     color: "rgba(80,160,80,0.12)",
-    border: "rgba(80,160,80,0.3)",
+    border: "rgba(200,160,80,0.35)",
   },
   {
     href: "/belleza",
     icon: (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 44, height: 44 }}>
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34 }}>
         <circle cx="24" cy="20" r="7" stroke="#c8a050" strokeWidth="1.5" fill="rgba(200,160,80,0.06)"/>
         <path d="M24 13C24 13 24 6 24 4" stroke="#c8a050" strokeWidth="1.2" strokeLinecap="round"/>
         <path d="M24 27C24 27 24 34 24 36" stroke="#c8a050" strokeWidth="1.2" strokeLinecap="round"/>
@@ -37,12 +37,12 @@ const AGENTES = [
     descripcion: "Rutinas personalizadas para tu piel y cabello con el respaldo de la botánica",
     etiqueta: "649 artículos científicos",
     color: "rgba(160,80,140,0.10)",
-    border: "rgba(160,80,140,0.3)",
+    border: "rgba(200,160,80,0.35)",
   },
   {
     href: "/formulacion",
     icon: (
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 44, height: 44 }}>
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 34, height: 34 }}>
         <path d="M18 6H30V16L38 32C39.5 35 37.5 40 34 40H14C10.5 40 8.5 35 10 32L18 16V6Z" stroke="#c8a050" strokeWidth="1.5" fill="rgba(200,160,80,0.06)"/>
         <path d="M16 6H32" stroke="#c8a050" strokeWidth="1.5" strokeLinecap="round"/>
         <path d="M13 30H35" stroke="#c8a050" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
@@ -56,7 +56,7 @@ const AGENTES = [
     descripcion: "Formula tus propios cosméticos con respaldo científico: cremas, shampoos, sérums y más",
     etiqueta: "935 artículos científicos",
     color: "rgba(80,120,200,0.08)",
-    border: "rgba(80,120,200,0.25)",
+    border: "rgba(200,160,80,0.35)",
   },
 ];
 
@@ -144,7 +144,7 @@ export function AgentesIA() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "1.5rem",
+            gap: "2rem",
           }}
         >
           {AGENTES.map((a) => (
@@ -168,6 +168,7 @@ export function AgentesIA() {
                   transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
                   position: "relative",
                   overflow: "hidden",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.4), inset 0 1px rgba(200,160,80,0.06)",
                 }}
               >
                 {/* Brillo de esquina */}
@@ -186,8 +187,8 @@ export function AgentesIA() {
                 {/* Icono */}
                 <div
                   style={{
-                    width: 64,
-                    height: 64,
+                    width: 72,
+                    height: 72,
                     borderRadius: "0.75rem",
                     background: "rgba(200,160,80,0.06)",
                     border: "1px solid rgba(200,160,80,0.2)",
@@ -242,11 +243,11 @@ export function AgentesIA() {
                   <span
                     style={{
                       fontFamily: "var(--font-grimoire)",
-                      fontSize: "0.52rem",
+                      fontSize: "0.72rem",
                       letterSpacing: "0.18em",
                       textTransform: "uppercase",
                       color: "var(--color-gold)",
-                      opacity: 0.45,
+                      opacity: 0.70,
                     }}
                   >
                     {a.etiqueta}

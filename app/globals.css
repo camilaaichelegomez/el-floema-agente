@@ -16,9 +16,9 @@
   color: #d4c4a0;
 }
 .plant-prop-tag.even {
-  background: rgba(200,160,80,0.2);
-  color: #c8a050;
-  border-color: #c8a050;
+  background: rgba(200,160,80,0.15);
+  border: 1px solid rgba(200,160,80,0.4);
+  color: var(--color-gold-light);
 }
 
 /* --- PLANT CARD DECORATIVE DOTS --- */
@@ -70,10 +70,11 @@ h2.section-title,
 :root {
   --bg-primary:   #0d1a0d;
   --bg-secondary: #1a2e1a;
-  --bg-card:      #152515;
+  --bg-card:      #131f13;
   --bg-purple:    #2a1535;
   --color-gold:       #c8a050;
   --color-gold-light: #e8c070;
+  --color-gold-dim:   rgba(200, 160, 80, 0.35);
   --color-cream:  #d4c4a0;
   --color-purple:       #7a4a8a;
   --color-purple-light: #9a6aaa;
@@ -81,6 +82,8 @@ h2.section-title,
   --color-green:  #3d5228;
   --font-grimoire: var(--font-cinzel), 'Cinzel', serif;
   --font-body:     var(--font-crimson), 'Crimson Text', serif;
+  --border-radius-card: 4px;
+  --spacing-section: clamp(5rem, 9vh, 8rem);
 }
 
 /* ── RESET & BASE ───────────────────────────────────────── */
@@ -157,15 +160,15 @@ a:hover { color: var(--color-gold-light); }
   text-decoration: none;
 }
 .navbar-logo img {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
   border-radius: 50%;
   border: 1px solid rgba(200, 160, 80, 0.3);
 }
 .navbar-title {
   font-family: var(--font-grimoire);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--color-gold);
@@ -173,7 +176,7 @@ a:hover { color: var(--color-gold-light); }
 }
 .navbar-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.4rem;
   list-style: none;
 }
 .navbar-links a {
@@ -184,10 +187,22 @@ a:hover { color: var(--color-gold-light); }
   color: var(--color-cream);
   opacity: 0.7;
   transition: color 0.3s, opacity 0.3s;
+  position: relative;
+}
+.navbar-links a::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--color-gold);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
 }
 .navbar-links a:hover {
   color: var(--color-gold);
   opacity: 1;
+}
+.navbar-links a:hover::after {
+  transform: scaleX(1);
 }
 .navbar-burger {
   display: none;
@@ -336,23 +351,22 @@ a:hover { color: var(--color-gold-light); }
 .parallax-hero__cta {
   display: inline-block;
   font-family: var(--font-grimoire);
-  font-size: 0.68rem;
-  letter-spacing: 0.25em;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--bg-primary);
-  background: var(--color-gold);
-  border: none;
-  padding: 1rem 3rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1.5px solid var(--color-gold);
+  padding: 1rem 2.8rem;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  transition: background 0.3s, box-shadow 0.3s;
   text-decoration: none;
-  clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0% 50%);
+  margin-top: 2.5rem;
 }
 .parallax-hero__cta:hover {
-  background: var(--color-gold-light);
-  color: var(--bg-primary);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 40px rgba(200, 160, 80, 0.25);
+  background: rgba(200, 160, 80, 0.12);
+  box-shadow: 0 0 24px rgba(200, 160, 80, 0.25);
+  color: var(--color-gold);
 }
 .parallax-hero__bottom-deco {
   display: flex;
@@ -360,7 +374,7 @@ a:hover { color: var(--color-gold-light); }
   gap: 0.8rem;
   margin-top: 3rem;
   width: clamp(120px, 20vw, 220px);
-  opacity: 0.3;
+  opacity: 0.6;
 }
 .parallax-hero__deco-line {
   flex: 1;
@@ -658,7 +672,7 @@ a:hover { color: var(--color-gold-light); }
   background: #090f09;
   padding: 4.5rem 2rem 3rem;
   text-align: center;
-  border-top: 1px solid rgba(200, 160, 80, 0.1);
+  border-top: 1px solid rgba(200, 160, 80, 0.2);
   position: relative;
 }
 .site-footer::before {
@@ -692,10 +706,10 @@ a:hover { color: var(--color-gold-light); }
 }
 .footer-handle {
   font-family: var(--font-grimoire);
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   letter-spacing: 0.3em;
   color: var(--color-gold);
-  opacity: 0.3;
+  opacity: 0.5;
   text-transform: uppercase;
 }
 
@@ -859,6 +873,21 @@ a:hover { color: var(--color-gold-light); }
   border-bottom-left-radius:  0;
   border-bottom-right-radius: 0;
   padding-top: 3.5rem;
+  justify-content: flex-end;
+  padding-bottom: 2.5rem;
+}
+.grimorio-card .nav-card-icon {
+  margin-bottom: 0;
+}
+
+/* Gradient inferior */
+.grimorio-card-gradient {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(7, 14, 7, 0.7) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Alturas alternadas — ritmo visual */
@@ -1258,7 +1287,7 @@ a:hover { color: var(--color-gold-light); }
 
 .botica-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: clamp(1rem, 2vw, 1.75rem);
   max-width: 1160px;
   margin: 0 auto;
@@ -1270,6 +1299,7 @@ a:hover { color: var(--color-gold-light); }
 .botica-card {
   background: #111c11;
   border: 1px solid rgba(200, 160, 80, 0.2);
+  border-radius: var(--border-radius-card);
   overflow: hidden;
   transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
   position: relative;
@@ -1356,11 +1386,13 @@ a:hover { color: var(--color-gold-light); }
 }
 .botica-card__subtitulo {
   font-family: var(--font-grimoire);
-  font-size: 0.52rem;
-  letter-spacing: 0.18em;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(200, 160, 80, 0.45);
   margin: 0 0 0.1rem;
+  border-bottom: 1px solid rgba(200, 160, 80, 0.2);
+  padding-bottom: 0.4rem;
 }
 .botica-card__nombre {
   font-family: var(--font-grimoire);
@@ -1399,13 +1431,13 @@ a:hover { color: var(--color-gold-light); }
 }
 .botica-card__btn {
   font-family: var(--font-grimoire);
-  font-size: 0.52rem;
+  font-size: 0.68rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-gold);
   background: transparent;
   border: 1px solid rgba(200, 160, 80, 0.45);
-  padding: 0.48rem 0.95rem;
+  padding: 0.6rem 1.2rem;
   cursor: pointer;
   transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.2s;
   white-space: nowrap;
