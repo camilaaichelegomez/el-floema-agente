@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 const IMAGES = [
-  { src: '/Gemini_Generated_Image_ (7).png', alt: 'La bruja en su laboratorio' },
-  { src: '/bosque-hero.jpg', alt: 'El bosque' },
-  { src: '/bosque-plantas.jpg', alt: 'Plantas del bosque' },
-  { src: '/bosque-agente.jpg', alt: 'Agente del bosque' },
+  { src: '/hero.png', alt: 'La bruja en su laboratorio' },
+  { src: '/bosque-1.jpg', alt: 'El bosque' },
+  { src: '/bosque-2.jpg', alt: 'Plantas del bosque' },
+  { src: '/bosque-3.jpg', alt: 'Adentro del bosque' },
 ];
 
 function clamp(value: number, min: number, max: number) {
