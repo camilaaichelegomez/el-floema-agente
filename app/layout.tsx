@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cinzel, Crimson_Text } from "next/font/google";
+import { Cinzel, Crimson_Text, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,13 @@ const crimsonText = Crimson_Text({
   style: ["normal", "italic"],
 });
 
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
   title: "El Floema — Con ciencia, mi magia despierta",
   description: "Cosmética botánica artesanal",
@@ -27,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={cn(cinzel.variable, crimsonText.variable)}>
+    <html lang="es" className={cn(cinzel.variable, crimsonText.variable, cormorant.variable)}>
       <body>{children}</body>
     </html>
   );
