@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import { ParallaxHero } from "@/components/ParallaxHero";
+import { PageBackground } from "@/components/PageBackground";
 import { AgentesIA } from "@/components/AgentesIA";
 import { PlantasMedicinalesSection } from "@/components/PlantasMedicinalesSection";
 import { KnowledgeCards } from "@/components/KnowledgeCards";
@@ -10,17 +11,14 @@ import { LaBotica } from "@/components/LaBotica";
 export default function Home() {
   return (
     <>
+      <PageBackground />
       <Navbar />
       <ParallaxHero />
       <AgentesIA />
       <PlantasMedicinalesSection />
-      <section style={{ background: "var(--bg-primary)" }}>
-        <KnowledgeCards />
-      </section>
+      <KnowledgeCards />
       <SectionDivider />
-      <section style={{ background: "var(--bg-secondary)" }}>
-        <NavCards />
-      </section>
+      <NavCards />
       <LaBotica />
       <footer className="site-footer">
         <img src="/logo.jpg" alt="El Floema" className="footer-logo" />
