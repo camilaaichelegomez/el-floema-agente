@@ -64,7 +64,7 @@ export function AgentesIA() {
   return (
     <section
       style={{
-        background: "var(--bg-primary)",
+        background: "rgba(13,26,13,0.78)",
         padding: "5rem 1.5rem 6rem",
         position: "relative",
         overflow: "hidden",

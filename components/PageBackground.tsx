@@ -66,7 +66,7 @@ export function PageBackground() {
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(13,35,24,0.55)',
+          background: 'rgba(13,35,24,0.3)',
         }}
       />
     </div>

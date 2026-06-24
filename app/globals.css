@@ -52,7 +52,7 @@ h2.section-title,
 
 /* --- BOSQUE AL FRASCO SECTION --- */
 .bosque-frasco-section {
-  background: linear-gradient(135deg, #0d1a0d, #1a0d2e) !important;
+  background: linear-gradient(135deg, rgba(13,26,13,0.72), rgba(26,13,46,0.72)) !important;
 }
 
 /* --- ACCORDION ACTIVE --- */
@@ -92,7 +92,7 @@ h2.section-title,
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--bg-primary);
+  background-color: transparent;
   color: var(--color-cream);
   font-family: var(--font-body);
   font-size: 18px;
