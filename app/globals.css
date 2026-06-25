@@ -52,7 +52,7 @@ h2.section-title,
 
 /* --- BOSQUE AL FRASCO SECTION --- */
 .bosque-frasco-section {
-  background: linear-gradient(135deg, rgba(13,26,13,0.72), rgba(26,13,46,0.72)) !important;
+  background: linear-gradient(135deg, rgba(13,26,13,0.3), rgba(26,13,46,0.3)) !important;
 }
 
 /* --- ACCORDION ACTIVE --- */
@@ -669,7 +669,7 @@ a:hover { color: var(--color-gold-light); }
 
 /* ── FOOTER ─────────────────────────────────────────────── */
 .site-footer {
-  background: rgba(9,15,9,0.6);
+  background: rgba(9,15,9,0.3);
   padding: 4.5rem 2rem 3rem;
   text-align: center;
   border-top: 1px solid rgba(200, 160, 80, 0.2);
