@@ -103,14 +103,11 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-grimoire);
-  color: var(--color-gold);
+  color: var(--color-gold-light);
   letter-spacing: 0.05em;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,1);
 }
 
-p, span, li {
-  text-shadow: 0 1px 8px rgba(0,0,0,0.7);
-}
 
 a {
   color: var(--color-gold);
@@ -190,9 +187,10 @@ a:hover { color: var(--color-gold-light); }
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-cream);
-  opacity: 0.7;
+  opacity: 0.9;
   transition: color 0.3s, opacity 0.3s;
   position: relative;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.9);
 }
 .navbar-links a::after {
   content: '';

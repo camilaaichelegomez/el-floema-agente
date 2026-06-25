@@ -197,6 +197,9 @@ export function KnowledgeCards() {
           padding: "clamp(80px, 10vh, 120px) clamp(32px, 5vw, 80px)",
           position: "relative",
           zIndex: 10,
+          maxWidth: 1200,
+          marginLeft: "auto",
+          marginRight: "auto",
         }}
       >
         {/* Section header */}
