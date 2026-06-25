@@ -1474,3 +1474,74 @@ a:hover { color: var(--color-gold-light); }
   position: relative;
   z-index: 1;
 }
+
+
+/* ── MOBILE RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 640px) {
+
+  /* Hero */
+  .parallax-hero h1 {
+    font-size: clamp(2.2rem, 14vw, 3.5rem) !important;
+    letter-spacing: 0.15em !important;
+  }
+
+  /* Secciones — padding reducido */
+  section {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* AgentesIA cards — 1 columna */
+  .agente-card {
+    min-width: 0;
+  }
+
+  /* Grimorio NavCards — 2 columnas en mobile */
+  .grimorio-cards-list {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .grimorio-cards-list > li:nth-child(odd)  .grimorio-card { min-height: 160px; }
+  .grimorio-cards-list > li:nth-child(even) .grimorio-card { min-height: 160px; }
+  .grimorio-card {
+    padding: 1.5rem 1rem 1.2rem !important;
+  }
+  .grimorio-card .nav-card-icon svg {
+    height: 38px !important;
+  }
+  .grimorio-card .nav-card-title {
+    font-size: 0.65rem !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  /* Knowledge cards — 2 columnas en mobile */
+  .knowledge-card .nav-card-icon svg {
+    height: 40px !important;
+  }
+  .knowledge-card .nav-card-title {
+    font-size: 0.6rem !important;
+    letter-spacing: 0.1em !important;
+  }
+  .nav-card {
+    padding: 1.5rem 1rem !important;
+  }
+
+  /* PlantasMedicinalesSection — colapsar grids */
+  .bosque-frasco-section {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Footer */
+  .site-footer {
+    padding: 3rem 1.5rem 2rem !important;
+  }
+}
+
+/* PlantasMedicinalesSection mobile */
+@media (max-width: 768px) {
+  .plantas-contenido-grid {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+}

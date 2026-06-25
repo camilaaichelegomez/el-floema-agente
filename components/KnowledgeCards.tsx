@@ -255,7 +255,7 @@ export function KnowledgeCards() {
         <ul
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(220px, 100%), 1fr))",
             gap: "clamp(10px, 1.5vw, 18px)",
             listStyle: "none",
             padding: 0,

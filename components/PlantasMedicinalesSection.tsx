@@ -428,6 +428,7 @@ export function PlantasMedicinalesSection() {
 
       {/* ── CONTENIDO ── */}
       <div
+        className="plantas-contenido-grid"
         style={{
           position: "relative",
           zIndex: 2,
@@ -612,7 +613,7 @@ export function PlantasMedicinalesSection() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(130px, 100%), 1fr))",
               gap: "0.75rem",
             }}
           >
