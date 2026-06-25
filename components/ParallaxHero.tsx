@@ -24,8 +24,7 @@ export function ParallaxHero() {
       style={{
         position: 'relative',
         height: '100vh',
-        width: '100vw',
-        marginLeft: 'calc(50% - 50vw)',
+        width: '100%',
         overflow: 'hidden',
         backgroundColor: '#0d2318',
       }}
