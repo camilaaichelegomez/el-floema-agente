@@ -255,7 +255,8 @@ export function KnowledgeCards() {
             gap: "clamp(10px, 1.5vw, 18px)",
             listStyle: "none",
             padding: 0,
-            margin: 0,
+            margin: "0 auto",
+            maxWidth: 1100,
           }}
         >
           {modules.map(({ key, label, subtitle, Icon, href }) => (
