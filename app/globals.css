@@ -853,15 +853,16 @@ a:hover { color: var(--color-gold-light); }
 .knowledge-card {
   padding: 2rem 0.85rem !important;
 }
-/* Smaller title text to fit long names on one line */
 .knowledge-card .nav-card-title {
-  font-size: 0.62rem !important;
-  letter-spacing: 0.12em !important;
+  font-size: clamp(0.65rem, 1.1vw, 0.85rem) !important;
+  letter-spacing: 0.18em !important;
   line-height: 1.4 !important;
+  text-shadow: 0 0 20px rgba(200,160,80,0.6) !important;
 }
-/* Slightly smaller icon */
 .knowledge-card .nav-card-icon svg {
-  height: 64px !important;
+  height: 56px !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 8px rgba(200,160,80,0.45)) !important;
 }
 
 /* ── GRIMORIO CARDS — ventanas góticas ──────────────────── */
