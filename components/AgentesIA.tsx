@@ -156,7 +156,7 @@ export function AgentesIA() {
               <div
                 className="agente-card"
                 style={{
-                  background: `linear-gradient(135deg, ${a.color}, rgba(13,26,13,0.35))`,
+                  background: `linear-gradient(135deg, ${a.color}, rgba(10,18,10,0.88))`,
                   border: `1px solid ${a.border}`,
                   borderRadius: "1rem",
                   padding: "2rem 1.75rem",
