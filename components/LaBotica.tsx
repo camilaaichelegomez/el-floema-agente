@@ -271,9 +271,8 @@ export function LaBotica() {
     <section
       style={{
         position: "relative",
-        background: "rgba(6,11,6,0.3)",
+        background: "rgba(6,11,6,0.15)",
         padding: "clamp(5.5rem,10vh,9rem) clamp(1.5rem,5vw,5rem) clamp(3rem,5vh,5rem)",
-        overflow: "hidden",
         borderTop: "1px solid rgba(122,74,138,0.18)",
       }}
     >
@@ -285,11 +284,11 @@ export function LaBotica() {
           inset: 0,
           pointerEvents: "none",
           background: `
-            radial-gradient(ellipse 100% 50% at 50% 0%,   rgba(200,160,80,0.08) 0%, transparent 60%),
-            radial-gradient(ellipse 70%  60% at 0%   50%,  rgba(90,45,107,0.22)  0%, transparent 55%),
-            radial-gradient(ellipse 70%  60% at 100% 50%,  rgba(90,45,107,0.18)  0%, transparent 55%),
-            radial-gradient(ellipse 55%  45% at 50%  100%, rgba(42,21,53,0.35)   0%, transparent 60%),
-            radial-gradient(ellipse 40%  30% at 50%  40%,  rgba(122,74,138,0.08) 0%, transparent 50%)
+            radial-gradient(ellipse 100% 50% at 50% 0%,   rgba(200,160,80,0.05) 0%, transparent 60%),
+            radial-gradient(ellipse 70%  60% at 0%   50%,  rgba(90,45,107,0.1)   0%, transparent 55%),
+            radial-gradient(ellipse 70%  60% at 100% 50%,  rgba(90,45,107,0.08)  0%, transparent 55%),
+            radial-gradient(ellipse 55%  45% at 50%  100%, rgba(42,21,53,0.15)   0%, transparent 60%),
+            radial-gradient(ellipse 40%  30% at 50%  40%,  rgba(122,74,138,0.05) 0%, transparent 50%)
           `,
         }}
       />
