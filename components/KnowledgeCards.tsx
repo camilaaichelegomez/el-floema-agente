@@ -242,9 +242,10 @@ export function KnowledgeCards() {
               fontFamily: "var(--font-crimson), serif",
               fontSize: "0.9rem",
               fontStyle: "italic",
-              color: "rgba(212,196,160,0.42)",
+              color: "rgba(212,196,160,0.9)",
               letterSpacing: "0.08em",
               margin: 0,
+              textShadow: "0 1px 8px rgba(0,0,0,0.95)",
             }}
           >
             Conocimiento ancestral · Ciencia viva

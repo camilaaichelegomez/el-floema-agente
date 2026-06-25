@@ -115,10 +115,11 @@ export function AgentesIA() {
               fontStyle: "italic",
               fontSize: "1rem",
               color: "var(--color-cream)",
-              opacity: 0.55,
+              opacity: 0.95,
               maxWidth: 520,
               margin: "0 auto",
               lineHeight: 1.7,
+              textShadow: "0 1px 8px rgba(0,0,0,0.95)",
             }}
           >
             Tres asistentes especializadas, cada una entrenada con cientos de artículos científicos
