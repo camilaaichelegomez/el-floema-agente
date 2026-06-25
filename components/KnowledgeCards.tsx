@@ -211,13 +211,13 @@ export function KnowledgeCards() {
               alignItems: "center",
               gap: "14px",
               marginBottom: "1rem",
-              opacity: 0.35,
+              opacity: 0.7,
               maxWidth: 360,
               margin: "0 auto 1rem",
             }}
           >
             <div style={{ flex: 1, height: "1px", background: "linear-gradient(to right, transparent, #c8a050)" }} />
-            <span style={{ fontFamily: "var(--font-cinzel), serif", fontSize: "0.55rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#c8a050", whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: "var(--font-cinzel), serif", fontSize: "0.55rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#e8c070", whiteSpace: "nowrap", textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}>
               Conocimiento
             </span>
             <div style={{ flex: 1, height: "1px", background: "linear-gradient(to left, transparent, #c8a050)" }} />
@@ -227,11 +227,11 @@ export function KnowledgeCards() {
             style={{
               fontFamily: "var(--font-cinzel), serif",
               fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)",
-              color: "#c8a050",
+              color: "#e8c070",
               letterSpacing: "0.22em",
               textTransform: "uppercase",
               margin: "0 0 0.75rem",
-              textShadow: "0 0 60px rgba(200,160,80,0.2)",
+              textShadow: "0 2px 12px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,1)",
             }}
           >
             La Biblioteca

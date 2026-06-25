@@ -90,8 +90,9 @@ export function AgentesIA() {
               letterSpacing: "0.35em",
               textTransform: "uppercase",
               color: "var(--color-gold)",
-              opacity: 0.6,
+              opacity: 0.9,
               marginBottom: "0.75rem",
+              textShadow: "0 1px 6px rgba(0,0,0,0.9)",
             }}
           >
             Inteligencia Botánica
@@ -101,10 +102,10 @@ export function AgentesIA() {
               fontFamily: "var(--font-grimoire)",
               fontSize: "clamp(1.6rem, 4vw, 2.4rem)",
               fontWeight: 400,
-              color: "var(--color-gold)",
+              color: "var(--color-gold-light)",
               letterSpacing: "0.1em",
               margin: "0 0 1rem",
-              textShadow: "0 0 40px rgba(200,160,80,0.2)",
+              textShadow: "0 2px 12px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,1)",
             }}
           >
             Consulta con Floema
@@ -157,8 +158,8 @@ export function AgentesIA() {
               <div
                 className="agente-card"
                 style={{
-                  background: `linear-gradient(135deg, ${a.color}, rgba(10,18,10,0.88))`,
-                  border: `1px solid ${a.border}`,
+                  background: `linear-gradient(135deg, rgba(8,15,8,0.92), rgba(6,12,6,0.95))`,
+                  border: `1.5px solid rgba(200,160,80,0.55)`,
                   borderRadius: "1rem",
                   padding: "2rem 1.75rem",
                   height: "100%",
@@ -169,7 +170,7 @@ export function AgentesIA() {
                   transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
                   position: "relative",
                   overflow: "hidden",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.4), inset 0 1px rgba(200,160,80,0.06)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.3), inset 0 1px rgba(200,160,80,0.1)",
                 }}
               >
                 {/* Brillo de esquina */}
@@ -209,9 +210,10 @@ export function AgentesIA() {
                       fontFamily: "var(--font-grimoire)",
                       fontSize: "1rem",
                       letterSpacing: "0.08em",
-                      color: "var(--color-gold)",
+                      color: "var(--color-gold-light)",
                       margin: "0 0 0.6rem",
                       fontWeight: 400,
+                      textShadow: "0 1px 6px rgba(0,0,0,0.9)",
                     }}
                   >
                     {a.titulo}
@@ -222,9 +224,10 @@ export function AgentesIA() {
                       fontStyle: "italic",
                       fontSize: "0.95rem",
                       color: "var(--color-cream)",
-                      opacity: 0.7,
+                      opacity: 0.92,
                       margin: 0,
                       lineHeight: 1.65,
+                      textShadow: "0 1px 4px rgba(0,0,0,0.85)",
                     }}
                   >
                     {a.descripcion}
