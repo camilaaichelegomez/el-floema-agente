@@ -273,6 +273,7 @@ export function LaBotica() {
         position: "relative",
         background: "rgba(6,11,6,0.15)",
         padding: "clamp(5.5rem,10vh,9rem) clamp(1.5rem,5vw,5rem) clamp(3rem,5vh,5rem)",
+        overflow: "hidden",
         borderTop: "1px solid rgba(122,74,138,0.18)",
       }}
     >
