@@ -129,7 +129,7 @@ function ProductCard({
           borderBottom: "1px solid rgba(200,160,80,0.08)",
           position: "relative",
           overflow: "hidden",
-          background: `radial-gradient(ellipse 70% 60% at 50% 55%, ${producto.accent} 0%, transparent 70%), linear-gradient(135deg, #152515 0%, #0d1a0d 100%)`,
+          background: `radial-gradient(ellipse 70% 60% at 50% 55%, ${producto.accent} 0%, transparent 70%), linear-gradient(135deg, rgba(21,37,21,0.4) 0%, rgba(13,26,13,0.4) 100%)`,
           filter: hovered ? "brightness(1.1)" : "brightness(1)",
           transition: "filter 0.4s",
         }}
