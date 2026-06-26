@@ -8,8 +8,8 @@ import { plantaIcons } from "@/components/PlantIcons";
 
 const GOLD = "#c8a050";
 const CREAM = "#d4c4a0";
-const BG_CARD = "rgba(17,29,17,0.3)";
-const BG_LEFT = "rgba(18,32,18,0.3)";
+const BG_CARD = "rgba(13,22,13,0.8)";
+const BG_LEFT = "rgba(10,18,10,0.82)";
 
 /* ── Datos del acordeón ─────────────────────────────────────── */
 
@@ -54,9 +54,10 @@ function PanelContenido({ id }: { id: string }) {
     fontStyle: "italic",
     fontSize: "1.05rem",
     color: CREAM,
-    opacity: 0.55,
+    opacity: 0.92,
     lineHeight: 1.75,
     margin: 0,
+    textShadow: "0 1px 6px rgba(0,0,0,0.95)",
   };
 
   if (id === "uso") {
@@ -123,9 +124,10 @@ function PanelContenido({ id }: { id: string }) {
                 fontStyle: "italic",
                 fontSize: "1.05rem",
                 color: CREAM,
-                opacity: 0.45,
+                opacity: 0.9,
                 lineHeight: 1.75,
                 margin: 0,
+                textShadow: "0 1px 6px rgba(0,0,0,0.95)",
               }}
             >
               {m.desc}
@@ -496,7 +498,7 @@ export function PlantasMedicinalesSection() {
               lineHeight: 1.1,
               fontWeight: 700,
               marginBottom: "1.6rem",
-              textShadow: "0 0 50px rgba(200,160,80,0.18)",
+              textShadow: "0 2px 12px rgba(0,0,0,0.95), 0 1px 3px rgba(0,0,0,1)",
             }}
           >
             Del Bosque
