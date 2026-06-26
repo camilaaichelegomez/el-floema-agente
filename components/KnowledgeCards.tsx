@@ -282,6 +282,7 @@ export function KnowledgeCards() {
                     <Icon />
                   </span>
                   <span className="nav-card-title">{label}</span>
+                  <span className="nav-card-subtitle">{subtitle}</span>
                 </Link>
               ) : (
                 <button
@@ -295,6 +296,7 @@ export function KnowledgeCards() {
                     <Icon />
                   </span>
                   <span className="nav-card-title">{label}</span>
+                  <span className="nav-card-subtitle">{subtitle}</span>
                 </button>
               )}
             </motion.li>

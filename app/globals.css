@@ -627,6 +627,18 @@ a:hover { color: var(--color-gold-light); }
 .nav-card-subtitle {
   display: none;
 }
+.knowledge-card .nav-card-subtitle {
+  display: block;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--color-cream);
+  opacity: 0.85;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.95);
+}
 
 /* Gem corners (Grimorio cards) */
 .nav-card-gem {
