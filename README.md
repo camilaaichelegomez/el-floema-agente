@@ -1,95 +1,90 @@
-# 🌿 El Floema — Botanical AI Agent
+# 🌿 El Floema — Plataforma de Cosmética Botánica con IA
 
-An intelligent botanical agent that answers questions about medicinal plants by integrating **Western phytotherapy**, **Ayurveda**, and **Traditional Chinese Medicine**, powered by scientific evidence from a library of 5,683 peer-reviewed articles.
+El Floema es una plataforma de cosmética botánica con dos agentes de inteligencia artificial que integran evidencia científica, fitoterapia y formulación natural con plantas nativas de Chile.
 
-## 🏆 Hackathon Track: MongoDB
+## 🏆 Hackathon H0 Hack Zero Stack
 
-Built for the **Google Cloud Rapid Agent Hackathon** using:
-- **Gemini 2.5 Flash** via Google Cloud Vertex AI
-- **Google Cloud Agent Builder** (RAG with ChromaDB)
-- **MongoDB Atlas** MCP server for storing and retrieving consultation history
+Proyecto participante del **H0 Hack Zero Stack** con integración de **AWS DynamoDB** para persistencia de conversaciones de los agentes IA.
 
-## ✨ Features
+**#H0Hackathon**
 
-- 🔍 **RAG-powered search** across 5,683 scientific articles (PubMed, Semantic Scholar, Europe PMC)
-- 🌿 **Multi-tradition integration**: Western phytotherapy + Ayurveda + Traditional Chinese Medicine
-- 💾 **MongoDB Atlas** stores every consultation with metadata (plant detected, similarity score, timestamp)
-- 🌐 **Web interface** with dark botanical aesthetic
-- ⚠️ **Safety-first**: always recommends consulting a health professional
-- 🗣️ **Conversational memory**: maintains context across a session
+## ✨ Agentes IA
 
-## 🛠️ Tech Stack
+### 🌱 Agente Botánico (`/consulta`)
+Responde preguntas sobre plantas medicinales integrando fitoterapia occidental, Ayurveda y Medicina Tradicional China, con respaldo de **7.613 artículos científicos** de PubMed, Semantic Scholar y Europe PMC. Usa RAG (Retrieval-Augmented Generation) con ChromaDB para citar fuentes en cada respuesta.
 
-| Component | Technology |
-|-----------|-----------|
-| AI Model | Gemini 2.5 Flash (Vertex AI) |
-| RAG | ChromaDB + sentence-transformers |
-| Database | MongoDB Atlas |
-| Backend | Python + Flask |
-| Scientific Library | 5,683 articles (PubMed, Semantic Scholar, Europe PMC) |
+### 💧 Agente de Belleza (`/belleza`)
+Especializado en formulación cosmética natural: elige activos vegetales, proporciones y métodos de extracción para sérum, aceites, cremas y rituales de cuidado. Backend en Render (`/ask-belleza`).
 
-## 🚀 Setup & Run
+## 🛠️ Stack Técnico
 
-### Prerequisites
-- Python 3.10+
-- Google Cloud account with Vertex AI enabled
-- MongoDB Atlas account (free tier works)
-- `gemini_service_account.json` (Google Cloud service account)
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | Next.js 16 · App Router · TypeScript · Tailwind CSS |
+| Deploy frontend | Vercel |
+| Backend agente botánico | Python · Flask · Render |
+| Backend agente de belleza | Python · Flask · Render |
+| Modelo de lenguaje | Gemini 2.5 Flash (Google Vertex AI) |
+| RAG / búsqueda semántica | ChromaDB + sentence-transformers |
+| **Persistencia de chats** | **AWS DynamoDB** |
+| Base de datos estructurada | Supabase (PostgreSQL) |
+| Biblioteca científica | 7.613 artículos (PubMed, Semantic Scholar, Europe PMC) |
 
-### Installation
+## 🗄️ Integración AWS DynamoDB
 
-```bash
-git clone https://github.com/camilaaichelegomez/elfloema.git
-cd elfloema
-pip install google-genai google-auth chromadb sentence-transformers pymongo flask
-```
+Cada mensaje del usuario y cada respuesta del agente se persisten automáticamente en DynamoDB.
 
-### Build the scientific index (first time only)
+**Tabla:** `conversaciones-el-floema`  
+**Partition key:** `session_id` (UUID generado en el browser)  
+**Sort key:** `timestamp` (ISO 8601)
 
-```bash
-python rag_biblioteca.py --build
-```
-
-### Run the web agent
-
-```bash
-python agente_botanico.py --web
-```
-
-Open `http://localhost:5000` in your browser.
-
-### Run in terminal mode
-
-```bash
-python agente_botanico.py
-```
-
-## 📊 MongoDB Integration
-
-Every consultation is stored in MongoDB Atlas with:
 ```json
 {
-  "session_id": "web",
-  "timestamp": "2026-06-09T...",
-  "question": "What can I take for inflammation?",
-  "response": "...",
-  "sources_count": 6,
-  "top_similarity": 0.412,
-  "plants_detected": ["matico", "maqui"],
-  "model": "gemini-2.5-flash"
+  "session_id": "a3f8c2d1-9b4e-4f7a-…",
+  "timestamp": "2026-06-26T14:32:11.204Z",
+  "rol": "agente",
+  "texto": "El matico contiene flavonoides y taninos con actividad antiinflamatoria…",
+  "pregunta": "¿Qué propiedades tiene el matico para la piel?",
+  "fuentes": [{ "plant_key": "matico", "similarity": 0.87 }]
 }
 ```
 
-## 🌱 About El Floema
+La integración vive en los Route Handlers de Next.js (`app/api/consulta/route.ts` y `app/api/belleza/route.ts`) usando `@aws-sdk/client-dynamodb` y `@aws-sdk/lib-dynamodb`.
 
-El Floema is a Chilean botanical cosmetics brand based in the Valdivian rainforest of southern Chile. The founder harvests, distills, and macerates native plants — triwe, arrayán, maqui, matico — integrating ancestral Mapuche ethnobotany with modern phytochemistry.
+## 📄 Páginas
 
-This agent is the knowledge backbone of the brand: a scientific witch's assistant that bridges traditional wisdom and peer-reviewed evidence.
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Página principal |
+| `/consulta` | Chat con el agente botánico |
+| `/belleza` | Chat con el agente de cosmética |
+| `/demo` | Recorrido visual del proyecto (hackathon) |
+| `/blog` | Bitácora / blog |
+| `/blog/h0-hackathon` | Artículo sobre el stack técnico |
+| `/biblioteca` | Biblioteca científica |
+| `/plantas` | Catálogo de plantas |
+| `/formulas` | Formulaciones guardadas |
+
+## 🚀 Variables de entorno
+
+```env
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=...
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+```
+
+## 🌱 Sobre El Floema
+
+El Floema es una marca chilena de cosmética botánica ubicada en el bosque valdiviano del sur de Chile. La fundadora cosecha, destila y macera plantas nativas — triwe, arrayán, maqui, matico — integrando etnobotánica mapuche con fitoquímica moderna.
+
+Este agente es la columna vertebral del conocimiento de la marca: un asistente científico que conecta la sabiduría tradicional con la evidencia revisada por pares.
 
 ## ⚠️ Disclaimer
 
-This agent provides educational information only. Always consult a qualified healthcare professional before using medicinal plants.
+El agente proporciona información educativa. Consulta siempre a un profesional de la salud antes de usar plantas medicinales.
 
-## 📄 License
+## 📄 Licencia
 
-MIT License — see [LICENSE](LICENSE)
+MIT
