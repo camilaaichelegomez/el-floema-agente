@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -77,34 +77,59 @@ function FichaPlanta({ planta, onClose }: { planta: Planta; onClose: () => void 
 
   return (
     <motion.div
-      key={planta.slug}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
+      key="backdrop"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      onClick={onClose}
       style={{
-        background: "linear-gradient(180deg, #152515 0%, #111d11 100%)",
-        border: "1px solid rgba(200,160,80,0.32)",
-        borderTop: "2px solid rgba(200,160,80,0.45)",
-        margin: "1.2rem 0 2rem",
-        padding: "clamp(1.8rem,4vh,3rem) clamp(1.4rem,4vw,3.5rem)",
-        position: "relative",
-        boxShadow: "0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(200,160,80,0.08)",
+        position: "fixed",
+        inset: 0,
+        zIndex: 1000,
+        background: "rgba(4,10,4,0.82)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        padding: "clamp(1rem,4vh,3rem) clamp(0.8rem,3vw,2rem)",
+        overflowY: "auto",
       }}
     >
+      <motion.div
+        key={planta.slug}
+        initial={{ opacity: 0, y: 30, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "linear-gradient(180deg, #152515 0%, #111d11 100%)",
+          border: "1px solid rgba(200,160,80,0.32)",
+          borderTop: "2px solid rgba(200,160,80,0.55)",
+          borderRadius: "0.75rem",
+          width: "100%",
+          maxWidth: 900,
+          margin: "auto",
+          padding: "clamp(1.8rem,4vh,3rem) clamp(1.4rem,4vw,3.5rem)",
+          position: "relative",
+          boxShadow: "0 24px 70px rgba(0,0,0,0.7), inset 0 1px 0 rgba(200,160,80,0.08)",
+        }}
+      >
       {/* close */}
       <button
         onClick={onClose}
         aria-label="Cerrar ficha"
         style={{
-          position: "absolute", top: "1rem", right: "1.2rem",
-          background: "none", border: "1px solid rgba(200,160,80,0.2)", cursor: "pointer",
-          color: "rgba(200,160,80,0.5)", fontSize: "0.7rem",
+          position: "sticky", top: 0, float: "right", marginLeft: "1rem", zIndex: 2,
+          background: "rgba(21,37,21,0.9)", border: "1px solid rgba(200,160,80,0.35)", cursor: "pointer",
+          color: "#c8a050", fontSize: "0.72rem",
           fontFamily: "var(--font-cinzel), serif", letterSpacing: "0.1em",
-          padding: "0.25rem 0.6rem", transition: "all 0.25s",
+          padding: "0.4rem 0.9rem", borderRadius: "2rem", transition: "all 0.25s",
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#c8a050"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(200,160,80,0.5)"; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(200,160,80,0.5)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(200,160,80,0.2)"; }}
+        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#e8c070"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(200,160,80,0.7)"; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#c8a050"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(200,160,80,0.35)"; }}
       >
         ✕ cerrar
       </button>
@@ -190,6 +215,7 @@ function FichaPlanta({ planta, onClose }: { planta: Planta; onClose: () => void 
           ))}
         </ul>
       </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -283,6 +309,20 @@ export default function PlantasPage() {
   const handleCardClick = (slug: string) =>
     setSelectedSlug((prev) => (prev === slug ? null : slug));
 
+  // Bloquear scroll del fondo y cerrar con Escape cuando el modal está abierto
+  useEffect(() => {
+    if (!selectedPlanta) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedSlug(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [selectedPlanta]);
+
   return (
     <>
       <Navbar />
@@ -321,7 +361,7 @@ export default function PlantasPage() {
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
               gap: "1rem",
-              marginBottom: selectedPlanta ? "0" : "1rem",
+              marginBottom: "1rem",
             }}>
               {plantas.map((planta) => (
                 <PlantaCard
