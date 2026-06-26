@@ -240,12 +240,12 @@ export function KnowledgeCards() {
           <p
             style={{
               fontFamily: "var(--font-crimson), serif",
-              fontSize: "0.9rem",
+              fontSize: "1.15rem",
               fontStyle: "italic",
-              color: "rgba(212,196,160,0.9)",
+              color: "rgba(225,210,175,1)",
               letterSpacing: "0.08em",
               margin: 0,
-              textShadow: "0 1px 8px rgba(0,0,0,0.95)",
+              textShadow: "0 2px 10px rgba(0,0,0,1), 0 1px 3px rgba(0,0,0,1)",
             }}
           >
             Conocimiento ancestral · Ciencia viva
