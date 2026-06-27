@@ -175,6 +175,70 @@ function EmptyState({ filtered }: { filtered: boolean }) {
   );
 }
 
+// ── Card estática H0 Hackathon ────────────────────────────────────────────────
+function H0HackathonCard() {
+  return (
+    <Link
+      href="/blog/h0-hackathon"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        background: "rgba(60,120,180,0.04)",
+        border: "1px solid rgba(60,120,180,0.18)",
+        borderRadius: "0.5rem",
+        overflow: "hidden",
+        textDecoration: "none",
+        transition: "border-color 0.25s, background 0.25s",
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(60,120,180,0.4)";
+        (e.currentTarget as HTMLAnchorElement).style.background = "rgba(60,120,180,0.08)";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(60,120,180,0.18)";
+        (e.currentTarget as HTMLAnchorElement).style.background = "rgba(60,120,180,0.04)";
+      }}
+    >
+      <div style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.6rem", flex: 1 }}>
+        <span style={{
+          display: "inline-block", alignSelf: "flex-start",
+          background: "rgba(60,120,180,0.12)", border: "1px solid rgba(60,120,180,0.35)",
+          color: "#6aaaee", fontFamily: "var(--font-cinzel), serif",
+          fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase",
+          padding: "2px 10px", borderRadius: "20px",
+        }}>
+          Ciencia · #H0Hackathon
+        </span>
+        <h2 style={{
+          fontFamily: "var(--font-grimoire)", fontSize: "clamp(0.95rem,2vw,1.15rem)",
+          color: "#6aaaee", letterSpacing: "0.06em", lineHeight: 1.35, margin: 0,
+        }}>
+          Cómo construí El Floema con AWS DynamoDB y Vercel
+        </h2>
+        <p style={{
+          fontFamily: "var(--font-body)", fontSize: "0.9rem",
+          color: "rgba(212,196,160,0.7)", lineHeight: 1.65, margin: 0, flex: 1,
+        }}>
+          Stack técnico, integración de DynamoDB para historial de conversaciones,
+          y arquitectura de los agentes IA de cosmética botánica.
+        </p>
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          marginTop: "auto", paddingTop: "0.75rem",
+          borderTop: "1px solid rgba(60,120,180,0.1)",
+        }}>
+          <span style={{ fontFamily: "var(--font-cinzel), serif", fontSize: "0.65rem", color: "rgba(200,160,80,0.45)", letterSpacing: "0.1em" }}>
+            26 de junio de 2026
+          </span>
+          <span style={{ fontFamily: "var(--font-cinzel), serif", fontSize: "0.65rem", color: "rgba(200,160,80,0.45)", letterSpacing: "0.08em" }}>
+            8 min de lectura
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 // ── Main page ──────────────────────────────────────────────────────────────────
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -267,8 +331,6 @@ export default function BlogPage() {
               Cargando…
             </p>
           </div>
-        ) : filtered.length === 0 ? (
-          <EmptyState filtered={catFilter !== null} />
         ) : (
           <div style={{
             display: "grid",
@@ -276,9 +338,15 @@ export default function BlogPage() {
             gap: "clamp(16px,2vw,28px)",
             alignItems: "start",
           }}>
+            {!catFilter && <H0HackathonCard />}
             {filtered.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
+            {filtered.length === 0 && catFilter && (
+              <div style={{ gridColumn: "1/-1" }}>
+                <EmptyState filtered={true} />
+              </div>
+            )}
           </div>
         )}
       </div>
