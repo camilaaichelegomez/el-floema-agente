@@ -104,7 +104,6 @@ buscar_productos.py
 buscar_urls.py
 clasificar_empresas.py
 crm_prospectos.py
-descargar_pdfs.py
 enviar_whatsapp.js
 enviar_whatsapp.py
 prospectos_chile.py
