@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Performance characteristics and solution properties of surfactants in shampoos.",
+    "abstract": "Synopsis A brief analysis is made of the main types of surfactants used in shampoos and bubble baths. The requirements of a modern shampoo are discussed as are the means by which these can be achieved by the use of a number of selected additives such as the traditional alkanolamides, and the newer amine oxides, amido amine betaines and alkyl amine betaines. In particular, such aspects as the achievement of viscosity control, foam generation, shelf life stability and safety are examined. The physical chemistry of the behaviour in solution of several selected non-ionic and amphoteric nitrogen containing surfactants is discussed and how these affect viscosity modification and foam generation. Mention is also made of the chemistry of the new highly concentrated anionic surfactants and the benefits that they give the formulator. Finally, the attributes of imidazoline derived surfactants are outlined with special reference to their mildness and foaming ability.",
+    "journal": "International journal of cosmetic science",
+    "source": "pubmed",
+    "year": 1979,
+    "doi": "10.1111/j.1467-2494.1979.tb00202.x",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19467057/",
+    "authors": [
+      "Donaldson B R",
+      "Messenger E T"
+    ]
+  },
+  {
+    "title": "Fatty acid sulphoalkyl amides and esters as cosmetic surfactants.",
+    "abstract": "Synopsis A review is given of the manufacture, properties and applications of the anionic surfactants commonly known as taurates and isethionates (fatty acid sulphoalkyl amides and esters, respectively). Originally developed in the 1930s for textile processing, these surfactants are used increasingly in the cosmetic field, particularly those derived from coconut fatty acid. Both types are produced from sodium isethionate, HO degrees C(2)H(4)SO(3)Na. The acyl isethionate, R degrees COO degrees C(2)H(4)SO(3)Na, is obtained by reaction with a fatty acid ('direct process'). or fatty acid chloride ('indirect process'). The direct process is cheaper but requires extreme conditions which can lead to discoloration of the product and a loss of shorter chain fatty acid components. The N-methyl-N-acyltaurate, R degrees CON(R(1))C(2)H(4)SO(3)Na, is obtained by Schotten-Baumann reaction of a fatty acid chloride with N-methyltaurine, which is derived from sodium isethionate via methylamine. Taurates and isethionates retain the benefits of the soaps to which they are structurally similar, but chemical modifications have eliminated many undesirable features. Thus they combine good detergency and wetting with high foaming, and maintain their performance in hard or salt water. Taurates are stable to hydrolysis over the whole pH range. Isethionates are prone to hydrolysis at high (>8) or low (<5) pH, but this does not normally present a problem in cosmetic formulations. Above all, these surfactants are characterized by their extreme mildness to skin. Syndet and syndet/soap bars based on isethionate can be formulated at neutral pH ('Dove type'bars) instead of the alkaline pH of soap, and have been shown in various studies to be milder than soap and better tolerated by the young, the old and those with sensitive skins. Similarly, isethionates have been shown to be less irritating than other anionic or amphoteric surfactants used in cosmetics. The difference has been related to the negligible effect of isethionate on the water-binding capacity of stratum corneum. Other cosmetic applications besides toilet bars include shampoos (excellent cleaning, mild to scalp, some hair conditioning effects), liquid soaps (mild for all-over body use), bubble baths (copious stable foam, efficient lime soap dispersal, low irritancy), skin creams and lotions (emulsification, alleviation of 'dry skin'), baby care products (ultra-mild cleansing bars and milks, impregnated baby wipes) and oral products (foaming agents with low toxicity for toothpastes and mouthwashes).",
+    "journal": "International journal of cosmetic science",
+    "source": "pubmed",
+    "year": 1984,
+    "doi": "10.1111/j.1467-2494.1984.tb00382.x",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/19467117/",
+    "authors": [
+      "Petter P J"
+    ]
+  },
+  {
+    "title": "Enhancing the stability of albumin foam-based support baths using pectin for embedded bioprinting.",
+    "abstract": "Embedded bioprinting enables the fabrication of complex, cell-laden structures by extruding bioinks into support baths. This technique has advanced the field of tissue engineering by expanding the range of printable bioinks and enabling the creation of intricate geometries; however, limitations such as instability and inadequate oxygen and nutrient delivery in current support materials restrict long print durations and compromise fidelity. Recently, albumin-based foams have been proposed as oxygen- and nutrient-permeable supports, but their rapid degradation restricts practical use. Here, we report the stabilization of albumin foams through the incorporation of pectin, a biocompatible polysaccharide. Three formulations-albumin-only (A8), albumin with 1% pectin (A8P1), and albumin with 2% pectin (A8P2)-were evaluated for foam stability, bubble morphology, rheology, and physicochemical properties. Pectin significantly delayed drainage and bubble coalescence while maintaining essential rheological features such as shear-thinning and recovery. These improvements enabled the embedded printing of chitosan, a low-viscosity and slow-crosslinking hydrogel, into multilayered and freeform structures with high fidelity. Cell viability assays confirmed that pectin did not compromise biocompatibility; A8P1 provided the most favorable microenvironment and outperformed conventional freeform reversible embedding of suspended hydrogels baths during extended incubation, owing to enhanced oxygen diffusion and a more physiological pH. Overall, pectin-stabilized albumin foams offer a simple, biocompatible, and self-removable support system that addresses key limitations of embedded bioprinting and broadens the range of printable bioinks.",
+    "journal": "Biomedical materials (Bristol, England)",
+    "source": "pubmed",
+    "year": 2026,
+    "doi": "10.1088/1748-605X/ae3a28",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/41554256/",
+    "authors": [
+      "Rodger M",
+      "Poirier É",
+      "Wasmer E M A",
+      "Touani Kameni F",
+      "Lerouge S",
+      "Ahmadi A"
+    ]
+  }
+]

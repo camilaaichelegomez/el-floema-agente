@@ -1,0 +1,65 @@
+[
+  {
+    "title": "Final report of the safety assessment of niacinamide and niacin.",
+    "abstract": "Niacinamide (aka nicotinamide) and Niacin (aka nicotinic acid) are heterocyclic aromatic compounds which function in cosmetics primarily as hair and skin conditioning agents. Niacinamide is used in around 30 cosmetic formulations including shampoos, hair tonics, skin moisturizers, and cleansing formulations. Niacin is used in a few similar product types. The concentration of use of Niacinamide varies from a low of 0.0001% in night preparations to a high of 3% in body and hand creams, lotions, powders and sprays. Niacin concentrations of use range from 0.01% in body and hand creams, lotions, powders and sprays to 0.1% in paste masks (mud packs). Both ingredients are accepted for use in cosmetics in Japan and the European Union. Both are GRAS direct food additives and nutrient and/or dietary supplements. Niacinamide may be used in clinical treatment of hypercholesteremia and Niacin in prevention of pellegra and treatment of certain psychological disorders. Both ingredients are readily absorbed from skin, blood, and the intestines and widely distribute throughout the body. Metabolites include N1-methylnicotinamide and N1-methyl-4-pyridone-3-carboxamide. Excretion is primarily through the urinary tract. While Niacinamide is more toxic than Niacin in acute toxicity studies, both are relatively non-toxic. Short-term oral, parenteral, or dermal toxicity studies did not identify significant irreversible effects. Niacinamide, evaluated in an in vitro test to predict ocular irritation, was not an acute ocular hazard. Animal testing of Niacinamide in rabbits in actual formulations produced mostly non-irritant reactions, with only some marginally irritating responses. Skin irritation tests of up to 2.5% Niacinamide in rabbits produced only marginal irritation. Skin sensitization tests of Niacinamide at 5% during induction and 20% during challenge were negative in guinea pigs. Neither cosmetic ingredient was mutagenic in Ames tests, with or without metabolic activation. Niacinamide and Niacin at 2 mg/ml were negative in a chromosome aberration test in Chinese hamster ovary cells, but did produce large structural chromosome aberrations at 3 mg/ml. Niacinamide induced sister chromatid exchanges in Chinese hamster ovary cells, but Niacin did not. Under certain circumstances, Niacinamide can cause an increase in unscheduled DNA synthesis in human lymphocytes treated with UV or a nitrosoguanidine compound. Niacinamide itself was not carcinogenic when administered (1%) in the drinking water of mice. No data on the carcinogenic effect of Niacin were available. Niacinamide can moderate the induction of tumors by established carcinogens. Niacinamide in combination with streptozotocin (a nitrosourea compound) or with heliotrine (a pyrrolizidine alkaloid), produced pancreatic islet tumors. On the other hand, Niacinamide reduced the renal adenomas produced by streptozotocin; and intestinal and bladder tumors induced by a preparation of bracken fern. Niacinamide evaluated in in vitro test systems did affect development, but Niacinamide reduced the reproductive/developmental toxicity of 2-aminonicotinamide-amino-1,3,4-thiadiazole hydrochloride and urethane. Clinical testing of Niacinamide produced no stinging sensation at concentrations up to 10%, use tests produced no irritation at concentrations up to 5%, and a 21-day cumulative irritation test at concentrations up to 5% resulted in no irritancy. Niacinamide was not a sensitizer, nor was it a photosensitizer. The CIR Expert Panel considered that Niacinamide and Niacin are sufficiently similar from a toxicologic standpoint to combine the available data and reach a conclusion on the safety of both as cosmetic ingredients. Overall, these ingredients are non-toxic at levels considerably higher than would be experienced in cosmetic products. Clinical testing confirms that these ingredients are not significant skin irritants, sensitizers or photosensitizers. While certain formulations were marginal to slight ocular irritants, other formulations were not. Niacinamide, while not carcinogenic alone, can modulate the induction of tumors by certain established carcinogens. The Panel noted that the doses in these studies are high relative to the low concentrations at which Niacinamide is used in cosmetic formulations. In neither case (tumor protection or tumor promotion) are these findings considered relevant to the use of Niacinamide at its current low concentrations of use in cosmetics. Both ingredients were considered safe as used in cosmetics.",
+    "journal": "International journal of toxicology",
+    "source": "pubmed",
+    "year": 2005,
+    "doi": "10.1080/10915810500434183",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/16596767/",
+    "authors": [
+      "Cosmetic Ingredient Review Expert Panel"
+    ]
+  },
+  {
+    "title": "The application of polymethylene waxes as conditioning agent in hair relaxers.",
+    "abstract": "Hair relaxers are harsh chemical treatments that leave the hair dull, dry and limp. There is a constant need for improvement of these products to make them milder and incorporate conditioning properties. Because of the high pH of relaxer or hair straightening systems, most quaternized (conditioning) ingredients are unstable and slowly break down to release ammonia over time, having no conditioning effects by the time the consumers use them. This paper discusses the partial substitution of the fatty alcohols that are traditionally used in relaxer systems with polymethylene wax and the benefits derived from using them. The study included the investigation of synergies among the ingredients, the stabilities of the various systems and comparisons with commercially available systems. The polymethylene wax, used in combination with the mineral oil gel and phosphate salt, coats the hair during the relaxing process, leaving it shiny, soft and conditioned as opposed to the poor condition of the hair relaxed by traditional, commercially available NaOH and LiOH relaxers. An additional benefit of using polymethylene wax in relaxer systems is that the conditioning agents that are normally added to the neutralizing shampoo to repair or mask the damage as a result of the relaxing process can be omitted.",
+    "journal": "Journal of cosmetic science",
+    "source": "pubmed",
+    "year": 2004,
+    "doi": "",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/15645095/",
+    "authors": [
+      "Vermeulen Shani",
+      "Van Rensburg Audrey Jansen",
+      "Van Der Merwe Belinda",
+      "Shalvoy Richard",
+      "Willford Suzanne"
+    ]
+  },
+  {
+    "title": "Figaro-tresses: A dataset for evaluating hair assembly features before and after cosmetic treatment.",
+    "abstract": "The published database is composed of 1,080 images taken from 120 hair tresses made of medium blond, fine Caucasian hair with the aim to facilitate quantitative and qualitative studies about shampoo and conditioner efficacies. Two types of hair tresses were used: Caucasian hair which had not been subjected to oxidation with bleaching agents - virgin (60 tresses); and Caucasian hair, previously subjected to light oxidative bleaching - lightly bleached (remaining 60 tresses). Since cosmetic products such as shampoos and conditioners are often designed to subtly augment hair assembly features via the carefully balanced cumulative effects of deposited actives, each tress was subjected to consecutive washing+conditioning+drying cycles referred to as cosmetic treatment. The shampoo and conditioner used for this project were specifically selected for their suitability for fine hair. Each tress was photographed at three different time-points: before the cosmetic treatment; after two cosmetic treatments, and after an additional third cosmetic treatment. At each time-point, each tress was photographed from three different angles (-45, 0, and +45°), resulting in a total number of nine images for each tress. For each image in the database, we also provide a corresponding hair segmentation mask, which identifies the hair location area in the original image.",
+    "journal": "Data in brief",
+    "source": "pubmed",
+    "year": 2020,
+    "doi": "10.1016/j.dib.2020.105964",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/32671161/",
+    "authors": [
+      "Savardi Mattia",
+      "Daniels Gabriela",
+      "Tamburic Slobodanka",
+      "Muhammad Umar Riaz",
+      "Benini Sergio"
+    ]
+  },
+  {
+    "title": "Cosmetic Potential of a Structural Protein Copolymer Based on Silk, Elastin, and Keratin.",
+    "abstract": "The hair cosmetic industry is constantly searching for new ingredients and innovative materials that can help enhance properties, such as softness, shine, shape, and color. However, conventional products contain harmful chemicals. In this study, we developed a biobased alternative using a recombinant protein composed of repetitions of consensus motifs from the structural proteins silk, elastin, and keratin, termed SELP::KP. This protein was expressed in Escherichia coli and purified by a nonchromatographic method to high purity. Fourier-transform infrared spectroscopy (FTIR) confirmed the β-sheet-rich structure, characteristic of silk and SELP-like proteins. Calorimetry studies confirmed the high thermal stability of SELP::KP. When applied to hair, SELP::KP colocalized at both the cuticle and cortex, indicating strong penetration capacity. Mechanical testing of treated virgin hair showed significant improvements: Young's modulus increased by 34.9%, and extensibility improved by 12.4% compared to untreated controls, indicating enhanced strength and elasticity. Additionally, the protein's potential as a safer perming agent was evaluated, maintaining a curling effect similar to the chemical treatment but with lower damaging effects. Furthermore, SELP::KP was shown to reduce by half the combing strength needed, acting as an effective conditioning agent. This research highlights SELP::KP as a promising biobased copolymer for hair cosmetics, offering both styling benefits and improved hair health, as a leave-in treatment or a hair mask that aids in combability and perming service.",
+    "journal": "ACS biomaterials science & engineering",
+    "source": "pubmed",
+    "year": 2025,
+    "doi": "10.1021/acsbiomaterials.5c01233",
+    "url": "https://pubmed.ncbi.nlm.nih.gov/40987580/",
+    "authors": [
+      "Mota Ana",
+      "Caçador Marta",
+      "Carvalho José Pedro",
+      "Tinoco Ana",
+      "da Costa André",
+      "Ribeiro Artur",
+      "Gonçalves Filipa",
+      "Cavaco-Paulo Artur"
+    ]
+  }
+]
