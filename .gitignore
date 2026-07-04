@@ -39,3 +39,77 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# proyecto duplicado (ya vive en su propio repo el-floema)
+/el-floema/
+
+# archivos personales, credenciales y datos de negocio (no van a git)
+*.pdf
+*.pub
+*.xlsx
+*.zip
+*.db
+*.mp4
+*.mp3
+*.webm
+api.env.txt
+clave\ api\ google.txt
+mis-api-keys.txt
+gemini_service_account.json
+crm_export.xlsx
+PyWhatKit_DB.txt
+concat_list.txt
+enviados.txt
+progreso_emails.json
+productos_ganadores.csv
+top_productos.html
+inventario-el-floema.md
+output.log
+frame_*.jpg
+frame_*.png
+scan_*.png
+primer-frame*.jpg
+logo.jpg
+logoelfloema.jpg
+afiche\ global\ factory.jpg
+bosque-plantas.jpg
+d817c378-*.jpg
+debug-*.png
+Gemini_Generated_Image_*.png
+El\ Floema\ Design\ System.html
+El\ Floema\ Design\ System_files/
+el-floema-direccion/
+el-floema-zip/
+el-floema-sistema.zip
+la-era-de-la-alquimia/
+biblioteca-cientifica/
+contactos\ para\ conferencia/
+whatsapp_session/
+.wwebjs_auth/
+.wwebjs_cache/
+__pycache__/
+.claude/
+
+# scripts de demo/video con credenciales embebidas (uso local únicamente)
+generar_video.py
+record-demo.js
+make-voiceover.js
+debug-screenshot.js
+
+# scripts de CRM/prospección (viven en su propio repo)
+actualizar_contactados.py
+actualizar_facebook.py
+buscar_emails_agtech.py
+buscar_productos.py
+buscar_urls.py
+clasificar_empresas.py
+crm_prospectos.py
+descargar_pdfs.py
+enviar_whatsapp.js
+enviar_whatsapp.py
+prospectos_chile.py
+prospectos_los_lagos.xlsx
+prospectos_los_rios.xlsx
+migrate_to_postgres.py
+railway.json
+Procfile
