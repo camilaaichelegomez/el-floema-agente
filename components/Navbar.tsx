@@ -44,6 +44,7 @@ export default function Navbar() {
           <li><Link href="/belleza"      onClick={close}>Belleza</Link></li>
           <li><Link href="/formulacion"  onClick={close}>Formulación</Link></li>
           <li><Link href="/agente"       onClick={close}>Agente</Link></li>
+          <li><Link href="/lab"          onClick={close}>El Floema Lab</Link></li>
         </ul>
       </div>
     </nav>
