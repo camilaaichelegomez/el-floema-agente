@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type CSSProperties } from "react";
-import { Check, Loader2, Upload, X } from "lucide-react";
+import { Check, FileText, Loader2, Upload, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import type { InventarioItem, Unidad } from "@/components/lab/InventarioManager";
 
@@ -54,6 +54,7 @@ export function SubirBoletaPanel({
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [archivoNombre, setArchivoNombre] = useState<string | null>(null);
   const [fotoBoletaPath, setFotoBoletaPath] = useState<string | null>(null);
   const [revision, setRevision] = useState<ItemRevision[] | null>(null);
 
@@ -61,7 +62,8 @@ export function SubirBoletaPanel({
     if (!file) return;
     setError(null);
     setRevision(null);
-    setPreview(URL.createObjectURL(file));
+    setArchivoNombre(file.name);
+    setPreview(file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
     setCargando(true);
 
     try {
@@ -106,6 +108,7 @@ export function SubirBoletaPanel({
   function cancelarTodo() {
     setRevision(null);
     setPreview(null);
+    setArchivoNombre(null);
     setFotoBoletaPath(null);
     setError(null);
     onCancelar();
@@ -166,6 +169,7 @@ export function SubirBoletaPanel({
     setGuardando(false);
     setRevision(null);
     setPreview(null);
+    setArchivoNombre(null);
     setFotoBoletaPath(null);
     await onGuardado();
   }
@@ -182,14 +186,14 @@ export function SubirBoletaPanel({
       {!revision && (
         <>
           <p style={ayudaStyle}>
-            Sube una foto de la boleta o factura. La IA lee los productos, cantidades y precios — tú revisas y confirmas
-            antes de que se agregue al inventario.
+            Sube una foto, PDF, Excel o Word de la boleta o factura. La IA lee los productos, cantidades y precios — tú
+            revisas y confirmas antes de que se agregue al inventario.
           </p>
           <label style={dropzoneStyle}>
             <input
               ref={inputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,application/pdf,.xlsx,.xls,.docx"
               style={{ display: "none" }}
               onChange={(e) => handleArchivo(e.target.files?.[0])}
             />
@@ -199,7 +203,7 @@ export function SubirBoletaPanel({
               <Upload size={22} color="#d4c4a0" />
             )}
             <span style={{ fontFamily: "var(--font-body)", color: "#d4c4a0" }}>
-              {cargando ? "Leyendo boleta…" : "Toca para subir una foto de la boleta"}
+              {cargando ? "Leyendo documento…" : "Toca para subir la boleta (foto, PDF, Excel o Word)"}
             </span>
           </label>
           {error && <p style={errorStyle}>{error}</p>}
@@ -209,7 +213,16 @@ export function SubirBoletaPanel({
       {revision && (
         <div>
           <div style={{ display: "flex", gap: "0.8rem", alignItems: "flex-start", marginBottom: "1rem" }}>
-            {preview && <img src={preview} alt="Boleta" style={previewImgStyle} />}
+            {preview ? (
+              <img src={preview} alt="Boleta" style={previewImgStyle} />
+            ) : (
+              archivoNombre && (
+                <div style={previewArchivoStyle}>
+                  <FileText size={22} color="#c8a050" />
+                  <span style={previewArchivoNombreStyle}>{archivoNombre}</span>
+                </div>
+              )
+            )}
             <p style={ayudaStyle}>
               Revisa lo que la IA leyó antes de confirmar. Si un insumo ya existe en tu inventario, se sumará al stock
               actual y se actualizará su costo con el precio de esta compra. Si no existe, se creará como nuevo.
@@ -369,6 +382,30 @@ const previewImgStyle: CSSProperties = {
   objectFit: "cover",
   border: "1px solid rgba(200,160,80,0.3)",
   flexShrink: 0,
+};
+
+const previewArchivoStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "0.3rem",
+  width: 84,
+  height: 84,
+  border: "1px solid rgba(200,160,80,0.3)",
+  flexShrink: 0,
+  padding: "0.4rem",
+  textAlign: "center",
+};
+
+const previewArchivoNombreStyle: CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "0.62rem",
+  color: "rgba(212,196,160,0.75)",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+  width: "100%",
 };
 
 const filaStyle: CSSProperties = {

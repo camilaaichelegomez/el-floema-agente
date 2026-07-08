@@ -1,16 +1,25 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import * as XLSX from "xlsx";
+import mammoth from "mammoth";
 import { createClient } from "@/lib/supabase-server";
 
-const PROMPT = `Esta es una foto de una boleta o factura de compra de insumos para cosmética natural artesanal.
+const PROMPT = `Este es un documento de compra (foto, PDF, planilla Excel o Word) de insumos para cosmética natural artesanal: una boleta o factura.
 Extrae cada línea de producto comprado. Responde ÚNICAMENTE con un array JSON válido, sin texto adicional, sin markdown, con este formato exacto:
 [{"nombre": "...", "cantidad": number, "unidad": "g" | "ml" | "unidad", "precio_total": number}]
 
 Reglas:
 - "precio_total" es el precio pagado por esa línea completa, en pesos chilenos (CLP), solo el número, sin puntos ni símbolo de moneda.
-- Si la boleta indica el tamaño del producto (ej. "500ml", "1kg"), convierte "cantidad" a la unidad correspondiente en gramos o mililitros (1kg = 1000g).
+- Si el documento indica el tamaño del producto (ej. "500ml", "1kg"), convierte "cantidad" a la unidad correspondiente en gramos o mililitros (1kg = 1000g).
 - Si no puedes leer con certeza algún dato, usa null en ese campo.
-- No inventes productos que no aparezcan en la boleta.`;
+- No inventes productos que no aparezcan en el documento.`;
+
+const TIPOS_IMAGEN_O_PDF = new Set(["application/pdf"]);
+const TIPOS_EXCEL = new Set([
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+]);
+const TIPOS_WORD = new Set(["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]);
 
 interface ItemExtraido {
   nombre: string;
@@ -35,6 +44,19 @@ function normalizarItems(raw: unknown): ItemExtraido[] {
     .filter((it): it is ItemExtraido => it !== null);
 }
 
+function excelATexto(buffer: Buffer): string {
+  const libro = XLSX.read(buffer, { type: "buffer" });
+  return libro.SheetNames.map((nombre) => {
+    const csv = XLSX.utils.sheet_to_csv(libro.Sheets[nombre]);
+    return `Hoja "${nombre}":\n${csv}`;
+  }).join("\n\n");
+}
+
+async function wordATexto(buffer: Buffer): Promise<string> {
+  const { value } = await mammoth.extractRawText({ buffer });
+  return value;
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
@@ -48,10 +70,22 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const imageBase64: string | undefined = body?.imageBase64;
   const mimeType: string | undefined = body?.mimeType;
-  const fileName: string = typeof body?.fileName === "string" ? body.fileName : "boleta.jpg";
+  const fileName: string = typeof body?.fileName === "string" ? body.fileName : "boleta";
 
   if (!imageBase64 || !mimeType) {
-    return NextResponse.json({ error: "Falta la imagen." }, { status: 400 });
+    return NextResponse.json({ error: "Falta el archivo." }, { status: 400 });
+  }
+
+  const esImagen = mimeType.startsWith("image/");
+  const esPdf = TIPOS_IMAGEN_O_PDF.has(mimeType);
+  const esExcel = TIPOS_EXCEL.has(mimeType);
+  const esWord = TIPOS_WORD.has(mimeType);
+
+  if (!esImagen && !esPdf && !esExcel && !esWord) {
+    return NextResponse.json(
+      { error: "Formato no soportado. Sube una foto, un PDF, un Excel (.xlsx) o un Word (.docx)." },
+      { status: 400 }
+    );
   }
 
   const apiKey = process.env.GEMINI_API_KEY;
@@ -59,35 +93,47 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "API key de Gemini no configurada." }, { status: 500 });
   }
 
+  const buffer = Buffer.from(imageBase64, "base64");
+
   let items: ItemExtraido[];
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const result = await model.generateContent([
-      { inlineData: { mimeType, data: imageBase64 } },
-      { text: PROMPT },
-    ]);
-    const texto = result.response.text();
-    const limpio = texto.replace(/```json|```/g, "").trim();
+
+    let result;
+    if (esImagen || esPdf) {
+      result = await model.generateContent([{ inlineData: { mimeType, data: imageBase64 } }, { text: PROMPT }]);
+    } else {
+      const texto = esExcel ? excelATexto(buffer) : await wordATexto(buffer);
+      if (!texto.trim()) {
+        return NextResponse.json(
+          { error: "El archivo no tiene contenido legible. Prueba con otro archivo." },
+          { status: 422 }
+        );
+      }
+      result = await model.generateContent([`${PROMPT}\n\nContenido del documento:\n\n${texto}`]);
+    }
+
+    const respuesta = result.response.text();
+    const limpio = respuesta.replace(/```json|```/g, "").trim();
     items = normalizarItems(JSON.parse(limpio));
   } catch (error) {
-    console.error("[lab/boleta] gemini", error);
+    console.error("[lab/boleta] extraccion", error);
     return NextResponse.json(
-      { error: "No pude leer la boleta con claridad. Prueba con una foto más nítida y bien iluminada." },
+      { error: "No pude leer el documento con claridad. Prueba con otro archivo o carga los datos manualmente." },
       { status: 422 }
     );
   }
 
   if (items.length === 0) {
     return NextResponse.json(
-      { error: "No encontré productos legibles en esa foto. Prueba con otra imagen o carga los datos manualmente." },
+      { error: "No encontré productos legibles en ese documento. Prueba con otro archivo o carga los datos manualmente." },
       { status: 422 }
     );
   }
 
   const nombreLimpio = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const path = `${user.id}/${Date.now()}-${nombreLimpio}`;
-  const buffer = Buffer.from(imageBase64, "base64");
 
   const { error: uploadError } = await supabase.storage.from("boletas").upload(path, buffer, {
     contentType: mimeType,
@@ -96,7 +142,7 @@ export async function POST(request: NextRequest) {
 
   if (uploadError) {
     console.error("[lab/boleta] storage", uploadError);
-    return NextResponse.json({ error: `No se pudo guardar la foto: ${uploadError.message}` }, { status: 500 });
+    return NextResponse.json({ error: `No se pudo guardar el archivo: ${uploadError.message}` }, { status: 500 });
   }
 
   return NextResponse.json({ items, fotoBoletaPath: path });
