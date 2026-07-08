@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type CSSProperties, type FormEvent } from "react";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { FileSpreadsheet, Pencil, Plus, Receipt, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
+import { SubirBoletaPanel } from "@/components/lab/SubirBoletaPanel";
+import { SubirInventarioPanel } from "@/components/lab/SubirInventarioPanel";
 
 export type Unidad = "g" | "ml" | "unidad";
 
@@ -19,6 +21,7 @@ export interface InventarioItem {
   vencimiento: string | null;
   notas: string | null;
   costo_unitario: number | null;
+  foto_boleta_path: string | null;
 }
 
 type FormState = {
@@ -39,7 +42,7 @@ const UNIDADES: Unidad[] = ["g", "ml", "unidad"];
 const DIAS_ALERTA = 60;
 
 const COLUMNAS =
-  "id, ingrediente, categoria, cantidad, unidad, precio_compra, cantidad_compra, proveedor, fecha_compra, vencimiento, notas, costo_unitario";
+  "id, ingrediente, categoria, cantidad, unidad, precio_compra, cantidad_compra, proveedor, fecha_compra, vencimiento, notas, costo_unitario, foto_boleta_path";
 
 function formatoCLP(valor: number | null): string {
   if (valor === null || !isFinite(valor)) return "—";
@@ -100,6 +103,7 @@ export function InventarioManager({
 }) {
   const [items, setItems] = useState(initialItems);
   const [form, setForm] = useState<FormState | null>(null);
+  const [panel, setPanel] = useState<"boleta" | "inventario" | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -168,15 +172,59 @@ export function InventarioManager({
     await recargar();
   }
 
+  async function handleVerBoleta(item: InventarioItem) {
+    if (!item.foto_boleta_path) return;
+    const supabase = createClient();
+    const { data, error: urlError } = await supabase.storage
+      .from("boletas")
+      .createSignedUrl(item.foto_boleta_path, 60);
+
+    if (urlError || !data) {
+      setError(urlError?.message ?? "No se pudo abrir la boleta.");
+      return;
+    }
+
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <div>
       <div style={cabeceraStyle}>
         <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", color: "#d4c4a0", margin: 0 }}>
           {items.length} ingrediente{items.length === 1 ? "" : "s"} en tu inventario.
         </p>
-        <button type="button" onClick={() => setForm(formBlank())} style={botonPrimarioStyle}>
-          <Plus size={14} /> Agregar ingrediente
-        </button>
+        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => {
+              setPanel(null);
+              setForm(formBlank());
+            }}
+            style={botonPrimarioStyle}
+          >
+            <Plus size={14} /> Agregar ingrediente
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setForm(null);
+              setPanel("boleta");
+            }}
+            style={botonSecundarioStyle}
+          >
+            <Receipt size={14} style={{ marginRight: 6 }} /> Subir boleta
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setForm(null);
+              setPanel("inventario");
+            }}
+            style={botonSecundarioStyle}
+          >
+            <FileSpreadsheet size={14} style={{ marginRight: 6 }} /> Subir inventario
+          </button>
+        </div>
       </div>
 
       {error && <p style={errorStyle}>{error}</p>}
@@ -194,7 +242,36 @@ export function InventarioManager({
         />
       )}
 
-      <TablaInventario items={items} onEditar={(item) => setForm(itemToForm(item))} onBorrar={handleBorrar} />
+      {panel === "boleta" && (
+        <SubirBoletaPanel
+          items={items}
+          userId={userId}
+          onCancelar={() => setPanel(null)}
+          onGuardado={async () => {
+            await recargar();
+            setPanel(null);
+          }}
+        />
+      )}
+
+      {panel === "inventario" && (
+        <SubirInventarioPanel
+          items={items}
+          userId={userId}
+          onCancelar={() => setPanel(null)}
+          onGuardado={async () => {
+            await recargar();
+            setPanel(null);
+          }}
+        />
+      )}
+
+      <TablaInventario
+        items={items}
+        onEditar={(item) => setForm(itemToForm(item))}
+        onBorrar={handleBorrar}
+        onVerBoleta={handleVerBoleta}
+      />
     </div>
   );
 }
@@ -340,10 +417,12 @@ function TablaInventario({
   items,
   onEditar,
   onBorrar,
+  onVerBoleta,
 }: {
   items: InventarioItem[];
   onEditar: (item: InventarioItem) => void;
   onBorrar: (item: InventarioItem) => void;
+  onVerBoleta: (item: InventarioItem) => void;
 }) {
   if (items.length === 0) {
     return (
@@ -392,6 +471,16 @@ function TablaInventario({
                   {porVencer && ` · en ${dias}d`}
                 </td>
                 <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                  {item.foto_boleta_path && (
+                    <button
+                      type="button"
+                      onClick={() => onVerBoleta(item)}
+                      style={iconoAccionStyle}
+                      aria-label="Ver boleta"
+                    >
+                      <Receipt size={14} />
+                    </button>
+                  )}
                   <button type="button" onClick={() => onEditar(item)} style={iconoAccionStyle} aria-label="Editar">
                     <Pencil size={14} />
                   </button>

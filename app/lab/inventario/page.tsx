@@ -4,7 +4,7 @@ import { SignOutButton } from "@/components/lab/SignOutButton";
 import { InventarioManager, type InventarioItem } from "@/components/lab/InventarioManager";
 
 const COLUMNAS =
-  "id, ingrediente, categoria, cantidad, unidad, precio_compra, cantidad_compra, proveedor, fecha_compra, vencimiento, notas, costo_unitario";
+  "id, ingrediente, categoria, cantidad, unidad, precio_compra, cantidad_compra, proveedor, fecha_compra, vencimiento, notas, costo_unitario, foto_boleta_path";
 
 export default async function InventarioLabPage() {
   const supabase = await createClient();
