@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { SignOutButton } from "@/components/lab/SignOutButton";
+import { LabNav } from "@/components/lab/LabNav";
 import { InventarioManager, type InventarioItem } from "@/components/lab/InventarioManager";
 
 const COLUMNAS =
@@ -64,6 +65,8 @@ export default async function InventarioLabPage() {
           </div>
           <SignOutButton />
         </div>
+
+        <LabNav actual="inventario" />
 
         {error ? (
           <p style={{ fontFamily: "var(--font-body)", color: "#e05a4a" }}>

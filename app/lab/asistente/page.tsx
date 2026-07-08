@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { SignOutButton } from "@/components/lab/SignOutButton";
 import { LabNav } from "@/components/lab/LabNav";
-import { FormulasManager, type Formula, type InventarioOpcion } from "@/components/lab/FormulasManager";
+import { AsistenteChat, type InventarioOpcion } from "@/components/lab/AsistenteChat";
 
-export default async function FormulasLabPage() {
+export default async function AsistenteLabPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -13,14 +13,6 @@ export default async function FormulasLabPage() {
   if (!user) {
     redirect("/lab/login");
   }
-
-  const { data: formulasData, error } = await supabase.from("formulas").select("*").order("nombre", { ascending: true });
-  const formulasBase = formulasData ?? [];
-
-  const costos = await Promise.all(
-    formulasBase.map((f) => supabase.rpc("costo_formula", { f_id: f.id }).then(({ data }) => data?.[0] ?? null))
-  );
-  const formulas: Formula[] = formulasBase.map((f, i) => ({ ...f, costo: costos[i] }));
 
   const { data: inventarioData } = await supabase
     .from("inventario_con_costo")
@@ -65,25 +57,15 @@ export default async function FormulasLabPage() {
                 letterSpacing: "0.08em",
               }}
             >
-              Fórmulas
+              Asistente
             </h1>
           </div>
           <SignOutButton />
         </div>
 
-        <LabNav actual="formulas" />
+        <LabNav actual="asistente" />
 
-        {error ? (
-          <p style={{ fontFamily: "var(--font-body)", color: "#e05a4a" }}>
-            No se pudieron cargar las fórmulas: {error.message}
-          </p>
-        ) : (
-          <FormulasManager
-            initialFormulas={formulas}
-            inventarioOpciones={(inventarioData as InventarioOpcion[] | null) ?? []}
-            userId={user.id}
-          />
-        )}
+        <AsistenteChat inventarioOpciones={(inventarioData as InventarioOpcion[] | null) ?? []} userId={user.id} />
       </div>
     </main>
   );
