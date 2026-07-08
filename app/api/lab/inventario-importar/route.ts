@@ -3,37 +3,39 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 import { TIPOS_PDF, TIPOS_EXCEL, TIPOS_WORD, excelATexto, wordATexto } from "@/lib/lab/documentos";
 
-const PROMPT = `Este es un documento de compra (foto, PDF, planilla Excel o Word) de insumos para cosmética natural artesanal: una boleta o factura.
-Extrae cada línea de producto comprado. Responde ÚNICAMENTE con un array JSON válido, sin texto adicional, sin markdown, con este formato exacto:
-[{"nombre": "...", "cantidad": number, "unidad": "g" | "ml" | "unidad", "precio_total": number}]
+const PROMPT = `Este es un documento (foto, PDF, planilla Excel o Word) con una lista de insumos de cosmética natural artesanal: un inventario o listado de stock, no necesariamente una boleta de compra.
+Extrae cada ingrediente/insumo de la lista. Responde ÚNICAMENTE con un array JSON válido, sin texto adicional, sin markdown, con este formato exacto:
+[{"nombre": "...", "categoria": string | null, "cantidad": number, "unidad": "g" | "ml" | "unidad", "proveedor": string | null}]
 
 Reglas:
-- "precio_total" es el precio pagado por esa línea completa, en pesos chilenos (CLP), solo el número, sin puntos ni símbolo de moneda.
-- Si el documento indica el tamaño del producto (ej. "500ml", "1kg"), convierte "cantidad" a la unidad correspondiente en gramos o mililitros (1kg = 1000g).
-- Si no puedes leer con certeza algún dato, usa null en ese campo.
-- No inventes productos que no aparezcan en el documento.`;
+- "cantidad" es el stock actual de ese insumo, no una cantidad comprada.
+- Si el documento indica el tamaño en otra unidad (ej. "500ml", "1kg"), convierte "cantidad" a gramos o mililitros (1kg = 1000g).
+- Si no puedes leer con certeza algún dato, usa null en ese campo (excepto "nombre" y "cantidad", que son obligatorios).
+- No inventes insumos que no aparezcan en el documento.`;
 
-interface ItemExtraido {
+interface ItemInventarioExtraido {
   nombre: string;
+  categoria: string | null;
   cantidad: number | null;
   unidad: "g" | "ml" | "unidad";
-  precio_total: number | null;
+  proveedor: string | null;
 }
 
-function normalizarItems(raw: unknown): ItemExtraido[] {
+function normalizarItems(raw: unknown): ItemInventarioExtraido[] {
   if (!Array.isArray(raw)) return [];
   return raw
-    .map((it): ItemExtraido | null => {
+    .map((it): ItemInventarioExtraido | null => {
       if (!it || typeof it !== "object") return null;
       const o = it as Record<string, unknown>;
       const nombre = typeof o.nombre === "string" ? o.nombre.trim() : "";
       if (!nombre) return null;
-      const unidad = ["g", "ml", "unidad"].includes(o.unidad as string) ? (o.unidad as ItemExtraido["unidad"]) : "g";
+      const unidad = ["g", "ml", "unidad"].includes(o.unidad as string) ? (o.unidad as ItemInventarioExtraido["unidad"]) : "g";
       const cantidad = typeof o.cantidad === "number" ? o.cantidad : null;
-      const precio_total = typeof o.precio_total === "number" ? o.precio_total : null;
-      return { nombre, cantidad, unidad, precio_total };
+      const categoria = typeof o.categoria === "string" && o.categoria.trim() ? o.categoria.trim() : null;
+      const proveedor = typeof o.proveedor === "string" && o.proveedor.trim() ? o.proveedor.trim() : null;
+      return { nombre, categoria, cantidad, unidad, proveedor };
     })
-    .filter((it): it is ItemExtraido => it !== null);
+    .filter((it): it is ItemInventarioExtraido => it !== null);
 }
 
 export async function POST(request: NextRequest) {
@@ -49,7 +51,6 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const imageBase64: string | undefined = body?.imageBase64;
   const mimeType: string | undefined = body?.mimeType;
-  const fileName: string = typeof body?.fileName === "string" ? body.fileName : "boleta";
 
   if (!imageBase64 || !mimeType) {
     return NextResponse.json({ error: "Falta el archivo." }, { status: 400 });
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   const buffer = Buffer.from(imageBase64, "base64");
 
-  let items: ItemExtraido[];
+  let items: ItemInventarioExtraido[];
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
     const limpio = respuesta.replace(/```json|```/g, "").trim();
     items = normalizarItems(JSON.parse(limpio));
   } catch (error) {
-    console.error("[lab/boleta] extraccion", error);
+    console.error("[lab/inventario-importar] extraccion", error);
     return NextResponse.json(
       { error: "No pude leer el documento con claridad. Prueba con otro archivo o carga los datos manualmente." },
       { status: 422 }
@@ -106,23 +107,10 @@ export async function POST(request: NextRequest) {
 
   if (items.length === 0) {
     return NextResponse.json(
-      { error: "No encontré productos legibles en ese documento. Prueba con otro archivo o carga los datos manualmente." },
+      { error: "No encontré insumos legibles en ese documento. Prueba con otro archivo o carga los datos manualmente." },
       { status: 422 }
     );
   }
 
-  const nombreLimpio = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const path = `${user.id}/${Date.now()}-${nombreLimpio}`;
-
-  const { error: uploadError } = await supabase.storage.from("boletas").upload(path, buffer, {
-    contentType: mimeType,
-    upsert: false,
-  });
-
-  if (uploadError) {
-    console.error("[lab/boleta] storage", uploadError);
-    return NextResponse.json({ error: `No se pudo guardar el archivo: ${uploadError.message}` }, { status: 500 });
-  }
-
-  return NextResponse.json({ items, fotoBoletaPath: path });
+  return NextResponse.json({ items });
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, type CSSProperties, type FormEvent } from "react";
-import { Pencil, Plus, Receipt, Trash2, X } from "lucide-react";
+import { FileSpreadsheet, Pencil, Plus, Receipt, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { SubirBoletaPanel } from "@/components/lab/SubirBoletaPanel";
+import { SubirInventarioPanel } from "@/components/lab/SubirInventarioPanel";
 
 export type Unidad = "g" | "ml" | "unidad";
 
@@ -102,7 +103,7 @@ export function InventarioManager({
 }) {
   const [items, setItems] = useState(initialItems);
   const [form, setForm] = useState<FormState | null>(null);
-  const [mostrarBoleta, setMostrarBoleta] = useState(false);
+  const [panel, setPanel] = useState<"boleta" | "inventario" | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -196,7 +197,7 @@ export function InventarioManager({
           <button
             type="button"
             onClick={() => {
-              setMostrarBoleta(false);
+              setPanel(null);
               setForm(formBlank());
             }}
             style={botonPrimarioStyle}
@@ -207,11 +208,21 @@ export function InventarioManager({
             type="button"
             onClick={() => {
               setForm(null);
-              setMostrarBoleta(true);
+              setPanel("boleta");
             }}
             style={botonSecundarioStyle}
           >
             <Receipt size={14} style={{ marginRight: 6 }} /> Subir boleta
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setForm(null);
+              setPanel("inventario");
+            }}
+            style={botonSecundarioStyle}
+          >
+            <FileSpreadsheet size={14} style={{ marginRight: 6 }} /> Subir inventario
           </button>
         </div>
       </div>
@@ -231,14 +242,26 @@ export function InventarioManager({
         />
       )}
 
-      {mostrarBoleta && (
+      {panel === "boleta" && (
         <SubirBoletaPanel
           items={items}
           userId={userId}
-          onCancelar={() => setMostrarBoleta(false)}
+          onCancelar={() => setPanel(null)}
           onGuardado={async () => {
             await recargar();
-            setMostrarBoleta(false);
+            setPanel(null);
+          }}
+        />
+      )}
+
+      {panel === "inventario" && (
+        <SubirInventarioPanel
+          items={items}
+          userId={userId}
+          onCancelar={() => setPanel(null)}
+          onGuardado={async () => {
+            await recargar();
+            setPanel(null);
           }}
         />
       )}
