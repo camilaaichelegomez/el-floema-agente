@@ -30,6 +30,7 @@ export interface Formula {
   margen: number | null;
   ph_objetivo: string | null;
   notas: string | null;
+  pasos: string | null;
   costo: FormulaCosto | null;
 }
 
@@ -53,6 +54,7 @@ interface FormulaFormState {
   margen: string;
   ph_objetivo: string;
   notas: string;
+  pasos: string;
   items: FormulaItemRow[];
 }
 
@@ -75,6 +77,7 @@ function formBlank(): FormulaFormState {
     margen: "",
     ph_objetivo: "",
     notas: "",
+    pasos: "",
     items: [],
   };
 }
@@ -155,6 +158,7 @@ export function FormulasManager({
       margen: formula.margen !== null ? String(formula.margen) : "",
       ph_objetivo: formula.ph_objetivo ?? "",
       notas: formula.notas ?? "",
+      pasos: formula.pasos ?? "",
       items,
     });
     setCargando(false);
@@ -209,6 +213,7 @@ export function FormulasManager({
       margen: form.margen ? Number(form.margen) : null,
       ph_objetivo: form.ph_objetivo.trim() || null,
       notas: form.notas.trim() || null,
+      pasos: form.pasos.trim() || null,
     };
 
     let formulaId = form.id;
@@ -378,6 +383,14 @@ function FormularioFormula({
         <div style={{ gridColumn: "1 / -1" }}>
           <Campo label="Notas" value={form.notas} onChange={(v) => setForm({ ...form, notas: v })} />
         </div>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <CampoTextarea
+            label="Pasos a seguir"
+            value={form.pasos}
+            onChange={(v) => setForm({ ...form, pasos: v })}
+            placeholder="1. Fundir la fase oleosa a baño maría...&#10;2. Agregar la fase acuosa...&#10;3. Emulsionar..."
+          />
+        </div>
       </div>
 
       <div style={dividerStyle} />
@@ -530,6 +543,31 @@ function CampoNumero({ label, value, onChange }: { label: string; value: string;
     <label style={campoWrapperStyle}>
       <span style={campoLabelStyle}>{label}</span>
       <input type="number" step="any" min="0" value={value} onChange={(e) => onChange(e.target.value)} style={inputStyle} />
+    </label>
+  );
+}
+
+function CampoTextarea({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label style={campoWrapperStyle}>
+      <span style={campoLabelStyle}>{label}</span>
+      <textarea
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        style={textareaStyle}
+        rows={5}
+      />
     </label>
   );
 }
@@ -717,6 +755,12 @@ const inputStyle: CSSProperties = {
   padding: "9px 10px",
   outline: "none",
   width: "100%",
+};
+
+const textareaStyle: CSSProperties = {
+  ...inputStyle,
+  resize: "vertical",
+  lineHeight: 1.5,
 };
 
 const botonAgregarItemStyle: CSSProperties = {
