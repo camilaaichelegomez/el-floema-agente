@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { SignOutButton } from "@/components/lab/SignOutButton";
+import { LabNav } from "@/components/lab/LabNav";
 import { FormulasManager, type Formula, type InventarioOpcion } from "@/components/lab/FormulasManager";
 
 export default async function FormulasLabPage() {
@@ -69,6 +70,8 @@ export default async function FormulasLabPage() {
           </div>
           <SignOutButton />
         </div>
+
+        <LabNav actual="formulas" />
 
         {error ? (
           <p style={{ fontFamily: "var(--font-body)", color: "#e05a4a" }}>

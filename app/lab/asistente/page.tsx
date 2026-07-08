@@ -2,12 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { SignOutButton } from "@/components/lab/SignOutButton";
 import { LabNav } from "@/components/lab/LabNav";
-import { InventarioManager, type InventarioItem } from "@/components/lab/InventarioManager";
+import { AsistenteChat, type InventarioOpcion } from "@/components/lab/AsistenteChat";
 
-const COLUMNAS =
-  "id, ingrediente, categoria, cantidad, unidad, precio_compra, cantidad_compra, proveedor, fecha_compra, vencimiento, notas, costo_unitario";
-
-export default async function InventarioLabPage() {
+export default async function AsistenteLabPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,9 +14,9 @@ export default async function InventarioLabPage() {
     redirect("/lab/login");
   }
 
-  const { data, error } = await supabase
+  const { data: inventarioData } = await supabase
     .from("inventario_con_costo")
-    .select(COLUMNAS)
+    .select("id, ingrediente, unidad, costo_unitario")
     .order("ingrediente", { ascending: true });
 
   return (
@@ -60,21 +57,15 @@ export default async function InventarioLabPage() {
                 letterSpacing: "0.08em",
               }}
             >
-              Inventario
+              Asistente
             </h1>
           </div>
           <SignOutButton />
         </div>
 
-        <LabNav actual="inventario" />
+        <LabNav actual="asistente" />
 
-        {error ? (
-          <p style={{ fontFamily: "var(--font-body)", color: "#e05a4a" }}>
-            No se pudo cargar el inventario: {error.message}
-          </p>
-        ) : (
-          <InventarioManager initialItems={(data as InventarioItem[] | null) ?? []} userId={user.id} />
-        )}
+        <AsistenteChat inventarioOpciones={(inventarioData as InventarioOpcion[] | null) ?? []} userId={user.id} />
       </div>
     </main>
   );
