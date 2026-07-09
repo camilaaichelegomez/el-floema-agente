@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
-import { Eye, Pencil, Plus, Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, Eye, FlaskConical, Pencil, Plus, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export interface InventarioOpcion {
@@ -9,6 +10,7 @@ export interface InventarioOpcion {
   ingrediente: string;
   unidad: string;
   costo_unitario: number | null;
+  cantidad: number;
 }
 
 export interface FormulaCosto {
@@ -346,6 +348,7 @@ export function FormulasManager({
           formula={viendo}
           items={itemsViendo}
           cargando={cargandoVer}
+          inventarioOpciones={inventarioOpciones}
           onCerrar={() => setViendo(null)}
           onEditar={() => abrirEditar(viendo)}
         />
@@ -360,15 +363,63 @@ function VistaFormula({
   formula,
   items,
   cargando,
+  inventarioOpciones,
   onCerrar,
   onEditar,
 }: {
   formula: Formula;
   items: FormulaItemRow[];
   cargando: boolean;
+  inventarioOpciones: InventarioOpcion[];
   onCerrar: () => void;
   onEditar: () => void;
 }) {
+  const router = useRouter();
+  const [preparando, setPreparando] = useState(false);
+  const [lotes, setLotes] = useState("1");
+  const [guardandoPreparacion, setGuardandoPreparacion] = useState(false);
+  const [errorPreparacion, setErrorPreparacion] = useState<string | null>(null);
+  const [preparado, setPreparado] = useState(false);
+
+  const inventarioPorId = useMemo(() => {
+    const mapa = new Map<number, InventarioOpcion>();
+    inventarioOpciones.forEach((o) => mapa.set(o.id, o));
+    return mapa;
+  }, [inventarioOpciones]);
+
+  const lotesNum = Number(lotes) || 0;
+  const itemsConDescuento = items.map((it) => {
+    const opcion = it.inventario_id !== null ? inventarioPorId.get(it.inventario_id) : undefined;
+    const aDescontar = (Number(it.gramos) || 0) * lotesNum;
+    const stockResultante = opcion ? opcion.cantidad - aDescontar : null;
+    return { ...it, opcion, aDescontar, stockResultante };
+  });
+
+  async function confirmarPreparacion() {
+    setGuardandoPreparacion(true);
+    setErrorPreparacion(null);
+    const supabase = createClient();
+
+    for (const it of itemsConDescuento) {
+      if (!it.opcion || it.stockResultante === null) continue;
+      const { error: dbError } = await supabase
+        .from("inventario")
+        .update({ cantidad: it.stockResultante })
+        .eq("id", it.opcion.id);
+
+      if (dbError) {
+        setErrorPreparacion(dbError.message);
+        setGuardandoPreparacion(false);
+        return;
+      }
+    }
+
+    setGuardandoPreparacion(false);
+    setPreparando(false);
+    setPreparado(true);
+    router.refresh();
+  }
+
   return (
     <div style={formularioStyle}>
       <div style={formularioTituloStyle}>
@@ -443,7 +494,90 @@ function VistaFormula({
             </div>
           )}
 
+          {preparado && <p style={okStyle}>Inventario descontado correctamente.</p>}
+          {errorPreparacion && <p style={errorStyle}>{errorPreparacion}</p>}
+
+          {preparando && (
+            <div style={prepararPanelStyle}>
+              <p style={itemsTituloStyle}>¿Cuántas veces vas a preparar esta receta?</p>
+              <input
+                type="number"
+                step="any"
+                min="0"
+                value={lotes}
+                onChange={(e) => setLotes(e.target.value)}
+                style={{ ...inputStyle, maxWidth: 140, marginBottom: "1rem" }}
+              />
+
+              <div style={tablaWrapperStyle}>
+                <table style={tablaStyle}>
+                  <thead>
+                    <tr>
+                      <th style={thStyle}>Ingrediente</th>
+                      <th style={thStyle}>Se descuenta</th>
+                      <th style={thStyle}>Stock actual</th>
+                      <th style={thStyle}>Quedará</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {itemsConDescuento.map((it, idx) => (
+                      <tr key={idx}>
+                        <td style={tdStyle}>{it.ingrediente}</td>
+                        <td style={tdStyle}>{it.opcion ? it.aDescontar : "—"}</td>
+                        <td style={tdStyle}>{it.opcion ? it.opcion.cantidad : "—"}</td>
+                        <td
+                          style={{
+                            ...tdStyle,
+                            color: it.stockResultante !== null && it.stockResultante < 0 ? "#e05a4a" : tdStyle.color,
+                            fontWeight: it.stockResultante !== null && it.stockResultante < 0 ? 600 : 400,
+                          }}
+                        >
+                          {it.opcion
+                            ? it.stockResultante
+                            : "no vinculado al inventario"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={accionesFormularioStyle}>
+                <button type="button" onClick={() => setPreparando(false)} style={botonSecundarioStyle}>
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmarPreparacion}
+                  disabled={guardandoPreparacion || lotesNum <= 0}
+                  style={botonPrimarioStyle}
+                >
+                  {guardandoPreparacion ? (
+                    "Descontando…"
+                  ) : (
+                    <>
+                      <Check size={14} /> Confirmar y descontar del inventario
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
           <div style={accionesFormularioStyle}>
+            {!preparando && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPreparado(false);
+                  setErrorPreparacion(null);
+                  setPreparando(true);
+                }}
+                style={botonSecundarioStyle}
+              >
+                <FlaskConical size={14} style={{ marginRight: 6 }} /> Preparar esta fórmula
+              </button>
+            )}
             <button type="button" onClick={onEditar} style={botonPrimarioStyle}>
               <Pencil size={14} /> Editar
             </button>
@@ -837,6 +971,20 @@ const errorStyle: CSSProperties = {
   fontFamily: "var(--font-body)",
   fontSize: "0.95rem",
   marginBottom: "1rem",
+};
+
+const okStyle: CSSProperties = {
+  color: "#7c9473",
+  fontFamily: "var(--font-body)",
+  fontSize: "0.95rem",
+  marginBottom: "1rem",
+};
+
+const prepararPanelStyle: CSSProperties = {
+  border: "1px solid rgba(200,160,80,0.3)",
+  background: "rgba(200,160,80,0.05)",
+  padding: "1.2rem",
+  marginTop: "1.6rem",
 };
 
 const formularioStyle: CSSProperties = {
