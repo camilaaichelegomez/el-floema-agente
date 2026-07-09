@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import Link from "next/link";
 import { Check, Send, Sparkles, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
@@ -30,6 +31,7 @@ interface FormulaSugerida {
   ph_objetivo: string | null;
   rinde_gramos: number | null;
   unidades: number | null;
+  pasos: string | null;
   items: FormulaSugeridaItem[];
 }
 
@@ -41,6 +43,7 @@ interface FormularioGuardado {
   rinde_gramos: string;
   unidades: string;
   notas: string;
+  pasos: string;
   items: Array<{
     ingrediente: string;
     inventario_id: number | null;
@@ -99,6 +102,7 @@ function formularioDesde(formula: FormulaSugerida, opciones: InventarioOpcion[])
     rinde_gramos: formula.rinde_gramos !== null && formula.rinde_gramos !== undefined ? String(formula.rinde_gramos) : "",
     unidades: formula.unidades !== null && formula.unidades !== undefined ? String(formula.unidades) : "",
     notas: "",
+    pasos: formula.pasos ?? "",
     items: (formula.items ?? []).map((it) => ({
       ingrediente: it.ingrediente,
       inventario_id: adivinarInventarioId(it.ingrediente, opciones),
@@ -122,7 +126,7 @@ export function AsistenteChat({
   const [error, setError] = useState<string | null>(null);
   const [revision, setRevision] = useState<FormularioGuardado | null>(null);
   const [guardando, setGuardando] = useState(false);
-  const [guardadoOk, setGuardadoOk] = useState(false);
+  const [formulaGuardada, setFormulaGuardada] = useState<string | null>(null);
   const finRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -163,7 +167,7 @@ export function AsistenteChat({
   }
 
   function abrirRevision(formula: FormulaSugerida) {
-    setGuardadoOk(false);
+    setFormulaGuardada(null);
     setRevision(formularioDesde(formula, inventarioOpciones));
   }
 
@@ -192,6 +196,7 @@ export function AsistenteChat({
         rinde_gramos: revision.rinde_gramos ? Number(revision.rinde_gramos) : null,
         unidades: revision.unidades ? Number(revision.unidades) : null,
         notas: revision.notas.trim() || null,
+        pasos: revision.pasos.trim() || null,
         user_id: userId,
       })
       .select("id")
@@ -223,14 +228,21 @@ export function AsistenteChat({
     }
 
     setGuardando(false);
-    setGuardadoOk(true);
+    setFormulaGuardada(revision.nombre.trim());
     setRevision(null);
   }
 
   return (
     <div>
       {error && <p style={errorStyle}>{error}</p>}
-      {guardadoOk && <p style={okStyle}>Fórmula guardada. Ya está disponible en /lab/formulas.</p>}
+      {formulaGuardada && (
+        <div style={guardadoBoxStyle}>
+          <span>&ldquo;{formulaGuardada}&rdquo; se guardó correctamente.</span>
+          <Link href="/lab/formulas" style={botonVerFormulaStyle}>
+            Ver fórmula
+          </Link>
+        </div>
+      )}
 
       <div style={chatWrapperStyle}>
         <div style={mensajesStyle}>
@@ -289,6 +301,13 @@ export function AsistenteChat({
                 value={revision.notas}
                 onChange={(v) => setRevision({ ...revision, notas: v })}
                 placeholder="Notas para replicar esta versión: por qué la elegiste, ajustes de la próxima vez, etc."
+              />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <CampoTextarea
+                label="Pasos a seguir"
+                value={revision.pasos}
+                onChange={(v) => setRevision({ ...revision, pasos: v })}
               />
             </div>
           </div>
@@ -389,6 +408,25 @@ function Campo({
   );
 }
 
+function CampoTextarea({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label style={campoWrapperStyle}>
+      <span style={campoLabelStyle}>{label}</span>
+      <textarea value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={textareaStyle} rows={5} />
+    </label>
+  );
+}
+
 const chatWrapperStyle: CSSProperties = {
   border: "1px solid rgba(200,160,80,0.35)",
   background: "rgba(26,48,34,0.5)",
@@ -480,11 +518,25 @@ const errorStyle: CSSProperties = {
   marginBottom: "1rem",
 };
 
-const okStyle: CSSProperties = {
+const guardadoBoxStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "1rem",
   color: "#7c9473",
   fontFamily: "var(--font-body)",
   fontSize: "0.95rem",
   marginBottom: "1rem",
+};
+
+const botonVerFormulaStyle: CSSProperties = {
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.6rem",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "#c8a050",
+  border: "1px solid rgba(200,160,80,0.4)",
+  padding: "6px 12px",
+  textDecoration: "none",
 };
 
 const panelRevisionStyle: CSSProperties = {
@@ -553,6 +605,12 @@ const inputStyle: CSSProperties = {
   padding: "9px 10px",
   outline: "none",
   width: "100%",
+};
+
+const textareaStyle: CSSProperties = {
+  ...inputStyle,
+  resize: "vertical",
+  lineHeight: 1.5,
 };
 
 const accionesStyle: CSSProperties = {

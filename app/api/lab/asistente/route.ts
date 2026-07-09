@@ -33,8 +33,9 @@ Instrucciones:
 - Responde siempre en español, de forma cercana y profesional, sin inventar propiedades cosméticas que no sean razonables.
 - Cuando la usuaria pida explícitamente guardar, finalizar o confirmar una fórmula, agrega al final de tu respuesta (después de tu explicación normal) un bloque de código con el lenguaje "formula" que contenga ÚNICAMENTE un JSON válido con este formato exacto:
 \`\`\`formula
-{"nombre": "string", "categoria": "string o null", "descripcion": "string o null", "ph_objetivo": "string o null", "rinde_gramos": number o null, "unidades": number o null, "items": [{"ingrediente": "string", "gramos": number, "porcentaje": number o null, "fase": "string o null"}]}
+{"nombre": "string", "categoria": "string o null", "descripcion": "string o null", "ph_objetivo": "string o null", "rinde_gramos": number o null, "unidades": number o null, "pasos": "string o null", "items": [{"ingrediente": "string", "gramos": number, "porcentaje": number o null, "fase": "string o null"}]}
 \`\`\`
+- "pasos" es el procedimiento de elaboración paso a paso (no solo las cantidades), como un solo texto con cada paso en una línea numerada (ej. "1. Fundir la fase oleosa...\\n2. Agregar la fase acuosa...").
 - No incluyas ese bloque "formula" en mensajes normales de conversación, solo cuando corresponda guardar una fórmula.`;
 }
 
