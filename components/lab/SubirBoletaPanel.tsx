@@ -3,6 +3,7 @@
 import { useRef, useState, type CSSProperties } from "react";
 import { Check, FileText, Loader2, Upload, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
+import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 import type { InventarioItem, Unidad } from "@/components/lab/InventarioManager";
 
 const UNIDADES: Unidad[] = ["g", "ml", "unidad"];
@@ -15,15 +16,6 @@ interface ItemRevision {
   precioTotal: string;
   matchId: string;
   incluir: boolean;
-}
-
-function adivinarCoincidencia(nombre: string, items: InventarioItem[]): string {
-  const n = nombre.trim().toLowerCase();
-  if (!n) return CREAR_NUEVO;
-  const encontrado = items.find(
-    (i) => n.includes(i.ingrediente.toLowerCase()) || i.ingrediente.toLowerCase().includes(n)
-  );
-  return encontrado ? encontrado.id : CREAR_NUEVO;
 }
 
 function fileToBase64(file: File): Promise<string> {
@@ -89,7 +81,7 @@ export function SubirBoletaPanel({
             cantidad: it.cantidad !== null ? String(it.cantidad) : "",
             unidad: it.unidad,
             precioTotal: it.precio_total !== null ? String(it.precio_total) : "",
-            matchId: adivinarCoincidencia(it.nombre, items),
+            matchId: adivinarCoincidencia(it.nombre, items)?.id ?? CREAR_NUEVO,
             incluir: true,
           })
         )
