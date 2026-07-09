@@ -24,7 +24,7 @@ export default async function FormulasLabPage() {
 
   const { data: inventarioData } = await supabase
     .from("inventario_con_costo")
-    .select("id, ingrediente, unidad, costo_unitario")
+    .select("id, ingrediente, unidad, costo_unitario, cantidad")
     .order("ingrediente", { ascending: true });
 
   return (
