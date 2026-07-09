@@ -295,7 +295,7 @@ export function InventarioManager({
       )}
 
       {panel === "duplicados" && (
-        <DuplicadosPanel grupos={duplicados} onCerrar={() => setPanel(null)} onFusionado={recargar} />
+        <DuplicadosPanel grupos={duplicados} onCerrar={() => setPanel(null)} onCambio={recargar} />
       )}
 
       {panel === "vaciar" && (

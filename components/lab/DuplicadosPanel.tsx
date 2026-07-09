@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Check, X } from "lucide-react";
+import { Check, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { normalizarTexto } from "@/lib/lab/coincidencias";
 import type { InventarioItem } from "@/components/lab/InventarioManager";
@@ -35,11 +35,11 @@ function elegirSuperviviente(items: InventarioItem[]): InventarioItem {
 export function DuplicadosPanel({
   grupos,
   onCerrar,
-  onFusionado,
+  onCambio,
 }: {
   grupos: GrupoDuplicado[];
   onCerrar: () => void;
-  onFusionado: () => Promise<void>;
+  onCambio: () => Promise<void>;
 }) {
   return (
     <div style={panelStyle}>
@@ -53,22 +53,24 @@ export function DuplicadosPanel({
       <p style={ayudaStyle}>
         Agrupé ingredientes con el mismo nombre (ignorando tildes y mayúsculas) y la misma unidad. Elegí cuál dejar
         como principal — las cantidades de los demás se suman ahí y esos otros se borran. Si dos ítems en realidad
-        son cosas distintas, destildá el que no corresponda para dejarlo afuera de la fusión.
+        son cosas distintas, destildá el que no corresponda para dejarlo afuera de la fusión, o usá el ícono de
+        basurero para borrar directamente un ítem puntual sin fusionarlo con nada.
       </p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
         {grupos.map((grupo) => (
-          <GrupoDuplicadoCard key={grupo.clave} grupo={grupo} onFusionado={onFusionado} />
+          <GrupoDuplicadoCard key={grupo.clave} grupo={grupo} onCambio={onCambio} />
         ))}
       </div>
     </div>
   );
 }
 
-function GrupoDuplicadoCard({ grupo, onFusionado }: { grupo: GrupoDuplicado; onFusionado: () => Promise<void> }) {
+function GrupoDuplicadoCard({ grupo, onCambio }: { grupo: GrupoDuplicado; onCambio: () => Promise<void> }) {
   const [supervivienteId, setSupervivienteId] = useState(() => elegirSuperviviente(grupo.items).id);
   const [incluidos, setIncluidos] = useState<Set<string>>(() => new Set(grupo.items.map((i) => i.id)));
   const [fusionando, setFusionando] = useState(false);
+  const [borrandoId, setBorrandoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const itemsIncluidos = grupo.items.filter((i) => incluidos.has(i.id));
@@ -121,10 +123,41 @@ function GrupoDuplicadoCard({ grupo, onFusionado }: { grupo: GrupoDuplicado; onF
         if (e4) throw e4;
       }
 
-      await onFusionado();
+      await onCambio();
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo fusionar el grupo.");
       setFusionando(false);
+    }
+  }
+
+  async function borrarItem(item: InventarioItem) {
+    if (!window.confirm(`¿Borrar "${item.ingrediente}" (${item.cantidad} ${item.unidad})? No se puede deshacer.`)) {
+      return;
+    }
+    setBorrandoId(item.id);
+    setError(null);
+    const supabase = createClient();
+
+    try {
+      const { error: e1 } = await supabase
+        .from("formula_items")
+        .update({ inventario_id: null })
+        .eq("inventario_id", item.id);
+      if (e1) throw e1;
+
+      const { error: e2 } = await supabase
+        .from("preparacion_items")
+        .update({ inventario_id: null })
+        .eq("inventario_id", item.id);
+      if (e2) throw e2;
+
+      const { error: e3 } = await supabase.from("inventario").delete().eq("id", item.id);
+      if (e3) throw e3;
+
+      await onCambio();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo borrar el ingrediente.");
+      setBorrandoId(null);
     }
   }
 
@@ -150,6 +183,20 @@ function GrupoDuplicadoCard({ grupo, onFusionado }: { grupo: GrupoDuplicado; onF
               {item.proveedor ? ` · ${item.proveedor}` : ""}
               {item.categoria ? ` · ${item.categoria}` : ""}
             </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                borrarItem(item);
+              }}
+              disabled={borrandoId === item.id}
+              style={botonBorrarItemStyle}
+              aria-label={`Borrar ${item.ingrediente}`}
+              title="Borrar este ítem (sin fusionar)"
+            >
+              <Trash2 size={13} />
+            </button>
           </label>
         ))}
       </div>
@@ -234,6 +281,15 @@ const filaStyle: CSSProperties = {
   fontFamily: "var(--font-body)",
   fontSize: "0.92rem",
   color: "#d4c4a0",
+};
+
+const botonBorrarItemStyle: CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "rgba(212,196,160,0.5)",
+  cursor: "pointer",
+  padding: "4px 6px",
+  flexShrink: 0,
 };
 
 const resultadoStyle: CSSProperties = {
