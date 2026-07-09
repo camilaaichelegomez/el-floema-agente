@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Eye, Pencil, Plus, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export interface InventarioOpcion {
@@ -119,6 +119,9 @@ export function FormulasManager({
   const [cargando, setCargando] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [viendo, setViendo] = useState<Formula | null>(null);
+  const [itemsViendo, setItemsViendo] = useState<FormulaItemRow[]>([]);
+  const [cargandoVer, setCargandoVer] = useState(false);
 
   const costoPorInventarioId = useMemo(() => {
     const mapa = new Map<number, number | null>();
@@ -137,12 +140,24 @@ export function FormulasManager({
   }
 
   async function abrirNueva() {
+    setViendo(null);
     setForm(formBlank());
     setItemsOriginales([]);
     setError(null);
   }
 
+  async function abrirVer(formula: Formula) {
+    setForm(null);
+    setCargandoVer(true);
+    setError(null);
+    setViendo(formula);
+    const items = await cargarFormula(formula.id);
+    setItemsViendo(items);
+    setCargandoVer(false);
+  }
+
   async function abrirEditar(formula: Formula) {
+    setViendo(null);
     setCargando(true);
     setError(null);
     const items = await cargarFormula(formula.id);
@@ -326,7 +341,124 @@ export function FormulasManager({
         />
       )}
 
-      <TablaFormulas formulas={formulas} onEditar={abrirEditar} onBorrar={handleBorrar} />
+      {viendo && (
+        <VistaFormula
+          formula={viendo}
+          items={itemsViendo}
+          cargando={cargandoVer}
+          onCerrar={() => setViendo(null)}
+          onEditar={() => abrirEditar(viendo)}
+        />
+      )}
+
+      <TablaFormulas formulas={formulas} onVer={abrirVer} onEditar={abrirEditar} onBorrar={handleBorrar} />
+    </div>
+  );
+}
+
+function VistaFormula({
+  formula,
+  items,
+  cargando,
+  onCerrar,
+  onEditar,
+}: {
+  formula: Formula;
+  items: FormulaItemRow[];
+  cargando: boolean;
+  onCerrar: () => void;
+  onEditar: () => void;
+}) {
+  return (
+    <div style={formularioStyle}>
+      <div style={formularioTituloStyle}>
+        <span>{formula.nombre}</span>
+        <button type="button" onClick={onCerrar} style={botonCerrarStyle} aria-label="Cerrar">
+          <X size={16} />
+        </button>
+      </div>
+
+      {cargando ? (
+        <p style={{ fontFamily: "var(--font-body)", color: "#d4c4a0", opacity: 0.7 }}>Cargando…</p>
+      ) : (
+        <>
+          <div style={gridVistaStyle}>
+            <DatoVista label="Categoría" valor={formula.categoria} />
+            <DatoVista label="Lote" valor={formula.lote} />
+            <DatoVista label="Rinde" valor={formula.rinde_gramos ? `${formula.rinde_gramos} g` : null} />
+            <DatoVista label="Unidades que rinde" valor={formula.unidades ? String(formula.unidades) : null} />
+            <DatoVista label="pH objetivo" valor={formula.ph_objetivo} />
+            <DatoVista label="Costo por unidad" valor={formatoCLP(formula.costo?.costo_unidad ?? null)} />
+            <DatoVista label="Precio sugerido" valor={formatoCLP(formula.costo?.precio_sugerido ?? null)} />
+          </div>
+
+          {formula.descripcion && (
+            <div style={{ marginBottom: "1.2rem" }}>
+              <span style={campoLabelStyle}>Descripción</span>
+              <p style={textoVistaStyle}>{formula.descripcion}</p>
+            </div>
+          )}
+
+          <div style={dividerStyle} />
+
+          <p style={itemsTituloStyle}>Ingredientes</p>
+          {items.length === 0 ? (
+            <p style={{ fontFamily: "var(--font-body)", color: "#d4c4a0", opacity: 0.7 }}>Sin ingredientes cargados.</p>
+          ) : (
+            <div style={tablaWrapperStyle}>
+              <table style={tablaStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Ingrediente</th>
+                    <th style={thStyle}>Gramos</th>
+                    <th style={thStyle}>%</th>
+                    <th style={thStyle}>Fase</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((it, idx) => (
+                    <tr key={idx}>
+                      <td style={tdStyle}>{it.ingrediente}</td>
+                      <td style={tdStyle}>{it.gramos || "—"}</td>
+                      <td style={tdStyle}>{it.porcentaje || "—"}</td>
+                      <td style={tdStyle}>{it.fase || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {formula.pasos && (
+            <div style={{ marginTop: "1.2rem" }}>
+              <span style={campoLabelStyle}>Pasos a seguir</span>
+              <p style={textoVistaStyle}>{formula.pasos}</p>
+            </div>
+          )}
+
+          {formula.notas && (
+            <div style={{ marginTop: "1.2rem" }}>
+              <span style={campoLabelStyle}>Observaciones</span>
+              <p style={textoVistaStyle}>{formula.notas}</p>
+            </div>
+          )}
+
+          <div style={accionesFormularioStyle}>
+            <button type="button" onClick={onEditar} style={botonPrimarioStyle}>
+              <Pencil size={14} /> Editar
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function DatoVista({ label, valor }: { label: string; valor: string | null }) {
+  return (
+    <div>
+      <span style={campoLabelStyle}>{label}</span>
+      <p style={{ ...textoVistaStyle, marginTop: "0.3rem" }}>{valor || "—"}</p>
     </div>
   );
 }
@@ -574,10 +706,12 @@ function CampoTextarea({
 
 function TablaFormulas({
   formulas,
+  onVer,
   onEditar,
   onBorrar,
 }: {
   formulas: Formula[];
+  onVer: (f: Formula) => void;
   onEditar: (f: Formula) => void;
   onBorrar: (f: Formula) => void;
 }) {
@@ -615,6 +749,9 @@ function TablaFormulas({
               <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{formatoCLP(f.costo?.costo_unidad ?? null)}</td>
               <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{formatoCLP(f.costo?.precio_sugerido ?? null)}</td>
               <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                <button type="button" onClick={() => onVer(f)} style={iconoAccionStyle} aria-label="Ver">
+                  <Eye size={14} />
+                </button>
                 <button type="button" onClick={() => onEditar(f)} style={iconoAccionStyle} aria-label="Editar">
                   <Pencil size={14} />
                 </button>
@@ -706,6 +843,21 @@ const gridFormularioStyle: CSSProperties = {
   gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
   gap: "1rem",
   marginBottom: "1.2rem",
+};
+
+const gridVistaStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+  gap: "1rem",
+  marginBottom: "1.2rem",
+};
+
+const textoVistaStyle: CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "0.92rem",
+  color: "#e8dcc8",
+  whiteSpace: "pre-wrap",
+  margin: 0,
 };
 
 const dividerStyle: CSSProperties = {
