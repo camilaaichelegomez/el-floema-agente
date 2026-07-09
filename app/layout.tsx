@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, Crimson_Text, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,19 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "El Floema — Con ciencia, mi magia despierta",
   description: "Cosmética botánica artesanal",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Floema Lab",
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0d1a0f",
 };
 
 export default function RootLayout({
