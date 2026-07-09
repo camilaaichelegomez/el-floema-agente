@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 
 import Link from "next/link";
 import { Check, Send, Sparkles, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
+import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 
 export interface InventarioOpcion {
   id: number;
@@ -59,22 +60,8 @@ const BIENVENIDA: Mensaje = {
     "Hola, soy tu asistente de formulación para el Lab. Conozco tu inventario actual, así que puedo ayudarte a armar fórmulas priorizando lo que ya tienes en stock. Contame qué querés crear.",
 };
 
-function normalizar(texto: string): string {
-  return texto
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
-}
-
 function adivinarInventarioId(nombre: string, opciones: InventarioOpcion[]): number | null {
-  const n = normalizar(nombre);
-  if (!n) return null;
-  const encontrado = opciones.find((o) => {
-    const io = normalizar(o.ingrediente);
-    return n.includes(io) || io.includes(n);
-  });
-  return encontrado ? encontrado.id : null;
+  return adivinarCoincidencia(nombre, opciones)?.id ?? null;
 }
 
 function extraerFormulaSugerida(texto: string): { textoLimpio: string; formula: FormulaSugerida | null } {

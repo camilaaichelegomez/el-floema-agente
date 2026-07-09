@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type CSSProperties, type FormEvent } from "react";
-import { FileSpreadsheet, Pencil, Plus, Receipt, Trash2, X } from "lucide-react";
+import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { AlertTriangle, FileSpreadsheet, Pencil, Plus, Receipt, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { SubirBoletaPanel } from "@/components/lab/SubirBoletaPanel";
 import { SubirInventarioPanel } from "@/components/lab/SubirInventarioPanel";
+import { DuplicadosPanel, detectarDuplicados } from "@/components/lab/DuplicadosPanel";
 
 export type Unidad = "g" | "ml" | "unidad";
 
@@ -103,9 +104,11 @@ export function InventarioManager({
 }) {
   const [items, setItems] = useState(initialItems);
   const [form, setForm] = useState<FormState | null>(null);
-  const [panel, setPanel] = useState<"boleta" | "inventario" | null>(null);
+  const [panel, setPanel] = useState<"boleta" | "inventario" | "duplicados" | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const duplicados = useMemo(() => detectarDuplicados(items), [items]);
 
   async function recargar() {
     const supabase = createClient();
@@ -224,6 +227,18 @@ export function InventarioManager({
           >
             <FileSpreadsheet size={14} style={{ marginRight: 6 }} /> Subir inventario
           </button>
+          {duplicados.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setForm(null);
+                setPanel("duplicados");
+              }}
+              style={botonAlertaStyle}
+            >
+              <AlertTriangle size={14} style={{ marginRight: 6 }} /> Revisar duplicados ({duplicados.length})
+            </button>
+          )}
         </div>
       </div>
 
@@ -264,6 +279,10 @@ export function InventarioManager({
             setPanel(null);
           }}
         />
+      )}
+
+      {panel === "duplicados" && (
+        <DuplicadosPanel grupos={duplicados} onCerrar={() => setPanel(null)} onFusionado={recargar} />
       )}
 
       <TablaInventario
@@ -530,6 +549,20 @@ const botonSecundarioStyle: CSSProperties = {
   color: "rgba(212,196,160,0.75)",
   background: "none",
   border: "1px solid rgba(200,160,80,0.3)",
+  padding: "10px 18px",
+  cursor: "pointer",
+};
+
+const botonAlertaStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.62rem",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "#d4a24a",
+  background: "none",
+  border: "1px solid rgba(212,130,60,0.5)",
   padding: "10px 18px",
   cursor: "pointer",
 };
