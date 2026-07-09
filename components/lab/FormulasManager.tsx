@@ -376,7 +376,9 @@ function VistaFormula({
 }) {
   const router = useRouter();
   const [preparando, setPreparando] = useState(false);
-  const [lotes, setLotes] = useState("1");
+  const [cantidadDeseada, setCantidadDeseada] = useState(() =>
+    formula.rinde_gramos ? String(formula.rinde_gramos) : ""
+  );
   const [guardandoPreparacion, setGuardandoPreparacion] = useState(false);
   const [errorPreparacion, setErrorPreparacion] = useState<string | null>(null);
   const [preparado, setPreparado] = useState(false);
@@ -387,11 +389,13 @@ function VistaFormula({
     return mapa;
   }, [inventarioOpciones]);
 
-  const lotesNum = Number(lotes) || 0;
+  const rindeBase = formula.rinde_gramos || items.reduce((suma, it) => suma + (Number(it.gramos) || 0), 0);
+  const cantidadDeseadaNum = Number(cantidadDeseada) || 0;
+  const factor = rindeBase > 0 ? cantidadDeseadaNum / rindeBase : 0;
   const itemsConDescuento = items.map((it) => {
     const opcion = it.inventario_id !== null ? inventarioPorId.get(it.inventario_id) : undefined;
-    const aDescontar = (Number(it.gramos) || 0) * lotesNum;
-    const stockResultante = opcion ? opcion.cantidad - aDescontar : null;
+    const aDescontar = Math.round((Number(it.gramos) || 0) * factor * 100) / 100;
+    const stockResultante = opcion ? Math.round((opcion.cantidad - aDescontar) * 100) / 100 : null;
     return { ...it, opcion, aDescontar, stockResultante };
   });
 
@@ -499,17 +503,23 @@ function VistaFormula({
 
           {preparando && (
             <div style={prepararPanelStyle}>
-              <p style={itemsTituloStyle}>¿Cuántas veces vas a preparar esta receta?</p>
+              <p style={itemsTituloStyle}>¿Cuántos gramos vas a preparar?</p>
               <input
                 type="number"
                 step="any"
                 min="0"
-                value={lotes}
-                onChange={(e) => setLotes(e.target.value)}
-                style={{ ...inputStyle, maxWidth: 140, marginBottom: "1rem" }}
+                value={cantidadDeseada}
+                onChange={(e) => setCantidadDeseada(e.target.value)}
+                placeholder={rindeBase ? `Ej: ${rindeBase}` : "Ej: 300"}
+                style={{ ...inputStyle, maxWidth: 140, marginBottom: "0.4rem" }}
               />
+              <p style={estimadoStyle}>
+                {formula.rinde_gramos
+                  ? `La receta original rinde ${formula.rinde_gramos} g. Se recalculan las cantidades de forma proporcional.`
+                  : `Esta fórmula no tiene "Rinde" definido, así que se usa la suma de sus ingredientes (${rindeBase} g) como base.`}
+              </p>
 
-              <div style={tablaWrapperStyle}>
+              <div style={{ ...tablaWrapperStyle, marginTop: "1rem" }}>
                 <table style={tablaStyle}>
                   <thead>
                     <tr>
@@ -549,7 +559,7 @@ function VistaFormula({
                 <button
                   type="button"
                   onClick={confirmarPreparacion}
-                  disabled={guardandoPreparacion || lotesNum <= 0}
+                  disabled={guardandoPreparacion || cantidadDeseadaNum <= 0 || rindeBase <= 0}
                   style={botonPrimarioStyle}
                 >
                   {guardandoPreparacion ? (
