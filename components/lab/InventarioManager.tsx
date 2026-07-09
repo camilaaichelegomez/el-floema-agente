@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase-browser";
 import { SubirBoletaPanel } from "@/components/lab/SubirBoletaPanel";
 import { SubirInventarioPanel } from "@/components/lab/SubirInventarioPanel";
 import { DuplicadosPanel, detectarDuplicados } from "@/components/lab/DuplicadosPanel";
+import { VaciarInventarioPanel } from "@/components/lab/VaciarInventarioPanel";
 
 export type Unidad = "g" | "ml" | "unidad";
 
@@ -104,7 +105,7 @@ export function InventarioManager({
 }) {
   const [items, setItems] = useState(initialItems);
   const [form, setForm] = useState<FormState | null>(null);
-  const [panel, setPanel] = useState<"boleta" | "inventario" | "duplicados" | null>(null);
+  const [panel, setPanel] = useState<"boleta" | "inventario" | "duplicados" | "vaciar" | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -239,6 +240,18 @@ export function InventarioManager({
               <AlertTriangle size={14} style={{ marginRight: 6 }} /> Revisar duplicados ({duplicados.length})
             </button>
           )}
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setForm(null);
+                setPanel("vaciar");
+              }}
+              style={botonPeligroSecundarioStyle}
+            >
+              <Trash2 size={14} style={{ marginRight: 6 }} /> Vaciar inventario
+            </button>
+          )}
         </div>
       </div>
 
@@ -283,6 +296,17 @@ export function InventarioManager({
 
       {panel === "duplicados" && (
         <DuplicadosPanel grupos={duplicados} onCerrar={() => setPanel(null)} onFusionado={recargar} />
+      )}
+
+      {panel === "vaciar" && (
+        <VaciarInventarioPanel
+          items={items}
+          onCerrar={() => setPanel(null)}
+          onVaciado={async () => {
+            await recargar();
+            setPanel(null);
+          }}
+        />
       )}
 
       <TablaInventario
@@ -563,6 +587,20 @@ const botonAlertaStyle: CSSProperties = {
   color: "#d4a24a",
   background: "none",
   border: "1px solid rgba(212,130,60,0.5)",
+  padding: "10px 18px",
+  cursor: "pointer",
+};
+
+const botonPeligroSecundarioStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.62rem",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "#e05a4a",
+  background: "none",
+  border: "1px solid rgba(224,90,74,0.4)",
   padding: "10px 18px",
   cursor: "pointer",
 };
