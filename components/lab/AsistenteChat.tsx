@@ -422,7 +422,7 @@ function CampoTextarea({
   return (
     <label style={campoWrapperStyle}>
       <span style={campoLabelStyle}>{label}</span>
-      <textarea value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={textareaStyle} rows={5} />
+      <textarea value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={textareaStyle} rows={10} />
     </label>
   );
 }

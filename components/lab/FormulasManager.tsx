@@ -430,9 +430,9 @@ function VistaFormula({
           )}
 
           {formula.pasos && (
-            <div style={{ marginTop: "1.2rem" }}>
-              <span style={campoLabelStyle}>Pasos a seguir</span>
-              <p style={textoVistaStyle}>{formula.pasos}</p>
+            <div style={{ marginTop: "1.6rem" }}>
+              <span style={itemsTituloStyle}>Pasos a seguir</span>
+              <PasosVista texto={formula.pasos} />
             </div>
           )}
 
@@ -451,6 +451,25 @@ function VistaFormula({
         </>
       )}
     </div>
+  );
+}
+
+function PasosVista({ texto }: { texto: string }) {
+  const pasos = texto
+    .split("\n")
+    .map((linea) => linea.trim())
+    .filter(Boolean)
+    .map((linea) => linea.replace(/^\d+[.)]\s*/, ""));
+
+  return (
+    <ol style={pasosListaStyle}>
+      {pasos.map((paso, idx) => (
+        <li key={idx} style={pasosItemStyle}>
+          <span style={pasosNumeroStyle}>{idx + 1}</span>
+          <span style={pasosTextoStyle}>{paso}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -698,7 +717,7 @@ function CampoTextarea({
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         style={textareaStyle}
-        rows={5}
+        rows={10}
       />
     </label>
   );
@@ -858,6 +877,45 @@ const textoVistaStyle: CSSProperties = {
   color: "#e8dcc8",
   whiteSpace: "pre-wrap",
   margin: 0,
+};
+
+const pasosListaStyle: CSSProperties = {
+  listStyle: "none",
+  margin: "0.8rem 0 0",
+  padding: 0,
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+};
+
+const pasosItemStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: "1rem",
+  border: "1px solid rgba(200,160,80,0.25)",
+  background: "rgba(200,160,80,0.05)",
+  padding: "1rem 1.2rem",
+};
+
+const pasosNumeroStyle: CSSProperties = {
+  flexShrink: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 32,
+  height: 32,
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "1rem",
+  color: "#0d1a0d",
+  background: "#c8a050",
+};
+
+const pasosTextoStyle: CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "1.15rem",
+  lineHeight: 1.6,
+  color: "#e8dcc8",
+  paddingTop: "3px",
 };
 
 const dividerStyle: CSSProperties = {
