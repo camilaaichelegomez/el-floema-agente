@@ -349,6 +349,7 @@ export function FormulasManager({
           items={itemsViendo}
           cargando={cargandoVer}
           inventarioOpciones={inventarioOpciones}
+          userId={userId}
           onCerrar={() => setViendo(null)}
           onEditar={() => abrirEditar(viendo)}
         />
@@ -364,6 +365,7 @@ function VistaFormula({
   items,
   cargando,
   inventarioOpciones,
+  userId,
   onCerrar,
   onEditar,
 }: {
@@ -371,6 +373,7 @@ function VistaFormula({
   items: FormulaItemRow[];
   cargando: boolean;
   inventarioOpciones: InventarioOpcion[];
+  userId: string;
   onCerrar: () => void;
   onEditar: () => void;
 }) {
@@ -413,6 +416,40 @@ function VistaFormula({
 
       if (dbError) {
         setErrorPreparacion(dbError.message);
+        setGuardandoPreparacion(false);
+        return;
+      }
+    }
+
+    const { data: preparacionData, error: preparacionError } = await supabase
+      .from("preparaciones")
+      .insert({
+        formula_id: formula.id,
+        nombre_formula: formula.nombre,
+        cantidad_gramos: cantidadDeseadaNum,
+        pasos: formula.pasos,
+        user_id: userId,
+      })
+      .select("id")
+      .single();
+
+    if (preparacionError || !preparacionData) {
+      setErrorPreparacion(preparacionError?.message ?? "No se pudo guardar el registro de preparación.");
+      setGuardandoPreparacion(false);
+      return;
+    }
+
+    for (const it of itemsConDescuento) {
+      const { error: itemError } = await supabase.from("preparacion_items").insert({
+        preparacion_id: preparacionData.id,
+        ingrediente: it.ingrediente,
+        gramos: it.aDescontar,
+        inventario_id: it.opcion ? it.opcion.id : null,
+        user_id: userId,
+      });
+
+      if (itemError) {
+        setErrorPreparacion(itemError.message);
         setGuardandoPreparacion(false);
         return;
       }
@@ -498,7 +535,9 @@ function VistaFormula({
             </div>
           )}
 
-          {preparado && <p style={okStyle}>Inventario descontado correctamente.</p>}
+          {preparado && (
+            <p style={okStyle}>Inventario descontado y guardado en /lab/preparadas.</p>
+          )}
           {errorPreparacion && <p style={errorStyle}>{errorPreparacion}</p>}
 
           {preparando && (

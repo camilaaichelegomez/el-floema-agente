@@ -4,10 +4,11 @@ import type { CSSProperties } from "react";
 const ENLACES = [
   { href: "/lab/inventario", label: "Inventario" },
   { href: "/lab/formulas", label: "Fórmulas" },
+  { href: "/lab/preparadas", label: "Preparadas" },
   { href: "/lab/asistente", label: "Asistente" },
 ];
 
-export function LabNav({ actual }: { actual: "inventario" | "formulas" | "asistente" }) {
+export function LabNav({ actual }: { actual: "inventario" | "formulas" | "preparadas" | "asistente" }) {
   return (
     <nav style={navStyle}>
       {ENLACES.map((e) => {
