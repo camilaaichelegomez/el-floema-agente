@@ -1,7 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import { TIPOS_PDF, TIPOS_EXCEL, TIPOS_WORD, excelATexto, wordATexto } from "@/lib/lab/documentos";
+import {
+  TIPOS_PDF,
+  TIPOS_EXCEL,
+  TIPOS_WORD,
+  excelATexto,
+  wordATexto,
+  generarArrayJsonConReintento,
+} from "@/lib/lab/documentos";
 
 const PROMPT = `Este es un documento (foto, PDF, planilla Excel o Word) con una lista de insumos de cosmética natural artesanal: un inventario o listado de stock, no necesariamente una boleta de compra.
 Extrae cada ingrediente/insumo de la lista. Responde ÚNICAMENTE con un array JSON válido, sin texto adicional, sin markdown, con este formato exacto:
@@ -80,23 +87,26 @@ export async function POST(request: NextRequest) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    let result;
-    if (esImagen || esPdf) {
-      result = await model.generateContent([{ inlineData: { mimeType, data: imageBase64 } }, { text: PROMPT }]);
-    } else {
-      const texto = esExcel ? excelATexto(buffer) : await wordATexto(buffer);
-      if (!texto.trim()) {
+    let textoDocumento: string | null = null;
+    if (!esImagen && !esPdf) {
+      textoDocumento = esExcel ? excelATexto(buffer) : await wordATexto(buffer);
+      if (!textoDocumento.trim()) {
         return NextResponse.json(
           { error: "El archivo no tiene contenido legible. Prueba con otro archivo." },
           { status: 422 }
         );
       }
-      result = await model.generateContent([`${PROMPT}\n\nContenido del documento:\n\n${texto}`]);
     }
 
-    const respuesta = result.response.text();
-    const limpio = respuesta.replace(/```json|```/g, "").trim();
-    items = normalizarItems(JSON.parse(limpio));
+    const parsed = await generarArrayJsonConReintento(async () => {
+      const result =
+        esImagen || esPdf
+          ? await model.generateContent([{ inlineData: { mimeType, data: imageBase64 } }, { text: PROMPT }])
+          : await model.generateContent([`${PROMPT}\n\nContenido del documento:\n\n${textoDocumento}`]);
+      return result.response.text();
+    });
+
+    items = normalizarItems(parsed);
   } catch (error) {
     console.error("[lab/inventario-importar] extraccion", error);
     return NextResponse.json(
