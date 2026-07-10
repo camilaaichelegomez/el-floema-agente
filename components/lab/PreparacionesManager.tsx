@@ -127,7 +127,7 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
       {error && <p style={errorStyle}>{error}</p>}
 
       {viendo && (
-        <div style={panelStyle}>
+        <div className="lab-panel" style={panelStyle}>
           <div style={tituloStyle}>
             <span>
               {viendo.nombre_formula} · {viendo.cantidad_gramos} g
@@ -144,7 +144,7 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
           ) : (
             <>
               <p style={itemsTituloStyle}>Ingredientes usados</p>
-              <div style={tablaWrapperStyle}>
+              <div className="lab-tabla-marco" style={tablaWrapperStyle}>
                 <table style={tablaStyle}>
                   <thead>
                     <tr>
@@ -180,7 +180,7 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
           /lab/formulas, va a aparecer acá.
         </p>
       ) : (
-        <div style={tablaWrapperStyle}>
+        <div className="lab-tabla-marco" style={tablaWrapperStyle}>
           <table style={tablaStyle}>
             <thead>
               <tr>
@@ -247,8 +247,6 @@ const errorStyle: CSSProperties = {
 };
 
 const panelStyle: CSSProperties = {
-  border: "1px solid rgba(200,160,80,0.35)",
-  background: "rgba(26,48,34,0.5)",
   padding: "clamp(18px, 3vw, 28px)",
   marginBottom: "2rem",
 };
@@ -318,7 +316,10 @@ const pasosNumeroStyle: CSSProperties = {
   fontFamily: "var(--font-grimoire)",
   fontSize: "1rem",
   color: "#0d1a0d",
-  background: "#c8a050",
+  background: "radial-gradient(circle at 35% 30%, #e8c070, #c8a050 60%, #a87f35)",
+  borderRadius: "50%",
+  border: "1px solid rgba(255, 226, 160, 0.5)",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.45)",
 };
 
 const pasosTextoStyle: CSSProperties = {

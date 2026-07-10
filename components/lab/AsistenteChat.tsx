@@ -231,7 +231,7 @@ export function AsistenteChat({
         </div>
       )}
 
-      <div style={chatWrapperStyle}>
+      <div className="lab-panel" style={chatWrapperStyle}>
         <div style={mensajesStyle}>
           {mensajes.map((m, idx) => {
             const { textoLimpio, formula } = m.role === "model" ? extraerFormulaSugerida(m.content) : { textoLimpio: m.content, formula: null };
@@ -265,7 +265,7 @@ export function AsistenteChat({
       </div>
 
       {revision && (
-        <div style={panelRevisionStyle}>
+        <div className="lab-panel" style={panelRevisionStyle}>
           <div style={tituloRevisionStyle}>
             <span>Guardar como fórmula</span>
             <button type="button" onClick={() => setRevision(null)} style={botonCerrarStyle} aria-label="Cerrar">
@@ -415,8 +415,6 @@ function CampoTextarea({
 }
 
 const chatWrapperStyle: CSSProperties = {
-  border: "1px solid rgba(200,160,80,0.35)",
-  background: "rgba(26,48,34,0.5)",
   display: "flex",
   flexDirection: "column",
   height: "min(70vh, 640px)",
@@ -492,8 +490,10 @@ const botonEnviarStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   color: "#0d1a0d",
-  background: "#c8a050",
-  border: "none",
+  background: "linear-gradient(160deg, #e8c070 0%, #c8a050 55%, #a87f35 100%)",
+  border: "1px solid rgba(255, 226, 160, 0.55)",
+  borderRadius: 2,
+  boxShadow: "0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,240,200,0.5)",
   padding: "0 16px",
   cursor: "pointer",
 };
@@ -527,8 +527,6 @@ const botonVerFormulaStyle: CSSProperties = {
 };
 
 const panelRevisionStyle: CSSProperties = {
-  border: "1px solid rgba(200,160,80,0.35)",
-  background: "rgba(26,48,34,0.5)",
   padding: "clamp(18px, 3vw, 28px)",
   marginTop: "1.5rem",
 };
@@ -616,8 +614,10 @@ const botonPrimarioStyle: CSSProperties = {
   letterSpacing: "0.14em",
   textTransform: "uppercase",
   color: "#0d1a0d",
-  background: "#c8a050",
-  border: "none",
+  background: "linear-gradient(160deg, #e8c070 0%, #c8a050 55%, #a87f35 100%)",
+  border: "1px solid rgba(255, 226, 160, 0.55)",
+  borderRadius: 2,
+  boxShadow: "0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,240,200,0.5)",
   padding: "10px 18px",
   cursor: "pointer",
   whiteSpace: "nowrap",

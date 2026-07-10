@@ -62,7 +62,7 @@ export default function LoginLabPage() {
 
   return (
     <main
-      className="parchment-bg"
+      className="parchment-bg lab-bg"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -72,12 +72,10 @@ export default function LoginLabPage() {
       }}
     >
       <div
+        className="lab-panel"
         style={{
           width: "100%",
           maxWidth: "420px",
-          border: "1px solid rgba(200, 160, 80, 0.35)",
-          boxShadow: "0 8px 35px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(200, 160, 80, 0.15)",
-          background: "linear-gradient(180deg, rgba(26,48,34,0.96) 0%, rgba(8,12,10,0.98) 100%)",
           padding: "clamp(28px, 5vw, 44px)",
         }}
       >
@@ -95,16 +93,31 @@ export default function LoginLabPage() {
           Área privada
         </span>
         <h1
+          className="lab-titulo"
           style={{
             fontFamily: "var(--font-grimoire)",
             fontSize: "clamp(1.5rem, 3.2vw, 2rem)",
             color: "#c8a050",
             letterSpacing: "0.08em",
-            marginBottom: "1.6rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
           }}
         >
+          <span className="lab-hojas" style={{ fontSize: "0.55em" }} aria-hidden>
+            ❧
+          </span>
           El Floema Lab
+          <span className="lab-hojas" style={{ fontSize: "0.55em", transform: "scaleX(-1)", display: "inline-block" }} aria-hidden>
+            ❧
+          </span>
         </h1>
+
+        <div className="lab-flourish" aria-hidden>
+          <span style={{ color: "rgba(200,160,80,0.8)", fontSize: "0.7rem" }}>✦</span>
+          <span className="lab-hojas">❦</span>
+          <span style={{ color: "rgba(200,160,80,0.8)", fontSize: "0.7rem" }}>✦</span>
+        </div>
 
         <div
           style={{
@@ -210,8 +223,10 @@ export default function LoginLabPage() {
               letterSpacing: "0.18em",
               textTransform: "uppercase",
               color: "#0d1a0d",
-              background: "#c8a050",
-              border: "none",
+              background: "linear-gradient(160deg, #e8c070 0%, #c8a050 55%, #a87f35 100%)",
+              border: "1px solid rgba(255, 226, 160, 0.55)",
+              borderRadius: 2,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,240,200,0.5)",
               cursor: cargando ? "wait" : "pointer",
               opacity: cargando ? 0.7 : 1,
               transition: "opacity 0.2s ease",
