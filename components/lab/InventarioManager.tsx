@@ -333,7 +333,7 @@ function FormularioIngrediente({
   guardando: boolean;
 }) {
   return (
-    <form onSubmit={onSubmit} style={formularioStyle}>
+    <form onSubmit={onSubmit} className="lab-panel" style={formularioStyle}>
       <div style={formularioTituloStyle}>
         <span>{form.id ? "Editar ingrediente" : "Nuevo ingrediente"}</span>
         <button type="button" onClick={onCancel} style={botonCerrarStyle} aria-label="Cerrar">
@@ -476,7 +476,7 @@ function TablaInventario({
   }
 
   return (
-    <div style={tablaWrapperStyle}>
+    <div className="lab-tabla-marco" style={tablaWrapperStyle}>
       <table style={tablaStyle}>
         <thead>
           <tr>
@@ -558,8 +558,10 @@ const botonPrimarioStyle: CSSProperties = {
   letterSpacing: "0.14em",
   textTransform: "uppercase",
   color: "#0d1a0d",
-  background: "#c8a050",
-  border: "none",
+  background: "linear-gradient(160deg, #e8c070 0%, #c8a050 55%, #a87f35 100%)",
+  border: "1px solid rgba(255, 226, 160, 0.55)",
+  borderRadius: 2,
+  boxShadow: "0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,240,200,0.5)",
   padding: "10px 18px",
   cursor: "pointer",
   whiteSpace: "nowrap",
@@ -622,8 +624,6 @@ const errorStyle: CSSProperties = {
 };
 
 const formularioStyle: CSSProperties = {
-  border: "1px solid rgba(200,160,80,0.35)",
-  background: "rgba(26,48,34,0.5)",
   padding: "clamp(18px, 3vw, 28px)",
   marginBottom: "2rem",
 };

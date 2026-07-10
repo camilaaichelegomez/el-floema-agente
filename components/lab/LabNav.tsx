@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import { Fragment, type CSSProperties } from "react";
 
 const ENLACES = [
   { href: "/lab/inventario", label: "Inventario" },
@@ -11,12 +11,19 @@ const ENLACES = [
 export function LabNav({ actual }: { actual: "inventario" | "formulas" | "preparadas" | "asistente" }) {
   return (
     <nav style={navStyle}>
-      {ENLACES.map((e) => {
+      {ENLACES.map((e, idx) => {
         const activo = e.href.endsWith(actual);
         return (
-          <Link key={e.href} href={e.href} style={activo ? { ...enlaceStyle, ...enlaceActivoStyle } : enlaceStyle}>
-            {e.label}
-          </Link>
+          <Fragment key={e.href}>
+            {idx > 0 && (
+              <span style={separadorStyle} aria-hidden>
+                ✦
+              </span>
+            )}
+            <Link href={e.href} style={activo ? { ...enlaceStyle, ...enlaceActivoStyle } : enlaceStyle}>
+              {e.label}
+            </Link>
+          </Fragment>
         );
       })}
     </nav>
@@ -25,9 +32,15 @@ export function LabNav({ actual }: { actual: "inventario" | "formulas" | "prepar
 
 const navStyle: CSSProperties = {
   display: "flex",
-  gap: "1.2rem",
-  marginBottom: "1.5rem",
+  alignItems: "center",
+  gap: "1rem",
+  marginBottom: "1.8rem",
   flexWrap: "wrap",
+};
+
+const separadorStyle: CSSProperties = {
+  color: "rgba(154, 106, 170, 0.55)",
+  fontSize: "0.55rem",
 };
 
 const enlaceStyle: CSSProperties = {
@@ -42,6 +55,7 @@ const enlaceStyle: CSSProperties = {
 };
 
 const enlaceActivoStyle: CSSProperties = {
-  color: "#c8a050",
+  color: "#e8c070",
   borderBottom: "1px solid #c8a050",
+  textShadow: "0 0 14px rgba(200,160,80,0.5)",
 };
