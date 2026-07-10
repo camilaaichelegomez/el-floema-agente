@@ -4,6 +4,7 @@ import { useRef, useState, type CSSProperties } from "react";
 import { Check, FileText, Loader2, Upload, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
+import { comprimirImagenSiHaceFalta } from "@/lib/lab/imagen";
 import type { InventarioItem, Unidad } from "@/components/lab/InventarioManager";
 
 const UNIDADES: Unidad[] = ["g", "ml", "unidad"];
@@ -53,13 +54,15 @@ export function SubirInventarioPanel({
   const [archivoNombre, setArchivoNombre] = useState<string | null>(null);
   const [revision, setRevision] = useState<ItemRevision[] | null>(null);
 
-  async function handleArchivo(file: File | undefined) {
-    if (!file) return;
+  async function handleArchivo(archivoOriginal: File | undefined) {
+    if (!archivoOriginal) return;
     setError(null);
     setRevision(null);
-    setArchivoNombre(file.name);
-    setPreview(file.type.startsWith("image/") ? URL.createObjectURL(file) : null);
+    setArchivoNombre(archivoOriginal.name);
+    setPreview(archivoOriginal.type.startsWith("image/") ? URL.createObjectURL(archivoOriginal) : null);
     setCargando(true);
+
+    const file = await comprimirImagenSiHaceFalta(archivoOriginal);
 
     try {
       const imageBase64 = await fileToBase64(file);
