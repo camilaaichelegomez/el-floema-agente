@@ -79,35 +79,11 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
     setBorrando(preparacion.id);
     const supabase = createClient();
 
-    const items = await cargarItems(preparacion.id);
+    // Una sola transacción: devuelve el stock y borra el registro — todo o nada.
+    const { error: rpcError } = await supabase.rpc("borrar_preparacion", { p_id: preparacion.id });
 
-    for (const it of items) {
-      if (it.inventario_id === null) continue;
-
-      const { data: inv, error: invError } = await supabase
-        .from("inventario")
-        .select("cantidad")
-        .eq("id", it.inventario_id)
-        .single();
-
-      if (invError || !inv) continue;
-
-      const { error: updateError } = await supabase
-        .from("inventario")
-        .update({ cantidad: inv.cantidad + it.gramos })
-        .eq("id", it.inventario_id);
-
-      if (updateError) {
-        setError(updateError.message);
-        setBorrando(null);
-        return;
-      }
-    }
-
-    const { error: dbError } = await supabase.from("preparaciones").delete().eq("id", preparacion.id);
-
-    if (dbError) {
-      setError(dbError.message);
+    if (rpcError) {
+      setError(rpcError.message);
       setBorrando(null);
       return;
     }

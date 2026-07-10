@@ -4,6 +4,7 @@ import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Eye, FlaskConical, Pencil, Plus, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
+import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 
 export interface InventarioOpcion {
   id: number;
@@ -349,7 +350,6 @@ export function FormulasManager({
           items={itemsViendo}
           cargando={cargandoVer}
           inventarioOpciones={inventarioOpciones}
-          userId={userId}
           onCerrar={() => setViendo(null)}
           onEditar={() => abrirEditar(viendo)}
         />
@@ -365,7 +365,6 @@ function VistaFormula({
   items,
   cargando,
   inventarioOpciones,
-  userId,
   onCerrar,
   onEditar,
 }: {
@@ -373,7 +372,6 @@ function VistaFormula({
   items: FormulaItemRow[];
   cargando: boolean;
   inventarioOpciones: InventarioOpcion[];
-  userId: string;
   onCerrar: () => void;
   onEditar: () => void;
 }) {
@@ -397,11 +395,21 @@ function VistaFormula({
   const cantidadDeseadaNum = Number(cantidadDeseada) || 0;
   const factor = rindeBase > 0 ? cantidadDeseadaNum / rindeBase : 0;
   const itemsConDescuento = items.map((it) => {
-    const inventarioIdEfectivo = (it.id !== null ? vinculosManual[it.id] : undefined) ?? it.inventario_id;
-    const opcion = inventarioIdEfectivo !== null ? inventarioPorId.get(inventarioIdEfectivo) : undefined;
+    let inventarioIdEfectivo = (it.id !== null ? vinculosManual[it.id] : undefined) ?? it.inventario_id;
+    let autoVinculado = false;
+    if (inventarioIdEfectivo === null || inventarioIdEfectivo === undefined) {
+      const coincidencia = adivinarCoincidencia(it.ingrediente, inventarioOpciones);
+      if (coincidencia) {
+        inventarioIdEfectivo = coincidencia.id;
+        autoVinculado = true;
+      }
+    }
+    const opcion = inventarioIdEfectivo !== null && inventarioIdEfectivo !== undefined
+      ? inventarioPorId.get(inventarioIdEfectivo)
+      : undefined;
     const aDescontar = Math.round((Number(it.gramos) || 0) * factor * 100) / 100;
     const stockResultante = opcion ? Math.round((opcion.cantidad - aDescontar) * 100) / 100 : null;
-    return { ...it, inventarioIdEfectivo, opcion, aDescontar, stockResultante };
+    return { ...it, inventarioIdEfectivo, opcion, aDescontar, stockResultante, autoVinculado };
   });
 
   async function confirmarPreparacion() {
@@ -409,65 +417,32 @@ function VistaFormula({
     setErrorPreparacion(null);
     const supabase = createClient();
 
+    // Incluye los vínculos manuales y los que se adivinaron automáticamente
+    // por nombre, para que la función en la base de datos los aplique igual.
+    const vinculosEfectivos: Record<number, number> = {};
     for (const it of itemsConDescuento) {
-      if (it.id !== null && vinculosManual[it.id] !== undefined && vinculosManual[it.id] !== it.inventario_id) {
-        const { error: dbError } = await supabase
-          .from("formula_items")
-          .update({ inventario_id: vinculosManual[it.id] })
-          .eq("id", it.id);
-
-        if (dbError) {
-          setErrorPreparacion(dbError.message);
-          setGuardandoPreparacion(false);
-          return;
-        }
-      }
-
-      if (!it.opcion || it.stockResultante === null) continue;
-      const { error: dbError } = await supabase
-        .from("inventario")
-        .update({ cantidad: it.stockResultante })
-        .eq("id", it.opcion.id);
-
-      if (dbError) {
-        setErrorPreparacion(dbError.message);
-        setGuardandoPreparacion(false);
-        return;
+      if (
+        it.id !== null &&
+        it.inventarioIdEfectivo !== null &&
+        it.inventarioIdEfectivo !== undefined &&
+        it.inventarioIdEfectivo !== it.inventario_id
+      ) {
+        vinculosEfectivos[it.id] = it.inventarioIdEfectivo;
       }
     }
 
-    const { data: preparacionData, error: preparacionError } = await supabase
-      .from("preparaciones")
-      .insert({
-        formula_id: formula.id,
-        nombre_formula: formula.nombre,
-        cantidad_gramos: cantidadDeseadaNum,
-        pasos: formula.pasos,
-        user_id: userId,
-      })
-      .select("id")
-      .single();
+    // Una sola transacción en la base de datos: aplica vínculos manuales,
+    // descuenta el inventario y registra la preparación — todo o nada.
+    const { error: rpcError } = await supabase.rpc("preparar_formula", {
+      f_id: formula.id,
+      gramos_deseados: cantidadDeseadaNum,
+      vinculos: vinculosEfectivos,
+    });
 
-    if (preparacionError || !preparacionData) {
-      setErrorPreparacion(preparacionError?.message ?? "No se pudo guardar el registro de preparación.");
+    if (rpcError) {
+      setErrorPreparacion(rpcError.message);
       setGuardandoPreparacion(false);
       return;
-    }
-
-    for (const it of itemsConDescuento) {
-      const { error: itemError } = await supabase.from("preparacion_items").insert({
-        preparacion_id: preparacionData.id,
-        ingrediente: it.ingrediente,
-        gramos: it.aDescontar,
-        inventario_id: it.opcion ? it.opcion.id : null,
-        user_id: userId,
-      });
-
-      if (itemError) {
-        setErrorPreparacion(itemError.message);
-        setGuardandoPreparacion(false);
-        return;
-      }
     }
 
     setGuardandoPreparacion(false);
@@ -586,7 +561,14 @@ function VistaFormula({
                   <tbody>
                     {itemsConDescuento.map((it, idx) => (
                       <tr key={idx}>
-                        <td style={tdStyle}>{it.ingrediente}</td>
+                        <td style={tdStyle}>
+                          {it.ingrediente}
+                          {it.autoVinculado && (
+                            <span style={{ display: "block", fontSize: "0.72rem", color: "#8fae7a", fontStyle: "italic" }}>
+                              vinculado automáticamente
+                            </span>
+                          )}
+                        </td>
                         <td style={tdStyle}>{it.aDescontar}</td>
                         <td style={tdStyle}>
                           {it.opcion ? `${it.opcion.cantidad} ${it.opcion.unidad}` : "—"}
