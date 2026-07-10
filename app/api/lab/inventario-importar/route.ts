@@ -63,6 +63,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Falta el archivo." }, { status: 400 });
   }
 
+  // Vercel rechaza cuerpos >4.5 MB antes de llegar aca; este limite da un error claro en cualquier entorno.
+  if (typeof imageBase64 !== "string" || imageBase64.length > 8_000_000) {
+    return NextResponse.json(
+      { error: "El archivo es muy pesado (max. ~5 MB). Prueba con una foto mas liviana o un PDF/Excel." },
+      { status: 413 }
+    );
+  }
+
   const esImagen = mimeType.startsWith("image/");
   const esPdf = TIPOS_PDF.has(mimeType);
   const esExcel = TIPOS_EXCEL.has(mimeType);

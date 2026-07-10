@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const RUTAS_PROTEGIDAS = ["/lab/inventario", "/lab/formulas"];
+// Todo /lab requiere sesión, salvo la página de login.
+const RUTAS_PUBLICAS = ["/lab/login"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -29,11 +30,11 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const esRutaProtegida = RUTAS_PROTEGIDAS.some((ruta) =>
+  const esRutaPublica = RUTAS_PUBLICAS.some((ruta) =>
     request.nextUrl.pathname.startsWith(ruta)
   );
 
-  if (esRutaProtegida && !user) {
+  if (!esRutaPublica && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/lab/login";
     return NextResponse.redirect(url);

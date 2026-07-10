@@ -56,6 +56,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Falta el mensaje." }, { status: 400 });
   }
 
+  // Limita tamaño y forma de la conversación para no quemar cuota de Gemini con payloads anómalos.
+  const MAX_MENSAJES = 40;
+  const MAX_LARGO_MENSAJE = 6_000;
+  const mensajesValidos = mensajes.every(
+    (m) =>
+      m &&
+      typeof m === "object" &&
+      (m.role === "user" || m.role === "model") &&
+      typeof m.content === "string" &&
+      m.content.length <= MAX_LARGO_MENSAJE
+  );
+  if (!mensajesValidos || mensajes.length > MAX_MENSAJES || mensajes[mensajes.length - 1].role !== "user") {
+    return NextResponse.json({ error: "La conversación es demasiado larga o tiene un formato inválido." }, { status: 400 });
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "API key de Gemini no configurada." }, { status: 500 });

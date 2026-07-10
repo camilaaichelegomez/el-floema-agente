@@ -132,10 +132,15 @@ export function AsistenteChat({
     setEnviando(true);
 
     try {
+      // Manda solo la cola reciente (el server limita a 40 mensajes), cuidando que
+      // el historial empiece con un mensaje de la usuaria (lo exige Gemini).
+      const recortados = historial.filter((m) => m !== BIENVENIDA).slice(-30);
+      while (recortados.length > 0 && recortados[0].role !== "user") recortados.shift();
+
       const res = await fetch("/api/lab/asistente", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: historial.filter((m) => m !== BIENVENIDA) }),
+        body: JSON.stringify({ messages: recortados }),
       });
       const data = await res.json();
 
