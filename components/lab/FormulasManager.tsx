@@ -385,6 +385,7 @@ function VistaFormula({
   const [guardandoPreparacion, setGuardandoPreparacion] = useState(false);
   const [errorPreparacion, setErrorPreparacion] = useState<string | null>(null);
   const [preparado, setPreparado] = useState(false);
+  const [vinculosManual, setVinculosManual] = useState<Record<number, number>>({});
 
   const inventarioPorId = useMemo(() => {
     const mapa = new Map<number, InventarioOpcion>();
@@ -396,10 +397,11 @@ function VistaFormula({
   const cantidadDeseadaNum = Number(cantidadDeseada) || 0;
   const factor = rindeBase > 0 ? cantidadDeseadaNum / rindeBase : 0;
   const itemsConDescuento = items.map((it) => {
-    const opcion = it.inventario_id !== null ? inventarioPorId.get(it.inventario_id) : undefined;
+    const inventarioIdEfectivo = (it.id !== null ? vinculosManual[it.id] : undefined) ?? it.inventario_id;
+    const opcion = inventarioIdEfectivo !== null ? inventarioPorId.get(inventarioIdEfectivo) : undefined;
     const aDescontar = Math.round((Number(it.gramos) || 0) * factor * 100) / 100;
     const stockResultante = opcion ? Math.round((opcion.cantidad - aDescontar) * 100) / 100 : null;
-    return { ...it, opcion, aDescontar, stockResultante };
+    return { ...it, inventarioIdEfectivo, opcion, aDescontar, stockResultante };
   });
 
   async function confirmarPreparacion() {
@@ -408,6 +410,19 @@ function VistaFormula({
     const supabase = createClient();
 
     for (const it of itemsConDescuento) {
+      if (it.id !== null && vinculosManual[it.id] !== undefined && vinculosManual[it.id] !== it.inventario_id) {
+        const { error: dbError } = await supabase
+          .from("formula_items")
+          .update({ inventario_id: vinculosManual[it.id] })
+          .eq("id", it.id);
+
+        if (dbError) {
+          setErrorPreparacion(dbError.message);
+          setGuardandoPreparacion(false);
+          return;
+        }
+      }
+
       if (!it.opcion || it.stockResultante === null) continue;
       const { error: dbError } = await supabase
         .from("inventario")
@@ -572,8 +587,10 @@ function VistaFormula({
                     {itemsConDescuento.map((it, idx) => (
                       <tr key={idx}>
                         <td style={tdStyle}>{it.ingrediente}</td>
-                        <td style={tdStyle}>{it.opcion ? it.aDescontar : "—"}</td>
-                        <td style={tdStyle}>{it.opcion ? it.opcion.cantidad : "—"}</td>
+                        <td style={tdStyle}>{it.aDescontar}</td>
+                        <td style={tdStyle}>
+                          {it.opcion ? `${it.opcion.cantidad} ${it.opcion.unidad}` : "—"}
+                        </td>
                         <td
                           style={{
                             ...tdStyle,
@@ -581,9 +598,25 @@ function VistaFormula({
                             fontWeight: it.stockResultante !== null && it.stockResultante < 0 ? 600 : 400,
                           }}
                         >
-                          {it.opcion
-                            ? it.stockResultante
-                            : "no vinculado al inventario"}
+                          {it.opcion ? (
+                            it.stockResultante
+                          ) : (
+                            <select
+                              value=""
+                              onChange={(e) => {
+                                if (it.id === null || !e.target.value) return;
+                                setVinculosManual((prev) => ({ ...prev, [it.id as number]: Number(e.target.value) }));
+                              }}
+                              style={inputStyle}
+                            >
+                              <option value="">Vincular al inventario…</option>
+                              {inventarioOpciones.map((o) => (
+                                <option key={o.id} value={o.id}>
+                                  {o.ingrediente} ({o.cantidad} {o.unidad} disponibles)
+                                </option>
+                              ))}
+                            </select>
+                          )}
                         </td>
                       </tr>
                     ))}
