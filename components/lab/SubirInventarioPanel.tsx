@@ -193,7 +193,7 @@ export function SubirInventarioPanel({
               onChange={(e) => handleArchivo(e.target.files?.[0])}
             />
             {cargando ? (
-              <Loader2 size={22} className="animate-spin" color="#c8a050" />
+              <Loader2 size={22} className="lab-spin" color="#c8a050" />
             ) : (
               <Upload size={22} color="#d4c4a0" />
             )}
