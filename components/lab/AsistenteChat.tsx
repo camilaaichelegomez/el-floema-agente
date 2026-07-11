@@ -228,7 +228,7 @@ export function AsistenteChat({
     <div>
       {error && <p style={errorStyle}>{error}</p>}
       {formulaGuardada && (
-        <div style={guardadoBoxStyle}>
+        <div className="lab-ok-msg" style={guardadoBoxStyle}>
           <span>&ldquo;{formulaGuardada}&rdquo; se guardó correctamente.</span>
           <Link href="/lab/formulas" style={botonVerFormulaStyle}>
             Ver fórmula

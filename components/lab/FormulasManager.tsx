@@ -526,7 +526,7 @@ function VistaFormula({
           )}
 
           {preparado && (
-            <p style={okStyle}>Inventario descontado y guardado en /lab/preparadas.</p>
+            <p className="lab-ok-msg" style={okStyle}>Inventario descontado y guardado en /lab/preparadas.</p>
           )}
           {errorPreparacion && <p style={errorStyle}>{errorPreparacion}</p>}
 

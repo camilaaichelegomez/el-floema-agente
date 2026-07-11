@@ -1648,3 +1648,90 @@ a:hover { color: var(--color-gold-light); }
 .lab-tabla-marco tbody tr:hover td {
   background: rgba(122, 74, 138, 0.07);
 }
+
+/* ── EL FLOEMA LAB — capa de movimiento (restringido, elegante) ─────────
+   Curvas y duraciones de la filosofia de Emil Kowalski: ease-out fuerte
+   para entradas, todo bajo 250ms, sin rebote. Seguro para reduced-motion. */
+
+:root {
+  --lab-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --lab-dur-panel: 220ms;
+  --lab-dur-press: 140ms;
+}
+
+@keyframes labSpin {
+  to { transform: rotate(360deg); }
+}
+.lab-spin {
+  animation: labSpin 0.9s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes labPanelIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.lab-panel {
+  animation: labPanelIn var(--lab-dur-panel) var(--lab-ease-out);
+}
+
+@keyframes labFilaIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lab-tabla-marco tbody tr {
+  animation: labFilaIn var(--lab-dur-panel) var(--lab-ease-out) both;
+}
+/* Stagger suave, tope a 12 filas para que listas largas no esperen. */
+.lab-tabla-marco tbody tr:nth-child(1)  { animation-delay: 20ms; }
+.lab-tabla-marco tbody tr:nth-child(2)  { animation-delay: 55ms; }
+.lab-tabla-marco tbody tr:nth-child(3)  { animation-delay: 90ms; }
+.lab-tabla-marco tbody tr:nth-child(4)  { animation-delay: 125ms; }
+.lab-tabla-marco tbody tr:nth-child(5)  { animation-delay: 160ms; }
+.lab-tabla-marco tbody tr:nth-child(6)  { animation-delay: 195ms; }
+.lab-tabla-marco tbody tr:nth-child(7)  { animation-delay: 230ms; }
+.lab-tabla-marco tbody tr:nth-child(8)  { animation-delay: 265ms; }
+.lab-tabla-marco tbody tr:nth-child(9)  { animation-delay: 300ms; }
+.lab-tabla-marco tbody tr:nth-child(10) { animation-delay: 335ms; }
+.lab-tabla-marco tbody tr:nth-child(11) { animation-delay: 370ms; }
+.lab-tabla-marco tbody tr:nth-child(n+12) { animation-delay: 400ms; }
+
+/* Feedback de botones: hover con leve brillo, press con hundido sutil.
+   Cubre TODOS los botones del Lab (cada <main> del Lab tiene .lab-bg)
+   sin tocar los estilos inline de cada componente. */
+.lab-bg button {
+  transition:
+    transform var(--lab-dur-press) var(--lab-ease-out),
+    filter var(--lab-dur-press) ease,
+    opacity var(--lab-dur-press) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lab-bg button:hover:not(:disabled) { filter: brightness(1.08); }
+}
+.lab-bg button:active:not(:disabled) { transform: scale(0.97); }
+
+/* Mensajes de confirmacion (exito) entran con un fade suave. */
+.lab-ok-msg {
+  animation: labPanelIn var(--lab-dur-panel) var(--lab-ease-out);
+}
+
+/* Enlaces del nav del Lab: cambio de color/subrayado suave al navegar. */
+.lab-bg nav a {
+  transition: color 160ms ease, border-color 160ms ease, text-shadow 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-panel,
+  .lab-tabla-marco tbody tr,
+  .lab-ok-msg {
+    animation: labFade var(--lab-dur-panel) ease both;
+  }
+  .lab-tabla-marco tbody tr { animation-delay: 0ms !important; }
+  .lab-bg button { transition: filter var(--lab-dur-press) ease; }
+  .lab-bg button:active:not(:disabled) { transform: none; }
+  .lab-spin { animation-duration: 1.4s; }
+}
+@keyframes labFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
