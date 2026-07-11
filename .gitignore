@@ -88,7 +88,8 @@ whatsapp_session/
 .wwebjs_auth/
 .wwebjs_cache/
 __pycache__/
-.claude/
+.claude/*
+!.claude/skills/
 
 # scripts de demo/video con credenciales embebidas (uso local únicamente)
 generar_video.py
