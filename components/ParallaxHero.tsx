@@ -3,6 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
+const EMBERS = [
+  { left: '9%', bottom: '18%', size: '5px', delay: '0s', duration: '4.5s' },
+  { left: '14%', bottom: '10%', size: '3px', delay: '1.4s', duration: '5.2s' },
+  { left: '47%', bottom: '22%', size: '4px', delay: '0.6s', duration: '4.8s' },
+  { left: '52%', bottom: '14%', size: '3px', delay: '2.3s', duration: '5.6s' },
+  { left: '63%', bottom: '26%', size: '4px', delay: '1.8s', duration: '4.2s' },
+  { left: '87%', bottom: '20%', size: '5px', delay: '0.9s', duration: '5s' },
+  { left: '91%', bottom: '30%', size: '3px', delay: '3.1s', duration: '4.6s' },
+];
+
 export function ParallaxHero() {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -56,6 +66,28 @@ export function ParallaxHero() {
           zIndex: 10,
         }}
       />
+
+      {/* Brasas y chispas ambientales: suben desde las velas y pociones de la
+          escena, como si la bruja siguiera trabajando. Posiciones fijas (no
+          Math.random) para evitar desajustes de hidratacion entre servidor y
+          cliente. */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 15, pointerEvents: 'none', overflow: 'hidden' }}>
+        {EMBERS.map((e, i) => (
+          <span
+            key={i}
+            className="hero-ember"
+            style={{
+              position: 'absolute',
+              left: e.left,
+              bottom: e.bottom,
+              width: e.size,
+              height: e.size,
+              animationDelay: e.delay,
+              animationDuration: e.duration,
+            }}
+          />
+        ))}
+      </div>
 
       <div
         style={{
