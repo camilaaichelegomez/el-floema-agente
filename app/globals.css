@@ -1655,7 +1655,7 @@ a:hover { color: var(--color-gold-light); }
 
 :root {
   --lab-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --lab-dur-panel: 220ms;
+  --lab-dur-panel: 320ms;
   --lab-dur-press: 140ms;
 }
 
@@ -1668,7 +1668,7 @@ a:hover { color: var(--color-gold-light); }
 }
 
 @keyframes labPanelIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+  from { opacity: 0; transform: translateY(-18px) scale(0.95); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .lab-panel {
@@ -1676,7 +1676,7 @@ a:hover { color: var(--color-gold-light); }
 }
 
 @keyframes labFilaIn {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .lab-tabla-marco tbody tr {
@@ -1703,12 +1703,21 @@ a:hover { color: var(--color-gold-light); }
   transition:
     transform var(--lab-dur-press) var(--lab-ease-out),
     filter var(--lab-dur-press) ease,
+    box-shadow var(--lab-dur-press) ease,
     opacity var(--lab-dur-press) ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .lab-bg button:hover:not(:disabled) { filter: brightness(1.08); }
+  .lab-bg button:hover:not(:disabled) {
+    filter: brightness(1.18);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  }
 }
-.lab-bg button:active:not(:disabled) { transform: scale(0.97); }
+.lab-bg button:active:not(:disabled) {
+  transform: scale(0.96) translateY(0);
+  filter: brightness(0.95);
+  transition-duration: 60ms;
+}
 
 /* Mensajes de confirmacion (exito) entran con un fade suave. */
 .lab-ok-msg {
@@ -1728,10 +1737,33 @@ a:hover { color: var(--color-gold-light); }
   }
   .lab-tabla-marco tbody tr { animation-delay: 0ms !important; }
   .lab-bg button { transition: filter var(--lab-dur-press) ease; }
+  .lab-bg button:hover:not(:disabled) { transform: none; box-shadow: none; }
   .lab-bg button:active:not(:disabled) { transform: none; }
   .lab-spin { animation-duration: 1.4s; }
 }
 @keyframes labFade {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* ── HERO PUBLICO — brasas ambientales sobre la escena de la bruja ─────── */
+.hero-ember {
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd27a 0%, #e8a03c 55%, transparent 75%);
+  box-shadow: 0 0 8px 2px rgba(232, 160, 60, 0.55);
+  opacity: 0;
+  animation-name: emberRise;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+@keyframes emberRise {
+  0%   { opacity: 0; transform: translateY(0) translateX(0) scale(0.6); }
+  12%  { opacity: 0.9; }
+  55%  { opacity: 0.7; transform: translateY(-90px) translateX(8px) scale(1); }
+  90%  { opacity: 0; transform: translateY(-170px) translateX(-6px) scale(0.5); }
+  100% { opacity: 0; transform: translateY(-170px) translateX(-6px) scale(0.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-ember { display: none; }
 }
