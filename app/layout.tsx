@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cinzel, Crimson_Text, Cormorant_Garamond } from "next/font/google";
+import { Cinzel, Crimson_Text, Cormorant_Garamond, Lora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +21,12 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   weight: ["300", "400", "500", "600"],
   style: ["normal", "italic"],
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -47,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={cn(cinzel.variable, crimsonText.variable, cormorant.variable)}>
+    <html lang="es" className={cn(cinzel.variable, crimsonText.variable, cormorant.variable, lora.variable)}>
       <body>{children}</body>
     </html>
   );
