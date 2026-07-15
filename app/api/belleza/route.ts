@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
 
 const SYSTEM_PROMPT = `Eres Floema, la asesora de belleza de El Floema — una marca de cosmética botánica artesanal colombiana.
@@ -34,7 +34,6 @@ interface HistoryItem {
 }
 
 export async function POST(request: NextRequest) {
-  console.log("API KEY:", process.env.GEMINI_API_KEY ? "presente" : "ausente");
   try {
     const { question, history } = await request.json();
 
@@ -42,16 +41,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Pregunta requerida" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "API key no configurada" }, { status: 500 });
     }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      systemInstruction: SYSTEM_PROMPT,
-    });
 
     const safeHistory: HistoryItem[] = Array.isArray(history)
       ? history.filter(
@@ -64,9 +57,21 @@ export async function POST(request: NextRequest) {
         )
       : [];
 
-    const chat = model.startChat({ history: safeHistory });
-    const result = await chat.sendMessage(question);
-    const answer = result.response.text();
+    const groq = new Groq({ apiKey });
+    const messages: Groq.Chat.ChatCompletionMessageParam[] = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...safeHistory.map((h) => ({
+        role: (h.role === "model" ? "assistant" : "user") as "assistant" | "user",
+        content: h.parts.map((p) => p.text).join(""),
+      })),
+      { role: "user", content: question },
+    ];
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages,
+    });
+    const answer = completion.choices[0]?.message?.content ?? "";
 
     return NextResponse.json({ answer });
   } catch (error) {
