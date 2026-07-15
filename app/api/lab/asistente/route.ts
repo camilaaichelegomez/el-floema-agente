@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 
@@ -71,9 +71,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "La conversación es demasiado larga o tiene un formato inválido." }, { status: 400 });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "API key de Gemini no configurada." }, { status: 500 });
+    return NextResponse.json({ error: "API key de Groq no configurada." }, { status: 500 });
   }
 
   const { data: inventario } = await supabase
@@ -84,19 +84,25 @@ export async function POST(request: NextRequest) {
   const contextoInventario = construirContextoInventario(inventario ?? []);
   const systemInstruction = construirSystemInstruction(contextoInventario);
 
-  const historial = mensajes.slice(0, -1).map((m) => ({ role: m.role, parts: [{ text: m.content }] }));
-  const ultimoMensaje = mensajes[mensajes.length - 1];
+  const groqMensajes: Groq.Chat.ChatCompletionMessageParam[] = [
+    { role: "system", content: systemInstruction },
+    ...mensajes.map((m) => ({
+      role: (m.role === "model" ? "assistant" : "user") as "assistant" | "user",
+      content: m.content,
+    })),
+  ];
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction });
-    const chat = model.startChat({ history: historial });
-    const result = await chat.sendMessage(ultimoMensaje.content);
-    const reply = result.response.text();
+    const groq = new Groq({ apiKey });
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: groqMensajes,
+    });
+    const reply = completion.choices[0]?.message?.content ?? "";
 
     return NextResponse.json({ reply });
   } catch (error) {
-    console.error("[lab/asistente] gemini", error);
+    console.error("[lab/asistente] groq", error);
     return NextResponse.json({ error: "No pude responder en este momento. Intenta de nuevo." }, { status: 502 });
   }
 }
