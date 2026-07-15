@@ -2,7 +2,8 @@
 
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Eye, FlaskConical, Pencil, Plus, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { Check, Eye, FlaskConical, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 
@@ -972,6 +973,13 @@ function TablaFormulas({
                 <button type="button" onClick={() => onEditar(f)} style={iconoAccionStyle} aria-label="Editar">
                   <Pencil size={14} />
                 </button>
+                <Link
+                  href={`/lab/etiquetas/${f.id}`}
+                  style={{ ...iconoAccionStyle, display: "inline-flex", textDecoration: "none" }}
+                  aria-label="Generar etiqueta"
+                >
+                  <Tag size={14} />
+                </Link>
                 <button type="button" onClick={() => onBorrar(f)} style={iconoAccionStyle} aria-label="Borrar">
                   <Trash2 size={14} />
                 </button>
