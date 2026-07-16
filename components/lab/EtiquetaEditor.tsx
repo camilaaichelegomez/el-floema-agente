@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Copy, Printer, Sparkles } from "lucide-react";
+import { Copy, Printer, Save, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { computeLayout, type EtiquetaData } from "@/lib/etiquetas";
 import { EtiquetaLabel } from "@/components/lab/EtiquetaLabel";
@@ -81,6 +81,18 @@ export function EtiquetaEditor({
       setError("No se pudo generar el texto. Intenta de nuevo.");
     }
     setGenerandoIA(false);
+  }
+
+  async function handleGuardar() {
+    setGuardando(true);
+    setError(null);
+    const err = await guardarCampos();
+    setGuardando(false);
+    if (err) {
+      setError("No se pudo guardar la etiqueta.");
+      return;
+    }
+    setGuardado(true);
   }
 
   async function handleImprimir() {
@@ -163,11 +175,17 @@ export function EtiquetaEditor({
           Alto calculado: {L.height_mm}mm (proporción fija del arte de fondo).
         </p>
 
-        <button type="button" onClick={handleImprimir} disabled={guardando} style={botonImprimirStyle}>
-          <Printer size={15} />
-          {guardando ? "Guardando…" : "Descargar / Imprimir"}
-        </button>
-        {guardado && <p style={okStyle}>Campos guardados. Se abrió el diálogo de impresión — elige &quot;Guardar como PDF&quot; para el tamaño real.</p>}
+        <div style={{ ...rowStyle, marginTop: "0.6rem" }}>
+          <button type="button" onClick={handleGuardar} disabled={guardando} style={botonSecundarioStyle}>
+            <Save size={15} />
+            {guardando ? "Guardando…" : "Guardar"}
+          </button>
+          <button type="button" onClick={handleImprimir} disabled={guardando} style={botonImprimirStyle}>
+            <Printer size={15} />
+            {guardando ? "Guardando…" : "Descargar / Imprimir"}
+          </button>
+        </div>
+        {guardado && <p style={okStyle}>Etiqueta guardada — queda disponible en Productos aunque no la uses ahora.</p>}
       </div>
 
       <div style={previewWrapStyle}>
@@ -316,7 +334,22 @@ const botonImprimirStyle: CSSProperties = {
   border: "1px solid rgba(255, 226, 160, 0.55)",
   padding: "12px 18px",
   cursor: "pointer",
-  marginTop: "0.6rem",
+};
+
+const botonSecundarioStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "8px",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.65rem",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "rgba(212,196,160,0.85)",
+  background: "none",
+  border: "1px solid rgba(200,160,80,0.35)",
+  padding: "12px 18px",
+  cursor: "pointer",
 };
 
 const botonIAStyle: CSSProperties = {

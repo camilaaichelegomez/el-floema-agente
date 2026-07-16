@@ -8,9 +8,9 @@ Dado el nombre de un producto y su lista de ingredientes (INCI), redacta cuatro 
 Instrucciones:
 - "modo_uso": instrucciones de uso breves y prácticas (2-4 oraciones), para la etiqueta física. Tono cercano pero profesional.
 - "advertencias": advertencias de seguridad estándar para cosmética natural (uso externo, evitar contacto con ojos, mantener fuera del alcance de niños, descontinuar si hay irritación), ajustadas si algún ingrediente lo amerita (ej. aceites esenciales con fotosensibilidad, alérgenos comunes conocidos). Para la etiqueta física.
-- "descripcion_catalogo": descripción del producto para catálogo/tienda (3-5 oraciones): qué hace, qué propiedades aportan sus ingredientes principales, para qué tipo de piel/cabello o necesidad es ideal, qué puede esperar quien lo usa. Tono profesional y descriptivo, sin exagerar beneficios.
-- "descripcion_redes": copy corto para redes sociales (Instagram), 2-3 oraciones, tono cercano y evocador (estética "bruja científica": botánica + evidencia), destacando 1-2 ingredientes clave y su propiedad más relevante. Sin hashtags, sin emojis.
-- Basa las propiedades solo en lo que es razonable esperar de los ingredientes dados — no inventes beneficios no respaldados.
+- "descripcion_catalogo": descripción de catálogo/tienda con copywriting real, no un listado técnico (3-5 oraciones). Abre con el beneficio o la transformación que busca quien lo usa, no con "este producto contiene...". Nombra 1-3 ingredientes clave y conecta cada uno con lo que le aporta a la persona (no solo la propiedad química). Usa lenguaje sensorial y concreto (textura, sensación, resultado esperado) en vez de adjetivos vacíos ("increíble", "espectacular"). Cierra dejando claro para quién es ideal. Tono profesional y persuasivo, sin sonar a infomercial.
+- "descripcion_redes": copy corto para Instagram (2-3 oraciones), tono cercano y evocador (estética "bruja científica": botánica + evidencia). Debe enganchar desde la primera frase, destacar 1-2 ingredientes clave y su beneficio de forma vívida, y sentirse como algo que da ganas de probar — no una ficha técnica resumida. Sin hashtags, sin emojis.
+- Persuasivo no es lo mismo que exagerado: basa cada afirmación solo en lo que es razonable esperar de los ingredientes dados — no inventes beneficios no respaldados ni uses superlativos sin sustento.
 - Responde ÚNICAMENTE con un JSON válido, sin texto adicional, con este formato exacto:
 {"modo_uso": "string", "advertencias": "string", "descripcion_catalogo": "string", "descripcion_redes": "string"}`;
 

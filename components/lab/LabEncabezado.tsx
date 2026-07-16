@@ -7,7 +7,7 @@ export function LabEncabezado({
   actual,
 }: {
   titulo: string;
-  actual: "inventario" | "formulas" | "preparadas" | "asistente" | "tareas";
+  actual: "inventario" | "formulas" | "preparadas" | "asistente" | "tareas" | "productos";
 }) {
   return (
     <>
