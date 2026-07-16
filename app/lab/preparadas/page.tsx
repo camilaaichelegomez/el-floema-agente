@@ -15,7 +15,7 @@ export default async function PreparadasLabPage() {
 
   const { data, error } = await supabase
     .from("preparaciones")
-    .select("id, formula_id, nombre_formula, cantidad_gramos, pasos, creado")
+    .select("id, formula_id, nombre_formula, cantidad_gramos, pasos, notas, creado")
     .order("creado", { ascending: false });
 
   return (

@@ -30,6 +30,7 @@ export interface Tarea {
   hecha: boolean;
   nota: string | null;
   creada: string;
+  formula_id: number | null;
 }
 
 export interface NotaLibre {

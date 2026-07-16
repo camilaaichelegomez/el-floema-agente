@@ -3,7 +3,7 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Eye, FlaskConical, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
+import { Check, Eye, FlaskConical, ListChecks, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 
@@ -125,6 +125,8 @@ export function FormulasManager({
   const [error, setError] = useState<string | null>(null);
   const [viendo, setViendo] = useState<Formula | null>(null);
   const [itemsViendo, setItemsViendo] = useState<FormulaItemRow[]>([]);
+  const [agregandoTarea, setAgregandoTarea] = useState<number | null>(null);
+  const [tareaAgregada, setTareaAgregada] = useState<number | null>(null);
   const [cargandoVer, setCargandoVer] = useState(false);
 
   const costoPorInventarioId = useMemo(() => {
@@ -313,6 +315,29 @@ export function FormulasManager({
     await recargarLista();
   }
 
+  async function handleAgregarATareas(formula: Formula) {
+    setError(null);
+    setAgregandoTarea(formula.id);
+    const supabase = createClient();
+    const { error: dbError } = await supabase.from("floema_tareas").insert({
+      user_id: userId,
+      titulo: formula.nombre,
+      tipo: "receta",
+      urgencia: "normal",
+      tiempo: null,
+      hecha: false,
+      nota: "",
+      formula_id: formula.id,
+    });
+    setAgregandoTarea(null);
+    if (dbError) {
+      setError("No se pudo agregar la fórmula a Tareas.");
+      return;
+    }
+    setTareaAgregada(formula.id);
+    setTimeout(() => setTareaAgregada((cur) => (cur === formula.id ? null : cur)), 2500);
+  }
+
   return (
     <div>
       <div style={cabeceraStyle}>
@@ -356,7 +381,15 @@ export function FormulasManager({
         />
       )}
 
-      <TablaFormulas formulas={formulas} onVer={abrirVer} onEditar={abrirEditar} onBorrar={handleBorrar} />
+      <TablaFormulas
+        formulas={formulas}
+        onVer={abrirVer}
+        onEditar={abrirEditar}
+        onBorrar={handleBorrar}
+        onAgregarTarea={handleAgregarATareas}
+        agregandoTarea={agregandoTarea}
+        tareaAgregada={tareaAgregada}
+      />
     </div>
   );
 }
@@ -927,11 +960,17 @@ function TablaFormulas({
   onVer,
   onEditar,
   onBorrar,
+  onAgregarTarea,
+  agregandoTarea,
+  tareaAgregada,
 }: {
   formulas: Formula[];
   onVer: (f: Formula) => void;
   onEditar: (f: Formula) => void;
   onBorrar: (f: Formula) => void;
+  onAgregarTarea: (f: Formula) => void;
+  agregandoTarea: number | null;
+  tareaAgregada: number | null;
 }) {
   if (formulas.length === 0) {
     return (
@@ -980,6 +1019,16 @@ function TablaFormulas({
                 >
                   <Tag size={14} />
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => onAgregarTarea(f)}
+                  disabled={agregandoTarea === f.id}
+                  style={iconoAccionStyle}
+                  aria-label="Agregar a tareas (para preparar)"
+                  title="Agregar a tareas — necesito prepararla"
+                >
+                  {tareaAgregada === f.id ? <Check size={14} color="#7c9473" /> : <ListChecks size={14} />}
+                </button>
                 <button type="button" onClick={() => onBorrar(f)} style={iconoAccionStyle} aria-label="Borrar">
                   <Trash2 size={14} />
                 </button>
