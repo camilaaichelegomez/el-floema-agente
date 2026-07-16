@@ -52,6 +52,8 @@ export interface EtiquetaData {
   vencimiento: string;
   width_mm: number;
   font_scale: number;
+  descripcion_catalogo: string;
+  descripcion_redes: string;
 }
 
 export const ETIQUETA_DEFAULTS: EtiquetaData = {
@@ -69,4 +71,6 @@ export const ETIQUETA_DEFAULTS: EtiquetaData = {
   vencimiento: "",
   width_mm: 150,
   font_scale: 1.0,
+  descripcion_catalogo: "",
+  descripcion_redes: "",
 };

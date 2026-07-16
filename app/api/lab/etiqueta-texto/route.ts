@@ -2,15 +2,17 @@ import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 
-const SYSTEM_INSTRUCTION = `Eres el asistente de etiquetado de El Floema, una marca de cosmética natural artesanal.
-Dado el nombre de un producto y su lista de ingredientes (INCI), redacta el texto de su etiqueta.
+const SYSTEM_INSTRUCTION = `Eres el asistente de contenido de El Floema, una marca de cosmética natural artesanal.
+Dado el nombre de un producto y su lista de ingredientes (INCI), redacta cuatro textos distintos.
 
 Instrucciones:
-- "modo_uso": instrucciones de uso breves y prácticas (2-4 oraciones), en español, tono cercano pero profesional.
-- "advertencias": advertencias de seguridad estándar para cosmética natural (uso externo, evitar contacto con ojos, mantener fuera del alcance de niños, descontinuar si hay irritación), ajustadas si algún ingrediente lo amerita (ej. aceites esenciales con fotosensibilidad, alérgenos comunes conocidos).
-- No inventes propiedades cosméticas ni beneficios que no sean razonables para los ingredientes dados.
+- "modo_uso": instrucciones de uso breves y prácticas (2-4 oraciones), para la etiqueta física. Tono cercano pero profesional.
+- "advertencias": advertencias de seguridad estándar para cosmética natural (uso externo, evitar contacto con ojos, mantener fuera del alcance de niños, descontinuar si hay irritación), ajustadas si algún ingrediente lo amerita (ej. aceites esenciales con fotosensibilidad, alérgenos comunes conocidos). Para la etiqueta física.
+- "descripcion_catalogo": descripción del producto para catálogo/tienda (3-5 oraciones): qué hace, qué propiedades aportan sus ingredientes principales, para qué tipo de piel/cabello o necesidad es ideal, qué puede esperar quien lo usa. Tono profesional y descriptivo, sin exagerar beneficios.
+- "descripcion_redes": copy corto para redes sociales (Instagram), 2-3 oraciones, tono cercano y evocador (estética "bruja científica": botánica + evidencia), destacando 1-2 ingredientes clave y su propiedad más relevante. Sin hashtags, sin emojis.
+- Basa las propiedades solo en lo que es razonable esperar de los ingredientes dados — no inventes beneficios no respaldados.
 - Responde ÚNICAMENTE con un JSON válido, sin texto adicional, con este formato exacto:
-{"modo_uso": "string", "advertencias": "string"}`;
+{"modo_uso": "string", "advertencias": "string", "descripcion_catalogo": "string", "descripcion_redes": "string"}`;
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -50,14 +52,19 @@ export async function POST(request: NextRequest) {
     const raw = completion.choices[0]?.message?.content ?? "{}";
     const parsed = JSON.parse(raw);
 
-    const modoUso = typeof parsed.modo_uso === "string" ? parsed.modo_uso : "";
-    const advertencias = typeof parsed.advertencias === "string" ? parsed.advertencias : "";
+    const texto = (campo: string) => (typeof parsed[campo] === "string" ? parsed[campo] : "");
+    const resultado = {
+      modo_uso: texto("modo_uso"),
+      advertencias: texto("advertencias"),
+      descripcion_catalogo: texto("descripcion_catalogo"),
+      descripcion_redes: texto("descripcion_redes"),
+    };
 
-    if (!modoUso && !advertencias) {
+    if (!Object.values(resultado).some(Boolean)) {
       return NextResponse.json({ error: "El asistente no devolvió un texto válido. Intenta de nuevo." }, { status: 502 });
     }
 
-    return NextResponse.json({ modo_uso: modoUso, advertencias });
+    return NextResponse.json(resultado);
   } catch (error) {
     console.error("[lab/etiqueta-texto] groq", error);
     return NextResponse.json({ error: "No pude generar el texto en este momento. Intenta de nuevo." }, { status: 502 });

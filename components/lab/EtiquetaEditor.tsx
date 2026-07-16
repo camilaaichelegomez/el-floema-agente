@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Printer, Sparkles } from "lucide-react";
+import { Copy, Printer, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { computeLayout, type EtiquetaData } from "@/lib/etiquetas";
 import { EtiquetaLabel } from "@/components/lab/EtiquetaLabel";
@@ -46,6 +46,8 @@ export function EtiquetaEditor({
         tamano: data.size || null,
         width_mm: data.width_mm,
         font_scale: data.font_scale,
+        descripcion_catalogo: data.descripcion_catalogo || null,
+        descripcion_redes: data.descripcion_redes || null,
         actualizada: new Date().toISOString(),
       },
       { onConflict: "formula_id" }
@@ -66,7 +68,13 @@ export function EtiquetaEditor({
       if (!res.ok) {
         setError(json.error ?? "No se pudo generar el texto.");
       } else {
-        setData((d) => ({ ...d, modo_uso: json.modo_uso || d.modo_uso, advertencias: json.advertencias || d.advertencias }));
+        setData((d) => ({
+          ...d,
+          modo_uso: json.modo_uso || d.modo_uso,
+          advertencias: json.advertencias || d.advertencias,
+          descripcion_catalogo: json.descripcion_catalogo || d.descripcion_catalogo,
+          descripcion_redes: json.descripcion_redes || d.descripcion_redes,
+        }));
         setGuardado(false);
       }
     } catch {
@@ -88,7 +96,16 @@ export function EtiquetaEditor({
     window.print();
   }
 
+  async function copiar(texto: string) {
+    try {
+      await navigator.clipboard.writeText(texto);
+    } catch {
+      // portapapeles no disponible — el texto sigue visible para copiar a mano
+    }
+  }
+
   return (
+    <div>
     <div style={wrapStyle}>
       <style>{`
         @media print {
@@ -117,7 +134,7 @@ export function EtiquetaEditor({
 
         <button type="button" onClick={generarConIA} disabled={generandoIA || !data.product_name.trim()} style={botonIAStyle}>
           <Sparkles size={14} />
-          {generandoIA ? "Generando…" : "Generar modo de uso y advertencias con IA"}
+          {generandoIA ? "Generando…" : "Generar con IA (etiqueta + catálogo + redes)"}
         </button>
 
         <CampoTextarea label="Modo de uso" value={data.modo_uso} onChange={(v) => set("modo_uso", v)} />
@@ -160,6 +177,25 @@ export function EtiquetaEditor({
         </div>
       </div>
     </div>
+
+    <div className="lab-panel" style={contenidoPanelStyle}>
+      <h2 style={panelTituloStyle}>Contenido para catálogo y redes</h2>
+      <p style={ayudaStyle}>No se imprime en la etiqueta — es texto para copiar y pegar donde lo necesites.</p>
+
+      <CampoConCopiar
+        label="Descripción para catálogo"
+        value={data.descripcion_catalogo}
+        onChange={(v) => set("descripcion_catalogo", v)}
+        onCopiar={() => copiar(data.descripcion_catalogo)}
+      />
+      <CampoConCopiar
+        label="Copy para redes sociales"
+        value={data.descripcion_redes}
+        onChange={(v) => set("descripcion_redes", v)}
+        onCopiar={() => copiar(data.descripcion_redes)}
+      />
+    </div>
+    </div>
   );
 }
 
@@ -180,6 +216,30 @@ function Campo({
     <label style={campoWrapperStyle}>
       <span style={campoLabelStyle}>{label}</span>
       <input type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={inputStyle} />
+    </label>
+  );
+}
+
+function CampoConCopiar({
+  label,
+  value,
+  onChange,
+  onCopiar,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onCopiar: () => void;
+}) {
+  return (
+    <label style={campoWrapperStyle}>
+      <span style={campoConCopiarLabelRowStyle}>
+        <span style={campoLabelStyle}>{label}</span>
+        <button type="button" onClick={onCopiar} style={botonCopiarStyle} aria-label={`Copiar ${label}`}>
+          <Copy size={12} /> Copiar
+        </button>
+      </span>
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} style={textareaStyle} rows={4} />
     </label>
   );
 }
@@ -292,4 +352,34 @@ const previewScrollStyle: CSSProperties = {
   border: "1px solid rgba(200,160,80,0.2)",
   padding: "1.5rem",
   background: "#0a0f0a",
+};
+
+const contenidoPanelStyle: CSSProperties = {
+  padding: "1.4rem",
+  marginTop: "1.5rem",
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.9rem",
+  maxWidth: 680,
+};
+
+const campoConCopiarLabelRowStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+};
+
+const botonCopiarStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "4px",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.56rem",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "rgba(200,160,80,0.7)",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  padding: "2px 4px",
 };
