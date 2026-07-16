@@ -10,6 +10,7 @@ export interface Preparacion {
   nombre_formula: string;
   cantidad_gramos: number;
   pasos: string | null;
+  notas: string | null;
   creado: string;
 }
 
@@ -48,6 +49,8 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
   const [cargando, setCargando] = useState(false);
   const [borrando, setBorrando] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notaTexto, setNotaTexto] = useState("");
+  const [guardandoNota, setGuardandoNota] = useState(false);
 
   async function recargarLista() {
     const supabase = createClient();
@@ -62,9 +65,24 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
     setError(null);
     setCargando(true);
     setViendo(preparacion);
+    setNotaTexto(preparacion.notas ?? "");
     const items = await cargarItems(preparacion.id);
     setItemsViendo(items);
     setCargando(false);
+  }
+
+  async function guardarNota() {
+    if (!viendo || notaTexto === (viendo.notas ?? "")) return;
+    setGuardandoNota(true);
+    const supabase = createClient();
+    const { error: err } = await supabase.from("preparaciones").update({ notas: notaTexto }).eq("id", viendo.id);
+    setGuardandoNota(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
+    setViendo({ ...viendo, notas: notaTexto });
+    setPreparaciones((prev) => prev.map((p) => (p.id === viendo.id ? { ...p, notas: notaTexto } : p)));
   }
 
   async function handleBorrar(preparacion: Preparacion) {
@@ -145,6 +163,19 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
                   <PasosVista texto={viendo.pasos} />
                 </div>
               )}
+
+              <div style={{ marginTop: "1.6rem" }}>
+                <span style={itemsTituloStyle}>Notas y comentarios</span>
+                <textarea
+                  value={notaTexto}
+                  onChange={(e) => setNotaTexto(e.target.value)}
+                  onBlur={guardarNota}
+                  placeholder="Observaciones de esta preparación: resultado, ajustes, textura, lo que quieras recordar la próxima vez…"
+                  style={notaTextareaStyle}
+                  rows={4}
+                />
+                {guardandoNota && <span style={notaGuardandoStyle}>Guardando…</span>}
+              </div>
             </>
           )}
         </div>
@@ -304,6 +335,30 @@ const pasosTextoStyle: CSSProperties = {
   lineHeight: 1.6,
   color: "#e8dcc8",
   paddingTop: "3px",
+};
+
+const notaTextareaStyle: CSSProperties = {
+  width: "100%",
+  marginTop: "0.8rem",
+  fontFamily: "var(--font-body)",
+  fontSize: "0.92rem",
+  color: "#e8dcc8",
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(200, 160, 80, 0.3)",
+  padding: "10px 12px",
+  outline: "none",
+  resize: "vertical",
+  lineHeight: 1.5,
+  boxSizing: "border-box",
+};
+
+const notaGuardandoStyle: CSSProperties = {
+  display: "block",
+  marginTop: "0.4rem",
+  fontFamily: "var(--font-body)",
+  fontSize: "0.78rem",
+  fontStyle: "italic",
+  color: "rgba(212,196,160,0.5)",
 };
 
 const tablaWrapperStyle: CSSProperties = {
