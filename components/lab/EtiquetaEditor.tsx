@@ -48,6 +48,9 @@ export function EtiquetaEditor({
         font_scale: data.font_scale,
         descripcion_catalogo: data.descripcion_catalogo || null,
         descripcion_redes: data.descripcion_redes || null,
+        offset_left_mm: data.offset_left_mm,
+        offset_center_mm: data.offset_center_mm,
+        offset_right_mm: data.offset_right_mm,
         actualizada: new Date().toISOString(),
       },
       { onConflict: "formula_id" }
@@ -174,6 +177,30 @@ export function EtiquetaEditor({
         <p style={ayudaStyle}>
           Alto calculado: {L.height_mm}mm (proporción fija del arte de fondo).
         </p>
+
+        <p style={ayudaStyle}>
+          Posición del texto: si el contenido de un panel es corto, súbelo o bájalo acá para que se vea proporcionado (mm, positivo = más abajo).
+        </p>
+        <div style={rowStyle}>
+          <Campo
+            label="Panel izquierdo"
+            value={String(data.offset_left_mm)}
+            onChange={(v) => set("offset_left_mm", Number(v) || 0)}
+            type="number"
+          />
+          <Campo
+            label="Centro"
+            value={String(data.offset_center_mm)}
+            onChange={(v) => set("offset_center_mm", Number(v) || 0)}
+            type="number"
+          />
+          <Campo
+            label="Panel derecho"
+            value={String(data.offset_right_mm)}
+            onChange={(v) => set("offset_right_mm", Number(v) || 0)}
+            type="number"
+          />
+        </div>
 
         <div style={{ ...rowStyle, marginTop: "0.6rem" }}>
           <button type="button" onClick={handleGuardar} disabled={guardando} style={botonSecundarioStyle}>

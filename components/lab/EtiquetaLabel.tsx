@@ -100,33 +100,39 @@ export function EtiquetaLabel({ data, className }: { data: EtiquetaData; classNa
   return (
     <div className={className} style={labelStyle}>
       <div style={zoneLeft}>
-        <h2 style={sectionTitle}>Modo de Uso</h2>
-        <p style={sectionTextSmall}>{data.modo_uso}</p>
-        {data.ingredientes && (
-          <>
-            <h2 style={sectionTitle}>Ingredientes (INCI)</h2>
-            <p style={sectionTextSmall}>{data.ingredientes}</p>
-          </>
-        )}
+        <div style={{ marginTop: `${data.offset_left_mm}mm` }}>
+          <h2 style={sectionTitle}>Modo de Uso</h2>
+          <p style={sectionTextSmall}>{data.modo_uso}</p>
+          {data.ingredientes && (
+            <>
+              <h2 style={sectionTitle}>Ingredientes (INCI)</h2>
+              <p style={sectionTextSmall}>{data.ingredientes}</p>
+            </>
+          )}
+        </div>
       </div>
 
       <div style={zoneCenter}>
-        <h1 style={productName}>{data.product_name}</h1>
-        {data.subtitle && <div style={productSubtitle}>{data.subtitle}</div>}
-        {data.category_line && <div style={productCategory}>{data.category_line}</div>}
+        <div style={{ marginTop: `${data.offset_center_mm}mm` }}>
+          <h1 style={productName}>{data.product_name}</h1>
+          {data.subtitle && <div style={productSubtitle}>{data.subtitle}</div>}
+          {data.category_line && <div style={productCategory}>{data.category_line}</div>}
+        </div>
         <div style={bottomStyle}>
           <div style={sizeTag}>{data.size}</div>
         </div>
       </div>
 
       <div style={zoneRight}>
-        {data.advertencias && (
-          <>
-            <h2 style={sectionTitle}>Advertencias</h2>
-            <p style={sectionTextSmall}>{data.advertencias}</p>
-          </>
-        )}
-        {data.storage_note && <div style={storageNote}>{data.storage_note}</div>}
+        <div style={{ marginTop: `${data.offset_right_mm}mm` }}>
+          {data.advertencias && (
+            <>
+              <h2 style={sectionTitle}>Advertencias</h2>
+              <p style={sectionTextSmall}>{data.advertencias}</p>
+            </>
+          )}
+          {data.storage_note && <div style={storageNote}>{data.storage_note}</div>}
+        </div>
         <div style={bottomStyle}>
           {data.social && <div style={social}>{data.social}</div>}
           <div style={footerBlock}>
