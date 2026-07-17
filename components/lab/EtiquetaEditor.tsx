@@ -52,6 +52,9 @@ export function EtiquetaEditor({
         offset_left_mm: data.offset_left_mm,
         offset_center_mm: data.offset_center_mm,
         offset_right_mm: data.offset_right_mm,
+        font_scale_left: data.font_scale_left,
+        font_scale_center: data.font_scale_center,
+        font_scale_right: data.font_scale_right,
         actualizada: new Date().toISOString(),
       },
       { onConflict: "formula_id" }
@@ -181,6 +184,7 @@ export function EtiquetaEditor({
         <Campo label="Lote" value={data.lote} onChange={(v) => set("lote", v)} />
         <Campo label="Vencimiento" value={data.vencimiento} onChange={(v) => set("vencimiento", v)} />
 
+        <h3 style={subseccionStyle}>Tamaño de la etiqueta</h3>
         <div style={rowStyle}>
           <Campo
             label="Ancho físico (mm)"
@@ -189,7 +193,7 @@ export function EtiquetaEditor({
             type="number"
           />
           <Campo
-            label="Ajuste de letra"
+            label="Ajuste de letra general"
             value={String(data.font_scale)}
             onChange={(v) => set("font_scale", Number(v) || 1)}
             type="number"
@@ -198,6 +202,8 @@ export function EtiquetaEditor({
         <p style={ayudaStyle}>
           Alto calculado: {L.height_mm}mm (proporción fija del arte de fondo).
         </p>
+
+        <h3 style={subseccionStyle}>Ajustes por panel</h3>
 
         <p style={ayudaStyle}>
           Posición del texto: si el contenido de un panel es corto, súbelo o bájalo acá para que se vea proporcionado (mm, positivo = más abajo).
@@ -219,6 +225,30 @@ export function EtiquetaEditor({
             label="Panel derecho"
             value={String(data.offset_right_mm)}
             onChange={(v) => set("offset_right_mm", Number(v) || 0)}
+            type="number"
+          />
+        </div>
+
+        <p style={ayudaStyle}>
+          Tamaño de letra por panel: 1 = normal, menos de 1 achica, más de 1 agranda (se suma al "Ajuste de letra" general de arriba).
+        </p>
+        <div style={rowStyle}>
+          <Campo
+            label="Panel izquierdo"
+            value={String(data.font_scale_left)}
+            onChange={(v) => set("font_scale_left", Number(v) || 1)}
+            type="number"
+          />
+          <Campo
+            label="Centro"
+            value={String(data.font_scale_center)}
+            onChange={(v) => set("font_scale_center", Number(v) || 1)}
+            type="number"
+          />
+          <Campo
+            label="Panel derecho"
+            value={String(data.font_scale_right)}
+            onChange={(v) => set("font_scale_right", Number(v) || 1)}
             type="number"
           />
         </div>
@@ -345,6 +375,17 @@ const panelTituloStyle: CSSProperties = {
   textTransform: "uppercase",
   color: "#c8a050",
   margin: "0 0 0.4rem",
+};
+
+const subseccionStyle: CSSProperties = {
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.62rem",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "rgba(200,160,80,0.6)",
+  margin: "0.6rem 0 0",
+  paddingTop: "0.6rem",
+  borderTop: "1px solid rgba(200,160,80,0.15)",
 };
 
 const campoWrapperStyle: CSSProperties = { display: "flex", flexDirection: "column", gap: "0.35rem" };
