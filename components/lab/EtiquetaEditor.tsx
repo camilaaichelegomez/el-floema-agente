@@ -22,7 +22,9 @@ export function EtiquetaEditor({
   const [guardado, setGuardado] = useState(false);
   const [alertaIA, setAlertaIA] = useState<string | null>(null);
 
-  const L = computeLayout(data.width_mm, data.font_scale, data.alto_mm);
+  const esRedonda = data.forma === "redonda";
+  // En redonda la etiqueta es cuadrada (alto = ancho); en rectangular usa alto_mm.
+  const L = computeLayout(data.width_mm, data.font_scale, esRedonda ? data.width_mm : data.alto_mm);
 
   function set<K extends keyof EtiquetaData>(key: K, value: EtiquetaData[K]) {
     setData((d) => ({ ...d, [key]: value }));
@@ -35,6 +37,7 @@ export function EtiquetaEditor({
       {
         formula_id: formulaId,
         user_id: userId,
+        forma: data.forma,
         subtitle: data.subtitle || null,
         category_line: data.category_line || null,
         modo_uso: data.modo_uso || null,
@@ -147,16 +150,44 @@ export function EtiquetaEditor({
 
         {error && <p style={errorStyle}>{error}</p>}
 
+        <div>
+          <span style={campoLabelStyle}>Forma de la etiqueta</span>
+          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.35rem" }}>
+            <button
+              type="button"
+              onClick={() => set("forma", "rectangular")}
+              style={data.forma === "rectangular" ? formaBotonActivoStyle : formaBotonStyle}
+            >
+              Rectangular
+            </button>
+            <button
+              type="button"
+              onClick={() => set("forma", "redonda")}
+              style={data.forma === "redonda" ? formaBotonActivoStyle : formaBotonStyle}
+            >
+              Redonda (medallón)
+            </button>
+          </div>
+          {esRedonda && (
+            <p style={ayudaStyle}>
+              En redonda va el logo (ya en el arte) + nombre, subtítulo y tamaño centrados. El modo de uso, INCI y
+              advertencias no aparecen (son para la rectangular).
+            </p>
+          )}
+        </div>
+
         <Campo label="Nombre del producto" value={data.product_name} onChange={(v) => set("product_name", v)} />
         <Campo label="Subtítulo" value={data.subtitle} onChange={(v) => set("subtitle", v)} />
         <Campo label="Línea de categoría" value={data.category_line} onChange={(v) => set("category_line", v)} />
         <Campo label="Tamaño (ej: 100 ml)" value={data.size} onChange={(v) => set("size", v)} />
-        <CampoTextarea
-          label="Ingredientes (INCI)"
-          value={data.ingredientes}
-          onChange={(v) => set("ingredientes", v)}
-          placeholder="Nombres INCI reales — revisa y corrige antes de imprimir."
-        />
+        {!esRedonda && (
+          <CampoTextarea
+            label="Ingredientes (INCI)"
+            value={data.ingredientes}
+            onChange={(v) => set("ingredientes", v)}
+            placeholder="Nombres INCI reales — revisa y corrige antes de imprimir."
+          />
+        )}
 
         <button type="button" onClick={generarConIA} disabled={generandoIA || !data.product_name.trim()} style={botonIAStyle}>
           <Sparkles size={14} />
@@ -177,28 +208,34 @@ export function EtiquetaEditor({
           </div>
         )}
 
-        <CampoTextarea label="Modo de uso" value={data.modo_uso} onChange={(v) => set("modo_uso", v)} />
-        <CampoTextarea label="Advertencias" value={data.advertencias} onChange={(v) => set("advertencias", v)} />
-        <CampoTextarea label="Nota de conservación" value={data.storage_note} onChange={(v) => set("storage_note", v)} />
-        <Campo label="Redes sociales" value={data.social} onChange={(v) => set("social", v)} />
-        <Campo label="Fabricante" value={data.fabricante} onChange={(v) => set("fabricante", v)} />
-        <Campo label="Lote" value={data.lote} onChange={(v) => set("lote", v)} />
-        <Campo label="Vencimiento" value={data.vencimiento} onChange={(v) => set("vencimiento", v)} />
+        {!esRedonda && (
+          <>
+            <CampoTextarea label="Modo de uso" value={data.modo_uso} onChange={(v) => set("modo_uso", v)} />
+            <CampoTextarea label="Advertencias" value={data.advertencias} onChange={(v) => set("advertencias", v)} />
+            <CampoTextarea label="Nota de conservación" value={data.storage_note} onChange={(v) => set("storage_note", v)} />
+            <Campo label="Redes sociales" value={data.social} onChange={(v) => set("social", v)} />
+            <Campo label="Fabricante" value={data.fabricante} onChange={(v) => set("fabricante", v)} />
+            <Campo label="Lote" value={data.lote} onChange={(v) => set("lote", v)} />
+            <Campo label="Vencimiento" value={data.vencimiento} onChange={(v) => set("vencimiento", v)} />
+          </>
+        )}
 
         <h3 style={subseccionStyle}>Tamaño de la etiqueta</h3>
         <div style={rowStyle}>
           <Campo
-            label="Ancho físico (mm)"
+            label={esRedonda ? "Diámetro (mm)" : "Ancho físico (mm)"}
             value={String(data.width_mm)}
             onChange={(v) => set("width_mm", Number(v) || 0)}
             type="number"
           />
-          <Campo
-            label="Alto (mm) — 0 = automático"
-            value={String(data.alto_mm)}
-            onChange={(v) => set("alto_mm", Number(v) || 0)}
-            type="number"
-          />
+          {!esRedonda && (
+            <Campo
+              label="Alto (mm) — 0 = automático"
+              value={String(data.alto_mm)}
+              onChange={(v) => set("alto_mm", Number(v) || 0)}
+              type="number"
+            />
+          )}
         </div>
         <div style={rowStyle}>
           <Campo
@@ -209,60 +246,84 @@ export function EtiquetaEditor({
           />
         </div>
         <p style={ayudaStyle}>
-          {data.alto_mm > 0
-            ? `Alto fijo: ${L.height_mm}mm. Ojo: si el alto no es proporcional al ancho, el arte de fondo se estira un poco (alto automático sería ${Math.round((data.width_mm / (1457 / 720)) * 10) / 10}mm).`
-            : `Alto automático: ${L.height_mm}mm (proporción del arte). Para una etiqueta más baja/ancha —como las de crema— escribí un alto en mm; el arte se estira levemente.`}
+          {esRedonda
+            ? `Redonda: siempre cuadrada, ${L.width_mm}×${L.width_mm}mm.`
+            : data.alto_mm > 0
+              ? `Alto fijo: ${L.height_mm}mm. Ojo: si el alto no es proporcional al ancho, el arte de fondo se estira un poco (alto automático sería ${Math.round((data.width_mm / (1457 / 720)) * 10) / 10}mm).`
+              : `Alto automático: ${L.height_mm}mm (proporción del arte). Para una etiqueta más baja/ancha —como las de crema— escribí un alto en mm; el arte se estira levemente.`}
         </p>
 
-        <h3 style={subseccionStyle}>Ajustes por panel</h3>
+        <h3 style={subseccionStyle}>Ajustes {esRedonda ? "del texto" : "por panel"}</h3>
 
-        <p style={ayudaStyle}>
-          Posición del texto: si el contenido de un panel es corto, súbelo o bájalo acá para que se vea proporcionado (mm, positivo = más abajo).
-        </p>
-        <div style={rowStyle}>
-          <Campo
-            label="Panel izquierdo"
-            value={String(data.offset_left_mm)}
-            onChange={(v) => set("offset_left_mm", Number(v) || 0)}
-            type="number"
-          />
-          <Campo
-            label="Centro"
-            value={String(data.offset_center_mm)}
-            onChange={(v) => set("offset_center_mm", Number(v) || 0)}
-            type="number"
-          />
-          <Campo
-            label="Panel derecho"
-            value={String(data.offset_right_mm)}
-            onChange={(v) => set("offset_right_mm", Number(v) || 0)}
-            type="number"
-          />
-        </div>
+        {esRedonda ? (
+          <>
+            <p style={ayudaStyle}>Subí o bajá el texto (mm, positivo = más abajo) y cambiá su tamaño.</p>
+            <div style={rowStyle}>
+              <Campo
+                label="Posición vertical (mm)"
+                value={String(data.offset_center_mm)}
+                onChange={(v) => set("offset_center_mm", Number(v) || 0)}
+                type="number"
+              />
+              <Campo
+                label="Tamaño de letra"
+                value={String(data.font_scale_center)}
+                onChange={(v) => set("font_scale_center", Number(v) || 1)}
+                type="number"
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <p style={ayudaStyle}>
+              Posición del texto: si el contenido de un panel es corto, súbelo o bájalo acá para que se vea proporcionado (mm, positivo = más abajo).
+            </p>
+            <div style={rowStyle}>
+              <Campo
+                label="Panel izquierdo"
+                value={String(data.offset_left_mm)}
+                onChange={(v) => set("offset_left_mm", Number(v) || 0)}
+                type="number"
+              />
+              <Campo
+                label="Centro"
+                value={String(data.offset_center_mm)}
+                onChange={(v) => set("offset_center_mm", Number(v) || 0)}
+                type="number"
+              />
+              <Campo
+                label="Panel derecho"
+                value={String(data.offset_right_mm)}
+                onChange={(v) => set("offset_right_mm", Number(v) || 0)}
+                type="number"
+              />
+            </div>
 
-        <p style={ayudaStyle}>
-          Tamaño de letra por panel: 1 = normal, menos de 1 achica, más de 1 agranda (se suma al "Ajuste de letra" general de arriba).
-        </p>
-        <div style={rowStyle}>
-          <Campo
-            label="Panel izquierdo"
-            value={String(data.font_scale_left)}
-            onChange={(v) => set("font_scale_left", Number(v) || 1)}
-            type="number"
-          />
-          <Campo
-            label="Centro"
-            value={String(data.font_scale_center)}
-            onChange={(v) => set("font_scale_center", Number(v) || 1)}
-            type="number"
-          />
-          <Campo
-            label="Panel derecho"
-            value={String(data.font_scale_right)}
-            onChange={(v) => set("font_scale_right", Number(v) || 1)}
-            type="number"
-          />
-        </div>
+            <p style={ayudaStyle}>
+              Tamaño de letra por panel: 1 = normal, menos de 1 achica, más de 1 agranda (se suma al "Ajuste de letra" general de arriba).
+            </p>
+            <div style={rowStyle}>
+              <Campo
+                label="Panel izquierdo"
+                value={String(data.font_scale_left)}
+                onChange={(v) => set("font_scale_left", Number(v) || 1)}
+                type="number"
+              />
+              <Campo
+                label="Centro"
+                value={String(data.font_scale_center)}
+                onChange={(v) => set("font_scale_center", Number(v) || 1)}
+                type="number"
+              />
+              <Campo
+                label="Panel derecho"
+                value={String(data.font_scale_right)}
+                onChange={(v) => set("font_scale_right", Number(v) || 1)}
+                type="number"
+              />
+            </div>
+          </>
+        )}
 
         <div style={{ ...rowStyle, marginTop: "0.6rem" }}>
           <button type="button" onClick={handleGuardar} disabled={guardando} style={botonSecundarioStyle}>
@@ -466,6 +527,26 @@ const botonIAStyle: CSSProperties = {
   border: "1px solid rgba(200,160,80,0.35)",
   padding: "9px 14px",
   cursor: "pointer",
+};
+
+const formaBotonStyle: CSSProperties = {
+  flex: 1,
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.58rem",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "rgba(212,196,160,0.7)",
+  background: "none",
+  border: "1px solid rgba(200,160,80,0.3)",
+  padding: "9px 10px",
+  cursor: "pointer",
+};
+
+const formaBotonActivoStyle: CSSProperties = {
+  ...formaBotonStyle,
+  color: "#0d1a0d",
+  background: "linear-gradient(160deg, #e8c070 0%, #c8a050 55%, #a87f35 100%)",
+  border: "1px solid rgba(255, 226, 160, 0.55)",
 };
 
 const errorStyle: CSSProperties = { color: "#e05a4a", fontFamily: "var(--font-body)", fontSize: "0.85rem", margin: 0 };

@@ -34,6 +34,7 @@ export default async function EtiquetaFormulaPage({
 
   const initialData: EtiquetaData = {
     ...ETIQUETA_DEFAULTS,
+    forma: etiqueta?.forma === "redonda" ? "redonda" : "rectangular",
     product_name: formula.nombre,
     lote: formula.lote ?? "",
     ingredientes: etiqueta?.ingredientes ?? ingredientesAuto,

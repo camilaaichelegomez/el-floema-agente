@@ -50,7 +50,10 @@ function round2(n: number) {
   return Math.round(n * 100) / 100;
 }
 
+export type FormaEtiqueta = "rectangular" | "redonda";
+
 export interface EtiquetaData {
+  forma: FormaEtiqueta;
   product_name: string;
   subtitle: string;
   category_line: string;
@@ -77,6 +80,7 @@ export interface EtiquetaData {
 }
 
 export const ETIQUETA_DEFAULTS: EtiquetaData = {
+  forma: "rectangular",
   product_name: "",
   subtitle: "",
   category_line: "",

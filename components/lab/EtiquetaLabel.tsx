@@ -89,6 +89,10 @@ function estilosDeTexto(sizes: ZoneSizes) {
 }
 
 export function EtiquetaLabel({ data, className }: { data: EtiquetaData; className?: string }) {
+  if (data.forma === "redonda") {
+    return <EtiquetaRedonda data={data} className={className} />;
+  }
+
   const L = computeLayout(data.width_mm, data.font_scale, data.alto_mm);
 
   const sizesLeft = sizesForZone(L.s, data.font_scale_left);
@@ -162,6 +166,54 @@ export function EtiquetaLabel({ data, className }: { data: EtiquetaData; classNa
             {data.vencimiento && ` · V: ${data.vencimiento}`}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Etiqueta redonda (medallón). Cuadrada, con el arte circular de fondo. El logo
+// "El Floema" ya viene en el arte arriba; el texto (nombre, subtítulo, tamaño) va
+// centrado en el área verde de abajo. No usa los 3 paneles ni el modo de uso/INCI.
+function EtiquetaRedonda({ data, className }: { data: EtiquetaData; className?: string }) {
+  // Cuadrada: el diámetro es el ancho; forzamos alto = ancho.
+  const L = computeLayout(data.width_mm, data.font_scale, data.width_mm);
+  const sizes = sizesForZone(L.s, data.font_scale_center);
+  const est = estilosDeTexto(sizes);
+
+  const labelStyle: CSSProperties = {
+    width: `${L.width_mm}mm`,
+    height: `${L.width_mm}mm`,
+    position: "relative",
+    backgroundImage: "url(/etiquetas/arte-fondo-redondo.png)",
+    backgroundSize: "100% 100%",
+    overflow: "hidden",
+    fontFamily: "var(--font-lora), Lora, serif",
+    color: CREAM,
+    flexShrink: 0,
+  };
+
+  // Zona de texto centrada, en el área verde bajo el logo. Angosta para no salirse
+  // del círculo. offset_center_mm sube/baja el bloque.
+  const zonaStyle: CSSProperties = {
+    position: "absolute",
+    left: "22%",
+    right: "22%",
+    top: "46%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    transform: `translateY(${data.offset_center_mm}mm)`,
+  };
+
+  return (
+    <div className={className} style={labelStyle}>
+      <div style={zonaStyle}>
+        <h1 style={est.productName}>{data.product_name}</h1>
+        {data.subtitle && <div style={est.productSubtitle}>{data.subtitle}</div>}
+        {data.category_line && <div style={est.productCategory}>{data.category_line}</div>}
+        {data.size && <div style={{ ...est.sizeTag, marginTop: `${1.4 * sizes.s}mm` }}>{data.size}</div>}
       </div>
     </div>
   );
