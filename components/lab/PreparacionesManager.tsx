@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Eye, Trash2, X } from "lucide-react";
+import Link from "next/link";
+import { Eye, Sparkles, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export interface Preparacion {
@@ -56,7 +57,7 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
     const supabase = createClient();
     const { data } = await supabase
       .from("preparaciones")
-      .select("id, formula_id, nombre_formula, cantidad_gramos, pasos, creado")
+      .select("id, formula_id, nombre_formula, cantidad_gramos, pasos, notas, creado")
       .order("creado", { ascending: false });
     setPreparaciones((data as Preparacion[] | null) ?? []);
   }
@@ -175,6 +176,25 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
                   rows={4}
                 />
                 {guardandoNota && <span style={notaGuardandoStyle}>Guardando…</span>}
+              </div>
+
+              <div style={{ marginTop: "1.6rem" }}>
+                <span style={itemsTituloStyle}>Etiqueta y contenido</span>
+                {viendo.formula_id ? (
+                  <div style={accesosDirectosStyle}>
+                    <Link href={`/lab/etiquetas/${viendo.formula_id}`} style={accesoDirectoStyle}>
+                      <Tag size={13} /> Generar etiqueta
+                    </Link>
+                    <Link href={`/lab/etiquetas/${viendo.formula_id}`} style={accesoDirectoStyle}>
+                      <Sparkles size={13} /> Copy de catálogo y redes
+                    </Link>
+                  </div>
+                ) : (
+                  <p style={notaGuardandoStyle}>
+                    Esta preparación no está vinculada a una fórmula (se borró o no la tenía), así que no se puede
+                    generar etiqueta desde acá.
+                  </p>
+                )}
               </div>
             </>
           )}
@@ -359,6 +379,27 @@ const notaGuardandoStyle: CSSProperties = {
   fontSize: "0.78rem",
   fontStyle: "italic",
   color: "rgba(212,196,160,0.5)",
+};
+
+const accesosDirectosStyle: CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "0.6rem",
+  marginTop: "0.6rem",
+};
+
+const accesoDirectoStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.6rem",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  color: "#c8a050",
+  border: "1px solid rgba(200,160,80,0.35)",
+  padding: "8px 12px",
+  textDecoration: "none",
 };
 
 const tablaWrapperStyle: CSSProperties = {
