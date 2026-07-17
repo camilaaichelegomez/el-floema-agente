@@ -54,6 +54,9 @@ export interface EtiquetaData {
   font_scale: number;
   descripcion_catalogo: string;
   descripcion_redes: string;
+  offset_left_mm: number;
+  offset_center_mm: number;
+  offset_right_mm: number;
 }
 
 export const ETIQUETA_DEFAULTS: EtiquetaData = {
@@ -73,4 +76,7 @@ export const ETIQUETA_DEFAULTS: EtiquetaData = {
   font_scale: 1.0,
   descripcion_catalogo: "",
   descripcion_redes: "",
+  offset_left_mm: 0,
+  offset_center_mm: 0,
+  offset_right_mm: 0,
 };

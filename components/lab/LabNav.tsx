@@ -7,9 +7,14 @@ const ENLACES = [
   { href: "/lab/preparadas", label: "Preparadas" },
   { href: "/lab/asistente", label: "Asistente" },
   { href: "/lab/tareas", label: "Tareas" },
+  { href: "/lab/productos", label: "Productos" },
 ];
 
-export function LabNav({ actual }: { actual: "inventario" | "formulas" | "preparadas" | "asistente" | "tareas" }) {
+export function LabNav({
+  actual,
+}: {
+  actual: "inventario" | "formulas" | "preparadas" | "asistente" | "tareas" | "productos";
+}) {
   return (
     <nav style={navStyle}>
       {ENLACES.map((e, idx) => {
