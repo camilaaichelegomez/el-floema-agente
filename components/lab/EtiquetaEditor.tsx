@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import { Copy, Printer, Save, Sparkles } from "lucide-react";
+import { AlertTriangle, Copy, Printer, Save, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { computeLayout, type EtiquetaData } from "@/lib/etiquetas";
 import { EtiquetaLabel } from "@/components/lab/EtiquetaLabel";
@@ -20,6 +20,7 @@ export function EtiquetaEditor({
   const [generandoIA, setGenerandoIA] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guardado, setGuardado] = useState(false);
+  const [alertaIA, setAlertaIA] = useState<string | null>(null);
 
   const L = computeLayout(data.width_mm, data.font_scale);
 
@@ -64,6 +65,7 @@ export function EtiquetaEditor({
   async function generarConIA() {
     setGenerandoIA(true);
     setError(null);
+    setAlertaIA(null);
     try {
       const res = await fetch("/api/lab/etiqueta-texto", {
         method: "POST",
@@ -73,6 +75,11 @@ export function EtiquetaEditor({
       const json = await res.json();
       if (!res.ok) {
         setError(json.error ?? "No se pudo generar el texto.");
+      } else if (json.revision && json.revision.aprobado === false) {
+        // El filtro detectó un problema (ej. no es un cosmético que se aplique en el cuerpo).
+        // No rellenamos nada, mostramos la alerta.
+        const problema = json.revision.problema || "El producto no parece un cosmético que se aplique sobre el cuerpo.";
+        setAlertaIA(problema);
       } else {
         setData((d) => ({
           ...d,
@@ -152,8 +159,22 @@ export function EtiquetaEditor({
 
         <button type="button" onClick={generarConIA} disabled={generandoIA || !data.product_name.trim()} style={botonIAStyle}>
           <Sparkles size={14} />
-          {generandoIA ? "Generando…" : "Generar con IA (etiqueta + catálogo + redes)"}
+          {generandoIA ? "Revisando y generando…" : "Generar con IA (etiqueta + catálogo + redes)"}
         </button>
+
+        {alertaIA && (
+          <div style={alertaStyle}>
+            <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
+            <div>
+              <strong style={{ display: "block", marginBottom: 4 }}>El filtro detuvo la generación</strong>
+              {alertaIA}
+              <span style={{ display: "block", marginTop: 6, opacity: 0.85 }}>
+                No se rellenó nada para no poner instrucciones de uso cosmético en un producto que no lo es. Si crees que
+                es un error, revisá el nombre y los ingredientes y volvé a intentar.
+              </span>
+            </div>
+          </div>
+        )}
 
         <CampoTextarea label="Modo de uso" value={data.modo_uso} onChange={(v) => set("modo_uso", v)} />
         <CampoTextarea label="Advertencias" value={data.advertencias} onChange={(v) => set("advertencias", v)} />
@@ -438,6 +459,19 @@ const botonIAStyle: CSSProperties = {
 
 const errorStyle: CSSProperties = { color: "#e05a4a", fontFamily: "var(--font-body)", fontSize: "0.85rem", margin: 0 };
 const okStyle: CSSProperties = { color: "#7c9473", fontFamily: "var(--font-body)", fontSize: "0.8rem", margin: "0.4rem 0 0" };
+
+const alertaStyle: CSSProperties = {
+  display: "flex",
+  gap: "10px",
+  alignItems: "flex-start",
+  background: "rgba(224,90,74,0.1)",
+  border: "1px solid rgba(224,90,74,0.5)",
+  color: "#f0b8b0",
+  fontFamily: "var(--font-body)",
+  fontSize: "0.85rem",
+  lineHeight: 1.5,
+  padding: "12px 14px",
+};
 
 const previewWrapStyle: CSSProperties = { position: "sticky", top: "1rem" };
 const previewLabelStyle: CSSProperties = {
