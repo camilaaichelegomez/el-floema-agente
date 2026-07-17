@@ -47,6 +47,7 @@ export default async function EtiquetaFormulaPage({
     vencimiento: etiqueta?.vencimiento ?? "",
     size: etiqueta?.tamano ?? "",
     width_mm: etiqueta?.width_mm ?? ETIQUETA_DEFAULTS.width_mm,
+    alto_mm: etiqueta?.alto_mm ?? ETIQUETA_DEFAULTS.alto_mm,
     font_scale: etiqueta?.font_scale ?? ETIQUETA_DEFAULTS.font_scale,
     descripcion_catalogo: etiqueta?.descripcion_catalogo ?? "",
     descripcion_redes: etiqueta?.descripcion_redes ?? "",

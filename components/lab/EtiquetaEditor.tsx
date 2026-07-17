@@ -22,7 +22,7 @@ export function EtiquetaEditor({
   const [guardado, setGuardado] = useState(false);
   const [alertaIA, setAlertaIA] = useState<string | null>(null);
 
-  const L = computeLayout(data.width_mm, data.font_scale);
+  const L = computeLayout(data.width_mm, data.font_scale, data.alto_mm);
 
   function set<K extends keyof EtiquetaData>(key: K, value: EtiquetaData[K]) {
     setData((d) => ({ ...d, [key]: value }));
@@ -47,6 +47,7 @@ export function EtiquetaEditor({
         tamano: data.size || null,
         width_mm: data.width_mm,
         font_scale: data.font_scale,
+        alto_mm: data.alto_mm,
         descripcion_catalogo: data.descripcion_catalogo || null,
         descripcion_redes: data.descripcion_redes || null,
         offset_left_mm: data.offset_left_mm,
@@ -193,6 +194,14 @@ export function EtiquetaEditor({
             type="number"
           />
           <Campo
+            label="Alto (mm) — 0 = automático"
+            value={String(data.alto_mm)}
+            onChange={(v) => set("alto_mm", Number(v) || 0)}
+            type="number"
+          />
+        </div>
+        <div style={rowStyle}>
+          <Campo
             label="Ajuste de letra general"
             value={String(data.font_scale)}
             onChange={(v) => set("font_scale", Number(v) || 1)}
@@ -200,7 +209,9 @@ export function EtiquetaEditor({
           />
         </div>
         <p style={ayudaStyle}>
-          Alto calculado: {L.height_mm}mm (proporción fija del arte de fondo).
+          {data.alto_mm > 0
+            ? `Alto fijo: ${L.height_mm}mm. Ojo: si el alto no es proporcional al ancho, el arte de fondo se estira un poco (alto automático sería ${Math.round((data.width_mm / (1457 / 720)) * 10) / 10}mm).`
+            : `Alto automático: ${L.height_mm}mm (proporción del arte). Para una etiqueta más baja/ancha —como las de crema— escribí un alto en mm; el arte se estira levemente.`}
         </p>
 
         <h3 style={subseccionStyle}>Ajustes por panel</h3>

@@ -89,7 +89,7 @@ function estilosDeTexto(sizes: ZoneSizes) {
 }
 
 export function EtiquetaLabel({ data, className }: { data: EtiquetaData; className?: string }) {
-  const L = computeLayout(data.width_mm, data.font_scale);
+  const L = computeLayout(data.width_mm, data.font_scale, data.alto_mm);
 
   const sizesLeft = sizesForZone(L.s, data.font_scale_left);
   const sizesCenter = sizesForZone(L.s, data.font_scale_center);
