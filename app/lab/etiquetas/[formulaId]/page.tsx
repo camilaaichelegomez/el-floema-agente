@@ -53,6 +53,9 @@ export default async function EtiquetaFormulaPage({
     offset_left_mm: etiqueta?.offset_left_mm ?? ETIQUETA_DEFAULTS.offset_left_mm,
     offset_center_mm: etiqueta?.offset_center_mm ?? ETIQUETA_DEFAULTS.offset_center_mm,
     offset_right_mm: etiqueta?.offset_right_mm ?? ETIQUETA_DEFAULTS.offset_right_mm,
+    font_scale_left: etiqueta?.font_scale_left ?? ETIQUETA_DEFAULTS.font_scale_left,
+    font_scale_center: etiqueta?.font_scale_center ?? ETIQUETA_DEFAULTS.font_scale_center,
+    font_scale_right: etiqueta?.font_scale_right ?? ETIQUETA_DEFAULTS.font_scale_right,
   };
 
   return (
