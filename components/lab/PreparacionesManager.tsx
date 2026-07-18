@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { Eye, Sparkles, Tag, Trash2, X } from "lucide-react";
+import { Eye, MessageSquare, Sparkles, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export interface Preparacion {
@@ -116,7 +116,8 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
     <div>
       <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", color: "#d4c4a0", marginBottom: "1.5rem" }}>
         {preparaciones.length} preparación{preparaciones.length === 1 ? "" : "es"} registrada
-        {preparaciones.length === 1 ? "" : "s"}.
+        {preparaciones.length === 1 ? "" : "s"}. Hacé clic en &ldquo;Ver / Comentar&rdquo; para dejar comentarios de cada
+        receta.
       </p>
 
       {error && <p style={errorStyle}>{error}</p>}
@@ -138,6 +139,20 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
             <p style={{ fontFamily: "var(--font-body)", color: "#d4c4a0", opacity: 0.7 }}>Cargando…</p>
           ) : (
             <>
+              <div style={notaDestacadaStyle}>
+                <span style={itemsTituloStyle}>Comentarios de la receta</span>
+                <p style={notaAyudaStyle}>¿Cómo quedó? ¿Qué mejorar la próxima vez? Se guarda solo al salir del campo.</p>
+                <textarea
+                  value={notaTexto}
+                  onChange={(e) => setNotaTexto(e.target.value)}
+                  onBlur={guardarNota}
+                  placeholder="Ej: quedó muy líquida, subir la cera al 8%. El aroma de lavanda se sintió poco, agregar más la próxima…"
+                  style={notaTextareaStyle}
+                  rows={4}
+                />
+                {guardandoNota && <span style={notaGuardandoStyle}>Guardando…</span>}
+              </div>
+
               <p style={itemsTituloStyle}>Ingredientes usados</p>
               <div className="lab-tabla-marco" style={tablaWrapperStyle}>
                 <table style={tablaStyle}>
@@ -164,19 +179,6 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
                   <PasosVista texto={viendo.pasos} />
                 </div>
               )}
-
-              <div style={{ marginTop: "1.6rem" }}>
-                <span style={itemsTituloStyle}>Notas y comentarios</span>
-                <textarea
-                  value={notaTexto}
-                  onChange={(e) => setNotaTexto(e.target.value)}
-                  onBlur={guardarNota}
-                  placeholder="Observaciones de esta preparación: resultado, ajustes, textura, lo que quieras recordar la próxima vez…"
-                  style={notaTextareaStyle}
-                  rows={4}
-                />
-                {guardandoNota && <span style={notaGuardandoStyle}>Guardando…</span>}
-              </div>
 
               <div style={{ marginTop: "1.6rem" }}>
                 <span style={itemsTituloStyle}>Etiqueta y contenido</span>
@@ -218,27 +220,39 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
               </tr>
             </thead>
             <tbody>
-              {preparaciones.map((p) => (
-                <tr key={p.id}>
-                  <td style={tdStyle}>{p.nombre_formula}</td>
-                  <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{p.cantidad_gramos} g</td>
-                  <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{formatoFecha(p.creado)}</td>
-                  <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
-                    <button type="button" onClick={() => abrirVer(p)} style={iconoAccionStyle} aria-label="Ver">
-                      <Eye size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleBorrar(p)}
-                      disabled={borrando === p.id}
-                      style={iconoAccionStyle}
-                      aria-label="Borrar"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {preparaciones.map((p) => {
+                const tieneNota = (p.notas ?? "").trim().length > 0;
+                return (
+                  <tr key={p.id}>
+                    <td style={tdStyle}>
+                      <button type="button" onClick={() => abrirVer(p)} style={nombreBotonStyle}>
+                        {p.nombre_formula}
+                      </button>
+                      {tieneNota && (
+                        <span style={notaBadgeStyle}>
+                          <MessageSquare size={11} /> con comentario
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{p.cantidad_gramos} g</td>
+                    <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{formatoFecha(p.creado)}</td>
+                    <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                      <button type="button" onClick={() => abrirVer(p)} style={verComentarBotonStyle}>
+                        <Eye size={13} /> Ver / Comentar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleBorrar(p)}
+                        disabled={borrando === p.id}
+                        style={iconoAccionStyle}
+                        aria-label="Borrar"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -379,6 +393,64 @@ const notaGuardandoStyle: CSSProperties = {
   fontSize: "0.78rem",
   fontStyle: "italic",
   color: "rgba(212,196,160,0.5)",
+};
+
+const notaDestacadaStyle: CSSProperties = {
+  border: "1px solid rgba(200,160,80,0.3)",
+  background: "rgba(200,160,80,0.05)",
+  padding: "1rem 1.2rem",
+  marginBottom: "1.6rem",
+};
+
+const notaAyudaStyle: CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "0.8rem",
+  fontStyle: "italic",
+  color: "rgba(212,196,160,0.6)",
+  margin: "0.2rem 0 0",
+};
+
+const nombreBotonStyle: CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "0.95rem",
+  color: "#e8dcc8",
+  background: "none",
+  border: "none",
+  borderBottom: "1px dashed rgba(200,160,80,0.4)",
+  cursor: "pointer",
+  padding: 0,
+  textAlign: "left",
+};
+
+const notaBadgeStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "4px",
+  marginLeft: "0.6rem",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.5rem",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "rgba(124,148,115,0.9)",
+  border: "1px solid rgba(124,148,115,0.4)",
+  padding: "2px 6px",
+  whiteSpace: "nowrap",
+};
+
+const verComentarBotonStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "5px",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.55rem",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  color: "#c8a050",
+  background: "none",
+  border: "1px solid rgba(200,160,80,0.4)",
+  padding: "6px 10px",
+  cursor: "pointer",
+  marginRight: "6px",
 };
 
 const accesosDirectosStyle: CSSProperties = {
