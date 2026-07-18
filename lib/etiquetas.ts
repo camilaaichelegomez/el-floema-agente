@@ -22,11 +22,16 @@ export interface LayoutBase {
 
 export type ZoneSizes = { [K in keyof typeof BASE_SIZES]: number } & { s: number };
 
-export function computeLayout(widthMm: number, fontScale = 1.0): LayoutBase {
+// altoMm = 0 (o vacío) => alto automático según la proporción del arte.
+// Si se pasa un alto > 0, se usa ese (el arte de fondo se estira para ocuparlo).
+// La escala de letra (s) siempre depende del ancho, no del alto — así cambiar el
+// alto no achica ni agranda el texto.
+export function computeLayout(widthMm: number, fontScale = 1.0, altoMm = 0): LayoutBase {
   const s = (widthMm / BASE_WIDTH_MM) * fontScale;
+  const heightMm = altoMm && altoMm > 0 ? altoMm : widthMm / ART_ASPECT;
   return {
     width_mm: round2(widthMm),
-    height_mm: round2(widthMm / ART_ASPECT),
+    height_mm: round2(heightMm),
     s: Math.round(s * 10000) / 10000,
   };
 }
@@ -45,7 +50,10 @@ function round2(n: number) {
   return Math.round(n * 100) / 100;
 }
 
+export type FormaEtiqueta = "rectangular" | "redonda";
+
 export interface EtiquetaData {
+  forma: FormaEtiqueta;
   product_name: string;
   subtitle: string;
   category_line: string;
@@ -59,6 +67,7 @@ export interface EtiquetaData {
   lote: string;
   vencimiento: string;
   width_mm: number;
+  alto_mm: number;
   font_scale: number;
   descripcion_catalogo: string;
   descripcion_redes: string;
@@ -71,6 +80,7 @@ export interface EtiquetaData {
 }
 
 export const ETIQUETA_DEFAULTS: EtiquetaData = {
+  forma: "rectangular",
   product_name: "",
   subtitle: "",
   category_line: "",
@@ -84,6 +94,7 @@ export const ETIQUETA_DEFAULTS: EtiquetaData = {
   lote: "",
   vencimiento: "",
   width_mm: 150,
+  alto_mm: 0,
   font_scale: 1.0,
   descripcion_catalogo: "",
   descripcion_redes: "",
