@@ -3,7 +3,7 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Eye, FlaskConical, ListChecks, Package, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Eye, FlaskConical, ListChecks, Package, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 
@@ -367,14 +367,30 @@ export function FormulasManager({
 
   return (
     <div>
-      <div style={cabeceraStyle}>
-        <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", color: "#d4c4a0", margin: 0 }}>
-          {formulas.length} fórmula{formulas.length === 1 ? "" : "s"}.
-        </p>
-        <button type="button" onClick={abrirNueva} style={botonPrimarioStyle}>
-          <Plus size={14} /> Nueva fórmula
+      {!form && !viendo && (
+        <div style={cabeceraStyle}>
+          <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", color: "#d4c4a0", margin: 0 }}>
+            {formulas.length} fórmula{formulas.length === 1 ? "" : "s"}.
+          </p>
+          <button type="button" onClick={abrirNueva} style={botonPrimarioStyle}>
+            <Plus size={14} /> Nueva fórmula
+          </button>
+        </div>
+      )}
+
+      {(form || viendo) && (
+        <button
+          type="button"
+          onClick={() => {
+            setForm(null);
+            setViendo(null);
+            setError(null);
+          }}
+          style={volverBotonStyle}
+        >
+          <ArrowLeft size={14} /> Volver a la lista
         </button>
-      </div>
+      )}
 
       {error && <p style={errorStyle}>{error}</p>}
 
@@ -408,18 +424,20 @@ export function FormulasManager({
         />
       )}
 
-      <TablaFormulas
-        formulas={formulas}
-        onVer={abrirVer}
-        onEditar={abrirEditar}
-        onBorrar={handleBorrar}
-        onAgregarTarea={handleAgregarATareas}
-        agregandoTarea={agregandoTarea}
-        tareaAgregada={tareaAgregada}
-        productos={productos}
-        onToggleProducto={toggleProducto}
-        guardandoProducto={guardandoProducto}
-      />
+      {!form && !viendo && (
+        <TablaFormulas
+          formulas={formulas}
+          onVer={abrirVer}
+          onEditar={abrirEditar}
+          onBorrar={handleBorrar}
+          onAgregarTarea={handleAgregarATareas}
+          agregandoTarea={agregandoTarea}
+          tareaAgregada={tareaAgregada}
+          productos={productos}
+          onToggleProducto={toggleProducto}
+          guardandoProducto={guardandoProducto}
+        />
+      )}
     </div>
   );
 }
@@ -1128,6 +1146,22 @@ const botonSecundarioStyle: CSSProperties = {
   border: "1px solid rgba(200,160,80,0.3)",
   padding: "10px 18px",
   cursor: "pointer",
+};
+
+const volverBotonStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "7px",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.62rem",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "#c8a050",
+  background: "none",
+  border: "1px solid rgba(200,160,80,0.35)",
+  padding: "9px 14px",
+  cursor: "pointer",
+  marginBottom: "1.2rem",
 };
 
 const botonCerrarStyle: CSSProperties = {
