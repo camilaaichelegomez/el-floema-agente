@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { Eye, MessageSquare, Sparkles, Tag, Trash2, X } from "lucide-react";
+import { Check, Eye, MessageSquare, Package, Sparkles, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export interface Preparacion {
@@ -52,6 +52,8 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
   const [error, setError] = useState<string | null>(null);
   const [notaTexto, setNotaTexto] = useState("");
   const [guardandoNota, setGuardandoNota] = useState(false);
+  const [esProducto, setEsProducto] = useState<boolean | null>(null);
+  const [guardandoProducto, setGuardandoProducto] = useState(false);
 
   async function recargarLista() {
     const supabase = createClient();
@@ -67,9 +69,38 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
     setCargando(true);
     setViendo(preparacion);
     setNotaTexto(preparacion.notas ?? "");
+    setEsProducto(null);
     const items = await cargarItems(preparacion.id);
     setItemsViendo(items);
+    if (preparacion.formula_id) {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("formula_etiquetas")
+        .select("es_producto")
+        .eq("formula_id", preparacion.formula_id)
+        .maybeSingle();
+      setEsProducto(Boolean(data?.es_producto));
+    }
     setCargando(false);
+  }
+
+  async function toggleProducto() {
+    if (!viendo?.formula_id) return;
+    const objetivo = !esProducto;
+    setError(null);
+    setGuardandoProducto(true);
+    const supabase = createClient();
+    // upsert por formula_id: si ya hay etiqueta, solo cambia es_producto y conserva
+    // la etiqueta + descripción de catálogo + descripción de redes ya guardadas.
+    const { error: err } = await supabase
+      .from("formula_etiquetas")
+      .upsert({ formula_id: viendo.formula_id, es_producto: objetivo }, { onConflict: "formula_id" });
+    setGuardandoProducto(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
+    setEsProducto(objetivo);
   }
 
   async function guardarNota() {
@@ -183,14 +214,34 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
               <div style={{ marginTop: "1.6rem" }}>
                 <span style={itemsTituloStyle}>Etiqueta y contenido</span>
                 {viendo.formula_id ? (
-                  <div style={accesosDirectosStyle}>
-                    <Link href={`/lab/etiquetas/${viendo.formula_id}`} style={accesoDirectoStyle}>
-                      <Tag size={13} /> Generar etiqueta
-                    </Link>
-                    <Link href={`/lab/etiquetas/${viendo.formula_id}`} style={accesoDirectoStyle}>
-                      <Sparkles size={13} /> Copy de catálogo y redes
-                    </Link>
-                  </div>
+                  <>
+                    <div style={accesosDirectosStyle}>
+                      <Link href={`/lab/etiquetas/${viendo.formula_id}`} style={accesoDirectoStyle}>
+                        <Tag size={13} /> Generar etiqueta
+                      </Link>
+                      <Link href={`/lab/etiquetas/${viendo.formula_id}`} style={accesoDirectoStyle}>
+                        <Sparkles size={13} /> Copy de catálogo y redes
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={toggleProducto}
+                        disabled={guardandoProducto || esProducto === null}
+                        style={esProducto ? productoActivoStyle : accesoDirectoStyle}
+                      >
+                        {esProducto ? <Check size={13} /> : <Package size={13} />}
+                        {guardandoProducto
+                          ? "Guardando…"
+                          : esProducto
+                            ? "En productos — quitar"
+                            : "Añadir a productos"}
+                      </button>
+                    </div>
+                    <p style={productoAyudaStyle}>
+                      {esProducto
+                        ? "Aparece en la sección Productos con su etiqueta y descripciones."
+                        : "Márcala para que aparezca en la sección Productos. Se conserva la etiqueta y las descripciones de catálogo y redes."}
+                    </p>
+                  </>
                 ) : (
                   <p style={notaGuardandoStyle}>
                     Esta preparación no está vinculada a una fórmula (se borró o no la tenía), así que no se puede
@@ -469,9 +520,34 @@ const accesoDirectoStyle: CSSProperties = {
   letterSpacing: "0.1em",
   textTransform: "uppercase",
   color: "#c8a050",
+  background: "none",
+  cursor: "pointer",
   border: "1px solid rgba(200,160,80,0.35)",
   padding: "8px 12px",
   textDecoration: "none",
+};
+
+const productoActivoStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.6rem",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+  color: "#0d1a0d",
+  background: "radial-gradient(circle at 35% 30%, #e8c070, #c8a050 60%, #a87f35)",
+  border: "1px solid rgba(200,160,80,0.6)",
+  padding: "8px 12px",
+  cursor: "pointer",
+};
+
+const productoAyudaStyle: CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "0.78rem",
+  fontStyle: "italic",
+  color: "rgba(212,196,160,0.55)",
+  margin: "0.6rem 0 0",
 };
 
 const tablaWrapperStyle: CSSProperties = {

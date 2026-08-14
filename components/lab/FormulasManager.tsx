@@ -3,7 +3,7 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Check, Eye, FlaskConical, ListChecks, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
+import { Check, Eye, FlaskConical, ListChecks, Package, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 import { adivinarCoincidencia } from "@/lib/lab/coincidencias";
 
@@ -112,12 +112,16 @@ export function FormulasManager({
   initialFormulas,
   inventarioOpciones,
   userId,
+  productoIdsIniciales = [],
 }: {
   initialFormulas: Formula[];
   inventarioOpciones: InventarioOpcion[];
   userId: string;
+  productoIdsIniciales?: number[];
 }) {
   const [formulas, setFormulas] = useState(initialFormulas);
+  const [productos, setProductos] = useState<Set<number>>(() => new Set(productoIdsIniciales));
+  const [guardandoProducto, setGuardandoProducto] = useState<number | null>(null);
   const [form, setForm] = useState<FormulaFormState | null>(null);
   const [itemsOriginales, setItemsOriginales] = useState<FormulaItemRow[]>([]);
   const [cargando, setCargando] = useState(false);
@@ -315,6 +319,29 @@ export function FormulasManager({
     await recargarLista();
   }
 
+  async function toggleProducto(formula: Formula) {
+    const objetivo = !productos.has(formula.id);
+    setError(null);
+    setGuardandoProducto(formula.id);
+    const supabase = createClient();
+    // upsert por formula_id: conserva la etiqueta y las descripciones ya guardadas,
+    // solo cambia la marca es_producto.
+    const { error: dbError } = await supabase
+      .from("formula_etiquetas")
+      .upsert({ formula_id: formula.id, es_producto: objetivo, user_id: userId }, { onConflict: "formula_id" });
+    setGuardandoProducto(null);
+    if (dbError) {
+      setError(dbError.message);
+      return;
+    }
+    setProductos((prev) => {
+      const next = new Set(prev);
+      if (objetivo) next.add(formula.id);
+      else next.delete(formula.id);
+      return next;
+    });
+  }
+
   async function handleAgregarATareas(formula: Formula) {
     setError(null);
     setAgregandoTarea(formula.id);
@@ -389,6 +416,9 @@ export function FormulasManager({
         onAgregarTarea={handleAgregarATareas}
         agregandoTarea={agregandoTarea}
         tareaAgregada={tareaAgregada}
+        productos={productos}
+        onToggleProducto={toggleProducto}
+        guardandoProducto={guardandoProducto}
       />
     </div>
   );
@@ -963,6 +993,9 @@ function TablaFormulas({
   onAgregarTarea,
   agregandoTarea,
   tareaAgregada,
+  productos,
+  onToggleProducto,
+  guardandoProducto,
 }: {
   formulas: Formula[];
   onVer: (f: Formula) => void;
@@ -971,6 +1004,9 @@ function TablaFormulas({
   onAgregarTarea: (f: Formula) => void;
   agregandoTarea: number | null;
   tareaAgregada: number | null;
+  productos: Set<number>;
+  onToggleProducto: (f: Formula) => void;
+  guardandoProducto: number | null;
 }) {
   if (formulas.length === 0) {
     return (
@@ -1019,6 +1055,19 @@ function TablaFormulas({
                 >
                   <Tag size={14} />
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => onToggleProducto(f)}
+                  disabled={guardandoProducto === f.id}
+                  style={{
+                    ...iconoAccionStyle,
+                    color: productos.has(f.id) ? "#e8c070" : "rgba(212,196,160,0.6)",
+                  }}
+                  aria-label={productos.has(f.id) ? "Quitar de productos" : "Agregar a productos"}
+                  title={productos.has(f.id) ? "En productos — clic para quitar" : "Agregar a productos"}
+                >
+                  <Package size={14} fill={productos.has(f.id) ? "#e8c070" : "none"} />
+                </button>
                 <button
                   type="button"
                   onClick={() => onAgregarTarea(f)}

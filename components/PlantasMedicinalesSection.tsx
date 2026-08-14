@@ -262,7 +262,7 @@ function PlantCard({ planta, index }: { planta: Planta; index: number }) {
       onHoverEnd={() => setHovered(false)}
     >
       <Link
-        href="/plantas"
+        href={`/plantas/${planta.slug}`}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -559,7 +559,7 @@ export function PlantasMedicinalesSection() {
               fontSize: "0.65rem",
               color: "rgba(200,160,80,0.55)",
               lineHeight: 1,
-              background: "var(--bg-primary)",
+              background: BG_LEFT,
               padding: "0.4rem 0.3rem",
             }}
           >
@@ -570,7 +570,7 @@ export function PlantasMedicinalesSection() {
         {/* ── RIGHT: grid 3 columnas ── */}
         <div
           style={{
-            background: "var(--bg-primary)",
+            background: BG_LEFT,
             padding: "clamp(3rem,6vw,5rem) clamp(1.5rem,4vw,3.5rem)",
             display: "flex",
             flexDirection: "column",

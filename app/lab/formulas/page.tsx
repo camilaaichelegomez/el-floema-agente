@@ -26,6 +26,12 @@ export default async function FormulasLabPage() {
     .select("id, ingrediente, unidad, costo_unitario, cantidad")
     .order("ingrediente", { ascending: true });
 
+  const { data: etiquetasProducto } = await supabase
+    .from("formula_etiquetas")
+    .select("formula_id")
+    .eq("es_producto", true);
+  const productoIds = (etiquetasProducto ?? []).map((e) => e.formula_id as number);
+
   return (
     <main
       className="parchment-bg lab-bg"
@@ -43,6 +49,7 @@ export default async function FormulasLabPage() {
             initialFormulas={formulas}
             inventarioOpciones={(inventarioData as InventarioOpcion[] | null) ?? []}
             userId={user.id}
+            productoIdsIniciales={productoIds}
           />
         )}
       </div>

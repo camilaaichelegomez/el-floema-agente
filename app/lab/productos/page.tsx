@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase-server";
 import { LabEncabezado } from "@/components/lab/LabEncabezado";
-import { ProductosManager, type ProductoConEtiqueta } from "@/components/lab/ProductosManager";
+import { ProductosManager, type ProductoConEtiqueta, type FormulaOpcion } from "@/components/lab/ProductosManager";
 
 export default async function ProductosLabPage() {
   const supabase = await createClient();
@@ -13,12 +13,16 @@ export default async function ProductosLabPage() {
     redirect("/lab/login");
   }
 
-  const { data, error } = await supabase
-    .from("formulas")
-    .select(
-      "id, nombre, categoria, formula_etiquetas(subtitle, category_line, tamano, descripcion_catalogo, descripcion_redes)"
-    )
-    .order("nombre", { ascending: true });
+  const [{ data, error }, { data: todasFormulas }] = await Promise.all([
+    supabase
+      .from("formulas")
+      .select(
+        "id, nombre, categoria, formula_etiquetas!inner(subtitle, category_line, tamano, descripcion_catalogo, descripcion_redes, es_producto)"
+      )
+      .eq("formula_etiquetas.es_producto", true)
+      .order("nombre", { ascending: true }),
+    supabase.from("formulas").select("id, nombre").order("nombre", { ascending: true }),
+  ]);
 
   return (
     <main
@@ -33,7 +37,11 @@ export default async function ProductosLabPage() {
             No se pudieron cargar los productos: {error.message}
           </p>
         ) : (
-          <ProductosManager productos={(data as unknown as ProductoConEtiqueta[] | null) ?? []} />
+          <ProductosManager
+            productos={(data as unknown as ProductoConEtiqueta[] | null) ?? []}
+            todasFormulas={(todasFormulas as FormulaOpcion[] | null) ?? []}
+            userId={user.id}
+          />
         )}
       </div>
     </main>
