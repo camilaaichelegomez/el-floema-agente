@@ -106,7 +106,7 @@ export function EtiquetaEditor({
     const err = await guardarCampos();
     setGuardando(false);
     if (err) {
-      setError("No se pudo guardar la etiqueta.");
+      setError(`No se pudo guardar la etiqueta: ${err.message}`);
       return;
     }
     setGuardado(true);
@@ -118,7 +118,7 @@ export function EtiquetaEditor({
     const err = await guardarCampos();
     setGuardando(false);
     if (err) {
-      setError("No se pudieron guardar los campos de la etiqueta, pero igual puedes imprimir.");
+      setError(`No se pudieron guardar los campos de la etiqueta (${err.message}), pero igual puedes imprimir.`);
     } else {
       setGuardado(true);
     }
