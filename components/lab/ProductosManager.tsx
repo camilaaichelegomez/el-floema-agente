@@ -141,12 +141,13 @@ export function ProductosManager({
           return (
             <div key={p.id} className="lab-panel" style={cardStyle}>
               <div style={cardHeaderStyle}>
-                <div>
+                <Link href={`/lab/productos/${p.id}`} style={nombreLinkStyle} title="Ver todo el producto">
                   <h3 style={nombreStyle}>{p.nombre}</h3>
                   {(etiqueta?.subtitle || p.categoria) && (
                     <p style={subtituloStyle}>{etiqueta?.subtitle || p.categoria}</p>
                   )}
-                </div>
+                  <span style={verMasStyle}>Ver ficha completa →</span>
+                </Link>
                 <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
                   <Link href={`/lab/etiquetas/${p.id}`} style={editarLinkStyle}>
                     <Pencil size={12} /> {tieneContenido ? "Editar" : "Generar"}
@@ -391,6 +392,21 @@ const cardHeaderStyle: CSSProperties = {
   justifyContent: "space-between",
   gap: "1rem",
   marginBottom: "0.8rem",
+};
+
+const nombreLinkStyle: CSSProperties = {
+  textDecoration: "none",
+  display: "block",
+};
+
+const verMasStyle: CSSProperties = {
+  display: "inline-block",
+  marginTop: "0.4rem",
+  fontFamily: "var(--font-grimoire)",
+  fontSize: "0.54rem",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "rgba(200,160,80,0.7)",
 };
 
 const nombreStyle: CSSProperties = {
