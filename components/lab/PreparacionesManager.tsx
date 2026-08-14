@@ -297,6 +297,7 @@ export function PreparacionesManager({ initialPreparaciones }: { initialPreparac
                         disabled={borrando === p.id}
                         style={iconoAccionStyle}
                         aria-label="Borrar"
+                        title="Borrar preparación (devuelve el stock al inventario)"
                       >
                         <Trash2 size={14} />
                       </button>

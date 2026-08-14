@@ -1042,16 +1042,17 @@ function TablaFormulas({
               <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{formatoCLP(f.costo?.costo_unidad ?? null)}</td>
               <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>{formatoCLP(f.costo?.precio_sugerido ?? null)}</td>
               <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
-                <button type="button" onClick={() => onVer(f)} style={iconoAccionStyle} aria-label="Ver">
+                <button type="button" onClick={() => onVer(f)} style={iconoAccionStyle} aria-label="Ver" title="Ver fórmula">
                   <Eye size={14} />
                 </button>
-                <button type="button" onClick={() => onEditar(f)} style={iconoAccionStyle} aria-label="Editar">
+                <button type="button" onClick={() => onEditar(f)} style={iconoAccionStyle} aria-label="Editar" title="Editar fórmula">
                   <Pencil size={14} />
                 </button>
                 <Link
                   href={`/lab/etiquetas/${f.id}`}
                   style={{ ...iconoAccionStyle, display: "inline-flex", textDecoration: "none" }}
                   aria-label="Generar etiqueta"
+                  title="Generar etiqueta"
                 >
                   <Tag size={14} />
                 </Link>
@@ -1078,7 +1079,7 @@ function TablaFormulas({
                 >
                   {tareaAgregada === f.id ? <Check size={14} color="#7c9473" /> : <ListChecks size={14} />}
                 </button>
-                <button type="button" onClick={() => onBorrar(f)} style={iconoAccionStyle} aria-label="Borrar">
+                <button type="button" onClick={() => onBorrar(f)} style={iconoAccionStyle} aria-label="Borrar" title="Borrar fórmula">
                   <Trash2 size={14} />
                 </button>
               </td>
