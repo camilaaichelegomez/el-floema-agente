@@ -57,6 +57,7 @@ interface Formula {
   title: string;
   ph: string;
   preservative: string;
+  note?: string;
   categories: FormulaCategory[];
 }
 
@@ -117,6 +118,11 @@ function FormulaCard({ formula }: { formula: Formula }) {
       {formula.categories.map((cat) => (
         <CategoryBlock key={cat.title} cat={cat} />
       ))}
+      {formula.note && (
+        <p style={{ fontFamily: "var(--font-body)", fontStyle: "italic", fontSize: "0.9rem", color: "rgba(220,180,80,0.8)", marginTop: "0.5rem", marginBottom: 0, paddingLeft: "0.75rem", borderLeft: "2px solid rgba(220,180,80,0.4)" }}>
+          {formula.note}
+        </p>
+      )}
     </div>
   );
 }
@@ -124,10 +130,46 @@ function FormulaCard({ formula }: { formula: Formula }) {
 // ── Formula data ──────────────────────────────────────────────────────────────
 const formulas: Formula[] = [
   {
+    id: "syndet-facial-liquido",
+    title: "Syndet Facial Líquido",
+    ph: "5.0–5.5",
+    preservative: "OBLIGATORIO (base acuosa)",
+    note: "Pensar en materia activa (ASM), no en el % del ingrediente: cada tensioactivo trae distinta concentración. Para rostro apuntar a ~10–14% de materia activa total.",
+    categories: [
+      {
+        title: "Fase acuosa",
+        range: "~72%",
+        items: [
+          { name: "Hidrolato o agua destilada", range: "55–72%", desc: "Base líquida. El hidrolato aporta aroma y activos suaves." },
+          { name: "Glicerina vegetal", range: "3–5%", desc: "Humectante, evita la tirantez." },
+          { name: "Goma xantana", range: "0.3–0.5%", desc: "Espesa a gel. Pre-dispersar en la glicerina." },
+          { name: "Inulina", range: "0.5–1%", desc: "Prebiótico — cuida el microbioma de la piel." },
+        ],
+      },
+      {
+        title: "Tensioactivos",
+        range: "~20% (materia activa ~12%)",
+        items: [
+          { name: "SCI", range: "6–8%", desc: "Aminoácido suave, principal. Disolver caliente (70–75 °C)." },
+          { name: "Glucósido de coco", range: "8–12%", desc: "Muy suave. ⚠️ pH natural alcalino — ajustar al final." },
+          { name: "Betaína de coco", range: "5–8%", desc: "Co-tensioactivo suave, da cuerpo." },
+        ],
+      },
+      {
+        title: "Finales",
+        range: "~1%",
+        items: [
+          { name: "Ácido cítrico", range: "c.s.", desc: "Ajuste de pH a 5.0–5.5." },
+          { name: "Conservante Cosgard", range: "0.5–1%", desc: "Obligatorio en base acuosa. Activo a pH < 6." },
+        ],
+      },
+    ],
+  },
+  {
     id: "syndet-solido",
     title: "Syndet Sólido",
     ph: "5.0–6.5 (solución 10%)",
-    preservative: "No necesario",
+    preservative: "No necesario (anhidro)",
     categories: [
       {
         title: "Tensioactivos",
@@ -161,7 +203,7 @@ const formulas: Formula[] = [
         items: [
           { name: "Vitamina E", range: "0.5%", desc: "Antioxidante para proteger aceites." },
           { name: "AE", range: "0.5–1.5%", desc: "Aceites esenciales de elección." },
-          { name: "Ácido cítrico", range: "0.5–1%", desc: "Ajuste de pH." },
+          { name: "Ácido cítrico", range: "0.5–1%", desc: "Ajuste de pH (medido en solución)." },
         ],
       },
     ],
@@ -170,7 +212,7 @@ const formulas: Formula[] = [
     id: "syndet-facial-solido",
     title: "Syndet Facial Sólido",
     ph: "4.5–5.5",
-    preservative: "No necesario",
+    preservative: "No necesario (anhidro)",
     categories: [
       {
         title: "Tensioactivos",
@@ -214,13 +256,13 @@ const formulas: Formula[] = [
     id: "shampoo-solido",
     title: "Shampoo Sólido",
     ph: "4.5–5.5",
-    preservative: "No necesario",
+    preservative: "No necesario (anhidro)",
     categories: [
       {
         title: "Tensioactivos",
         range: "60–75%",
         items: [
-          { name: "SCI", range: "45–55%", desc: "Base principal." },
+          { name: "SCI", range: "45–55%", desc: "Base principal, suave. Calentar a ~75 °C." },
           { name: "SLSA", range: "10–20%", desc: "Da volumen de espuma. Más potencia limpiadora." },
           { name: "Betaína de coco", range: "10–15%", desc: "Suaviza y acondiciona el cabello." },
         ],
@@ -239,14 +281,7 @@ const formulas: Formula[] = [
         items: [
           { name: "Proteína hidrolizada trigo / seda / avena", range: "2–3%", desc: "Se deposita en la cutícula. Da brillo y resistencia." },
           { name: "Pantenol en polvo", range: "1–2%", desc: "Hidratante capilar." },
-          { name: "Planta liofilizada", range: "1–3%", desc: "Activos botánicos capilares." },
-        ],
-      },
-      {
-        title: "Polvos",
-        range: "3–8%",
-        items: [
-          { name: "Almidón de arroz", range: "3–8%", desc: "Textura, absorción de exceso de sebo." },
+          { name: "Planta liofilizada", range: "1–3%", desc: "Activos botánicos (romero anticaída, ortiga, etc.)." },
         ],
       },
       {
@@ -260,43 +295,139 @@ const formulas: Formula[] = [
     ],
   },
   {
-    id: "syndet-liquido",
-    title: "Syndet Líquido",
-    ph: "5.0–5.5",
-    preservative: "OBLIGATORIO",
+    id: "serum-facial",
+    title: "Sérum Facial",
+    ph: "5.0–6.0",
+    preservative: "OBLIGATORIO (base acuosa)",
+    note: "Los activos se agregan en frío (se degradan con el calor). Niacinamida + ácido hialurónico tienen sinergia de hidratación.",
     categories: [
       {
-        title: "Fase acuosa",
-        range: "55–70%",
+        title: "Base acuosa / gel",
+        range: "85–95%",
         items: [
-          { name: "Agua destilada o hidrolato", range: "55–70%", desc: "Base líquida del producto." },
-          { name: "Glicerina vegetal", range: "3–5%", desc: "Humectante, da cuerpo." },
-        ],
-      },
-      {
-        title: "Tensioactivos",
-        range: "25–40%",
-        items: [
-          { name: "Betaína de coco", range: "20–25%", desc: "Base principal. Limpia y acondiciona." },
-          { name: "Glucósido de coco", range: "10–15%", desc: "Co-tensioactivo ultra suave. ⚠️ pH natural 11-12 — siempre ajustar." },
+          { name: "Hidrolato o agua destilada", range: "c.s.p. 100%", desc: "Base del sérum." },
+          { name: "Ácido hialurónico", range: "0.1–1%", desc: "Humecta en profundidad, efecto plumping." },
+          { name: "Glicerina vegetal", range: "3–5%", desc: "Humectante de refuerzo." },
+          { name: "Goma xantana", range: "0.2–0.5%", desc: "Da la textura sérum ligera." },
         ],
       },
       {
         title: "Activos",
-        range: "3–8%",
+        range: "2–10%",
         items: [
-          { name: "Extracto glicérico de planta", range: "3–5%", desc: "Activos botánicos en vehículo glicérico." },
-          { name: "Proteína hidrolizada", range: "1–3%", desc: "Acondiciona y da cuerpo." },
-          { name: "Pantenol", range: "1–2%", desc: "Hidratante y suavizante." },
+          { name: "Niacinamida", range: "2–5%", desc: "Regula sebo, unifica el tono, fortalece la barrera." },
+          { name: "Pantenol", range: "1–3%", desc: "Calma y repara." },
+          { name: "Extracto glicérico (centella, etc.)", range: "2–5%", desc: "Activo botánico específico." },
         ],
       },
       {
         title: "Finales",
-        range: "1–2%",
+        range: "~1%",
         items: [
-          { name: "AE + solubilizante polisorbato 20 ratio 1:1", range: "0.5–1%", desc: "Aceites esenciales con solubilizante." },
-          { name: "Vitamina E", range: "0.2%", desc: "Antioxidante." },
-          { name: "Conservante Cosgard", range: "0.5–1%", desc: "Obligatorio. Activo a pH < 6." },
+          { name: "Ácido cítrico", range: "c.s.", desc: "Ajuste de pH a 5.0–6.0." },
+          { name: "Conservante Cosgard", range: "0.5–1%", desc: "Obligatorio." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "crema-emulsion-ow",
+    title: "Crema / Emulsión O/W",
+    ph: "5.0–5.5",
+    preservative: "OBLIGATORIO (base acuosa)",
+    note: "Calentar ambas fases a ~70 °C, verter la acuosa sobre la oleosa y emulsionar; agregar los activos y el conservante bajo 40 °C.",
+    categories: [
+      {
+        title: "Fase acuosa",
+        range: "65–75%",
+        items: [
+          { name: "Hidrolato o agua destilada", range: "c.s.p. 100%", desc: "Fase continua." },
+          { name: "Glicerina vegetal", range: "3–5%", desc: "Humectante." },
+        ],
+      },
+      {
+        title: "Fase oleosa",
+        range: "18–28%",
+        items: [
+          { name: "Aceites vegetales por tipo de piel", range: "10–18%", desc: "Jojoba, rosa mosqueta, escualano, etc." },
+          { name: "Manteca (karité / cacao)", range: "3–8%", desc: "Nutre, da cuerpo." },
+          { name: "Emulsionante O/W (Olivem 1000 / cera lanette)", range: "5–8%", desc: "Une agua y aceite en emulsión estable." },
+          { name: "Alcohol cetílico", range: "1–3%", desc: "Co-emulsionante, textura sedosa." },
+        ],
+      },
+      {
+        title: "Activos y finales",
+        range: "1–5%",
+        items: [
+          { name: "Vitamina E", range: "0.5%", desc: "Antioxidante para la fase oleosa." },
+          { name: "Activos en frío", range: "1–3%", desc: "Niacinamida, extractos, ácido hialurónico." },
+          { name: "Conservante Cosgard + ácido cítrico", range: "~1%", desc: "Conservante obligatorio; ajuste de pH." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "gel-facial",
+    title: "Gel Facial",
+    ph: "5.0–5.5",
+    preservative: "OBLIGATORIO (base acuosa)",
+    categories: [
+      {
+        title: "Fase acuosa",
+        range: "90–97%",
+        items: [
+          { name: "Hidrolato o agua destilada", range: "70–80%", desc: "Base del gel." },
+          { name: "Glicerina vegetal", range: "10–15%", desc: "Humectante, evita que la goma se apelmace." },
+          { name: "Goma xantana / guar", range: "0.5–2%", desc: "Gelificante. Pre-dispersar en la glicerina." },
+        ],
+      },
+      {
+        title: "Activos",
+        range: "0.5–5%",
+        items: [
+          { name: "Activos botánicos (agua/glicerina)", range: "0.5–3%", desc: "Aloe, extractos hidroglicerinados." },
+          { name: "Niacinamida u otro activo", range: "0–2%", desc: "Opcional, según objetivo." },
+        ],
+      },
+      {
+        title: "Finales",
+        range: "~1%",
+        items: [
+          { name: "Conservante Cosgard", range: "0.5–1%", desc: "Obligatorio." },
+          { name: "Ácido cítrico", range: "c.s.", desc: "Ajuste de pH." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "tonico-facial",
+    title: "Tónico Facial",
+    ph: "4.5–5.5",
+    preservative: "OBLIGATORIO (base acuosa)",
+    note: "Sin alcohol para no resecar. Ideal el hidrolato según tipo de piel: rosa (madura), manzanilla (sensible), triwe/menta (grasa).",
+    categories: [
+      {
+        title: "Base",
+        range: "90–97%",
+        items: [
+          { name: "Hidrolato", range: "80–95%", desc: "Base activa y aromática." },
+          { name: "Glicerina vegetal", range: "2–5%", desc: "Humectante suave." },
+        ],
+      },
+      {
+        title: "Activos",
+        range: "1–8%",
+        items: [
+          { name: "Extractos hidroglicerinados", range: "2–8%", desc: "Según piel (2–8% se agregan en frío)." },
+          { name: "Niacinamida", range: "0–4%", desc: "Opcional, para tono y poros." },
+        ],
+      },
+      {
+        title: "Finales",
+        range: "~1%",
+        items: [
+          { name: "Conservante Cosgard", range: "0.5–1%", desc: "Obligatorio." },
+          { name: "Ácido cítrico", range: "c.s.", desc: "Ajuste de pH." },
         ],
       },
     ],
@@ -304,7 +435,7 @@ const formulas: Formula[] = [
   {
     id: "unguento-anhidro",
     title: "Ungüento Anhidro",
-    ph: "No aplica",
+    ph: "No aplica (anhidro)",
     preservative: "No necesario — 100% anhidro",
     categories: [
       {
@@ -312,7 +443,7 @@ const formulas: Formula[] = [
         range: "70–85%",
         items: [
           { name: "Tallow purificado o infusionado", range: "50–75%", desc: "Base principal biomimética." },
-          { name: "Aceite de maceración oleato", range: "10–20%", desc: "Vehículo de activos botánicos." },
+          { name: "Aceite de maceración / oleato", range: "10–20%", desc: "Vehículo de activos botánicos." },
         ],
       },
       {
@@ -330,6 +461,26 @@ const formulas: Formula[] = [
           { name: "Vitamina E", range: "0.5–1%", desc: "Antioxidante esencial en bases oleosas." },
           { name: "AE", range: "0.5–2%", desc: "Aceites esenciales terapéuticos." },
           { name: "Activos lipófilos específicos", range: "1–3%", desc: "Según objetivo de la fórmula." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "balsamo-labial",
+    title: "Bálsamo Labial",
+    ph: "No aplica (anhidro)",
+    preservative: "No necesario — 100% anhidro",
+    note: "La piel del labio tiene solo 3–5 capas celulares (vs 16 del rostro): el AE no debe superar el 0.5%, y es un producto que se reaplica mucho.",
+    categories: [
+      {
+        title: "Base oleosa",
+        range: "100%",
+        items: [
+          { name: "Cera de abeja", range: "20–30%", desc: "Da la dureza de la barra." },
+          { name: "Mantecas (cacao / karité)", range: "20–30%", desc: "Nutren y protegen." },
+          { name: "Aceites vegetales", range: "30–40%", desc: "Suavidad y deslizamiento." },
+          { name: "Vitamina E", range: "0.2–1%", desc: "Antioxidante." },
+          { name: "AE / aroma", range: "0–0.5% máximo", desc: "Dosis muy baja en labios." },
         ],
       },
     ],

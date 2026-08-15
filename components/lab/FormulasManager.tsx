@@ -35,6 +35,7 @@ export interface Formula {
   ph_objetivo: string | null;
   notas: string | null;
   pasos: string | null;
+  created_at: string | null;
   costo: FormulaCosto | null;
 }
 
@@ -67,6 +68,13 @@ const CUSTOM = "custom";
 function formatoCLP(valor: number | null): string {
   if (valor === null || !isFinite(valor)) return "—";
   return valor.toLocaleString("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
+}
+
+function formatoFecha(valor: string | null): string {
+  if (!valor) return "—";
+  const d = new Date(valor);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("es-CL", { day: "2-digit", month: "long", year: "numeric" });
 }
 
 function formBlank(): FormulaFormState {
@@ -303,8 +311,8 @@ export function FormulasManager({
     setGuardando(false);
   }
 
-  async function handleBorrar(formula: Formula) {
-    if (!window.confirm(`¿Borrar la fórmula "${formula.nombre}"? Esto también borra sus ingredientes.`)) return;
+  async function handleBorrar(formula: Formula): Promise<boolean> {
+    if (!window.confirm(`¿Borrar la fórmula "${formula.nombre}"? Esto también borra sus ingredientes.`)) return false;
 
     setError(null);
     const supabase = createClient();
@@ -313,10 +321,11 @@ export function FormulasManager({
 
     if (dbError) {
       setError(dbError.message);
-      return;
+      return false;
     }
 
     await recargarLista();
+    return true;
   }
 
   async function toggleProducto(formula: Formula) {
@@ -421,6 +430,10 @@ export function FormulasManager({
           inventarioOpciones={inventarioOpciones}
           onCerrar={() => setViendo(null)}
           onEditar={() => abrirEditar(viendo)}
+          onBorrar={async () => {
+            const ok = await handleBorrar(viendo);
+            if (ok) setViendo(null);
+          }}
         />
       )}
 
@@ -449,6 +462,7 @@ function VistaFormula({
   inventarioOpciones,
   onCerrar,
   onEditar,
+  onBorrar,
 }: {
   formula: Formula;
   items: FormulaItemRow[];
@@ -456,6 +470,7 @@ function VistaFormula({
   inventarioOpciones: InventarioOpcion[];
   onCerrar: () => void;
   onEditar: () => void;
+  onBorrar: () => void;
 }) {
   const router = useRouter();
   const [preparando, setPreparando] = useState(false);
@@ -552,6 +567,7 @@ function VistaFormula({
             <DatoVista label="Rinde" valor={formula.rinde_gramos ? `${formula.rinde_gramos} g` : null} />
             <DatoVista label="Unidades que rinde" valor={formula.unidades ? String(formula.unidades) : null} />
             <DatoVista label="pH objetivo" valor={formula.ph_objetivo} />
+            <DatoVista label="Creada el" valor={formula.created_at ? formatoFecha(formula.created_at) : null} />
             <DatoVista label="Costo por unidad" valor={formatoCLP(formula.costo?.costo_unidad ?? null)} />
             <DatoVista label="Precio sugerido" valor={formatoCLP(formula.costo?.precio_sugerido ?? null)} />
           </div>
@@ -726,6 +742,13 @@ function VistaFormula({
             )}
             <button type="button" onClick={onEditar} style={botonPrimarioStyle}>
               <Pencil size={14} /> Editar
+            </button>
+            <button
+              type="button"
+              onClick={onBorrar}
+              style={{ ...botonSecundarioStyle, color: "#e0785f", borderColor: "rgba(224,120,95,0.4)" }}
+            >
+              <Trash2 size={14} style={{ marginRight: 6 }} /> Borrar
             </button>
           </div>
         </>
@@ -1052,6 +1075,7 @@ function TablaFormulas({
               <td style={tdStyle}>
                 <span style={{ color: "#e8dcc8" }}>{f.nombre}</span>
                 {f.categoria && <span style={subtituloStyle}>{f.categoria}</span>}
+                {f.created_at && <span style={subtituloStyle}>Creada el {formatoFecha(f.created_at)}</span>}
               </td>
               <td style={{ ...tdStyle, whiteSpace: "nowrap" }}>
                 {f.rinde_gramos ? `${f.rinde_gramos} g` : "—"}

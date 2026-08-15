@@ -51,7 +51,38 @@ interface Recipe {
 }
 
 // ── Recipe data ────────────────────────────────────────────────────────────────
-const RECIPES: Recipe[] = [];
+const RECIPES: Recipe[] = [
+  {
+    id: "syndet-facial-triwe",
+    name: "Syndet Facial Líquido de Triwe",
+    tag: "Limpieza facial · Rinse-off",
+    desc: "Gel limpiador facial sin sulfatos, pH piel, con hidrolato de triwe (laurel nativo chileno). Limpia sin dejar la cara tirante.",
+    batch: "Lote 100 g",
+    ph: "pH 5.0–5.5",
+    warning:
+      "Uso de enjuague. Hacer prueba de parche 24 h antes de usar o vender. Usar mascarilla al pesar el SCI en polvo (irrita las vías respiratorias).",
+    ingredients: [
+      { name: "Agua destilada (fase A1)", pct: "18%", grams: "18 g" },
+      { name: "SCI (Sodium Cocoyl Isethionate)", pct: "7%", grams: "7 g" },
+      { name: "Hidrolato de triwe (fase A2)", pct: "54.7%", grams: "54.7 g" },
+      { name: "Glicerina vegetal", pct: "4%", grams: "4 g" },
+      { name: "Goma xantana", pct: "0.5%", grams: "0.5 g" },
+      { name: "Inulina", pct: "1%", grams: "1 g" },
+      { name: "Glucósido de coco", pct: "8%", grams: "8 g" },
+      { name: "Betaína de coco", pct: "6%", grams: "6 g" },
+      { name: "Ácido cítrico (solución)", pct: "c.s.", grams: "hasta pH 5.0–5.5" },
+      { name: "Conservante Cosgard", pct: "0.8%", grams: "0.8 g" },
+    ],
+    steps: [
+      "Fase A1: calienta el agua destilada a 70–75 °C, agrega el SCI y revuelve con paciencia hasta obtener un líquido transparente.",
+      "Fase A2: mezcla la goma xantana con la glicerina en seco; incorpora el hidrolato de triwe (frío) y la inulina, y revuelve hasta lograr un gel parejo.",
+      "Une la fase A1 ya entibiada (menos de 40 °C) con el gel de la fase A2.",
+      "Agrega el glucósido y la betaína de coco revolviendo despacio, sin batir, para no generar espuma.",
+      "Ajusta el pH a 5.0–5.5 con la solución de ácido cítrico (el glucósido viene alcalino, este paso es clave).",
+      "Agrega el conservante Cosgard, mezcla y envasa. Queda un gel translúcido de pH piel.",
+    ],
+  },
+];
 
 // ── Ingredient table ───────────────────────────────────────────────────────────
 function IngredientTable({ ingredients }: { ingredients: Ingredient[] }) {
