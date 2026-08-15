@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BackButton } from "@/components/BackButton";
+import { FiguraLibro } from "@/components/biblioteca/FiguraLibro";
 
 function GrainOverlay() {
   return (
@@ -115,7 +116,7 @@ const SECTIONS = ["infusion","decoccion","maceracion-fria","tintura","glicerico"
 type SectionId = (typeof SECTIONS)[number];
 
 export default function MetodosExtraccion() {
-  const [open, setOpen] = useState<SectionId | null>(null);
+  const [open, setOpen] = useState<SectionId | null>("infusion");
   const toggle = (id: SectionId) => setOpen(prev => prev === id ? null : id);
 
   return (
@@ -154,6 +155,7 @@ export default function MetodosExtraccion() {
 
           {/* 1 — Infusión */}
           <AccordionItem id="infusion" title="1 · Infusión" open={open === "infusion"} onToggle={() => toggle("infusion")}>
+            <FiguraLibro num="1" titulo="Infusión" src="/biblioteca/metodos/lamina-1.png" prompt="Una tetera de vidrio infusionando flores y hojas delicadas en agua caliente, con vapor subiendo. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> El método más conocido y usado. Consiste en verter agua caliente sobre el material vegetal y dejarlo reposar tapado. Es el té de toda la vida.</P>
             <InfoBox title="Por qué tapado">
               Los aceites esenciales y los compuestos volátiles se evaporan con el vapor. Tapar el recipiente retiene esos compuestos dentro de la infusión. Una infusión de menta sin tapar pierde hasta el 40% de su mentol en los primeros 5 minutos.
@@ -190,6 +192,7 @@ export default function MetodosExtraccion() {
 
           {/* 2 — Decocción */}
           <AccordionItem id="decoccion" title="2 · Decocción" open={open === "decoccion"} onToggle={() => toggle("decoccion")}>
+            <FiguraLibro num="2" titulo="Decocción" src="/biblioteca/metodos/lamina-2.png" prompt="Raices y cortezas hirviendo a fuego en una olla de agua, preparando una decoccion. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> Hervir el material vegetal directamente en agua durante un tiempo prolongado. A diferencia de la infusión el material va al agua fría, se lleva a ebullición y se mantiene hirviendo.</P>
             <InfoBox title="Cuándo usar decocción en vez de infusión">
               La decocción es para materiales duros y densos donde la infusión no logra penetrar — raíces, cortezas, semillas, tallos leñosos. Estos materiales necesitan el calor sostenido para romper las paredes celulares y liberar los activos.
@@ -218,6 +221,7 @@ export default function MetodosExtraccion() {
 
           {/* 3 — Maceración fría acuosa */}
           <AccordionItem id="maceracion-fria" title="3 · Maceración fría acuosa" open={open === "maceracion-fria"} onToggle={() => toggle("maceracion-fria")}>
+            <FiguraLibro num="3" titulo="Maceración fría" src="/biblioteca/metodos/lamina-3.png" prompt="Hierbas reposando en agua fria dentro de un frasco de vidrio, maceracion en frio, agua tenida de verde. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> Poner el material vegetal en agua fría o temperatura ambiente y dejarlo reposar sin aplicar calor. Es el método más lento pero preserva los activos más delicados.</P>
             <P><strong style={{ color: "#c8a050" }}>Temperatura:</strong> Agua fría o temperatura ambiente (15–25°C). Nunca calor.</P>
             <P><strong style={{ color: "#c8a050" }}>Tiempo:</strong> 8–24 horas según el material. Algunas maceraciones acuosas se dejan hasta 48 horas en refrigeración.</P>
@@ -239,6 +243,7 @@ export default function MetodosExtraccion() {
 
           {/* 4 — Tintura alcohólica */}
           <AccordionItem id="tintura" title="4 · Tintura alcohólica" open={open === "tintura"} onToggle={() => toggle("tintura")}>
+            <FiguraLibro num="4" titulo="Tintura" src="/biblioteca/metodos/lamina-4.png" prompt="Hierbas macerando en alcohol dentro de un frasco de vidrio ambar, una tintura herbal con gotero. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> Maceración del material vegetal en alcohol etílico de distintas graduaciones durante semanas. Es uno de los métodos de extracción más completos y versátiles.</P>
             <InfoBox title="Por qué el alcohol es tan buen solvente">
               El alcohol etílico es anfifílico — tiene una parte que ama el agua y otra que ama el aceite. Por eso extrae tanto compuestos hidrófilos como lipófilos. La graduación del alcohol determina qué extrae más.
@@ -278,6 +283,7 @@ export default function MetodosExtraccion() {
 
           {/* 5 — Macerado glicérico */}
           <AccordionItem id="glicerico" title="5 · Macerado glicérico" open={open === "glicerico"} onToggle={() => toggle("glicerico")}>
+            <FiguraLibro num="5" titulo="Macerado glicérico" src="/biblioteca/metodos/lamina-5.png" prompt="Hierbas macerando en glicerina, un macerado glicerico, liquido dorado y espeso en un frasco. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> Maceración en glicerina vegetal pura o mezclada con agua. Es la alternativa al alcohol para quienes buscan productos sin etanol.</P>
             <InfoBox title="La glicerina como solvente">
               La glicerina es un poliol — tiene múltiples grupos hidroxilo que le permiten disolver compuestos de polaridad media. No es tan versátil como el alcohol pero es completamente segura, no volátil y tiene propiedades humectantes propias.
@@ -306,6 +312,7 @@ export default function MetodosExtraccion() {
 
           {/* 6 — Oleomacerado */}
           <AccordionItem id="oleomacerado" title="6 · Maceración en aceite — oleomacerado" open={open === "oleomacerado"} onToggle={() => toggle("oleomacerado")}>
+            <FiguraLibro num="6" titulo="Oleomacerado" src="/biblioteca/metodos/lamina-6.png" prompt="Flores infusionando en aceite dentro de un frasco de vidrio al sol, un oleomacerado solar. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> Maceración del material vegetal en aceite vegetal. Extrae exclusivamente los compuestos lipófilos — los que se disuelven en grasa.</P>
             <SubLabel>Aceites para macerar</SubLabel>
             <MiniTable
@@ -346,6 +353,7 @@ export default function MetodosExtraccion() {
 
           {/* 7 — Tallow */}
           <AccordionItem id="tallow" title="7 · Maceración en sebo — oleomacerado en tallow" open={open === "tallow"} onToggle={() => toggle("tallow")}>
+            <FiguraLibro num="7" titulo="Maceración en tallow" src="/biblioteca/metodos/lamina-7.png" prompt="Hierbas infusionando en sebo derretido a bano maria, oleomacerado en tallow. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> El método estrella de El Floema. Es el mismo principio que el oleomacerado en aceite pero usando tallow purificado como solvente extractor.</P>
             <InfoBox title="Por qué el tallow es diferente a los aceites vegetales">
               Su composición de ácidos grasos — ~45% oleico, ~27% palmítico, ~20% esteárico — es casi idéntica a la composición de la barrera lipídica del estrato córneo humano. Esto tiene dos consecuencias: extrae activos con mayor afinidad por compuestos de polaridad intermedia, y al aplicar el tallow macerado en la piel los activos están disueltos en un vehículo que la piel reconoce como propio — la penetración de los activos es significativamente mayor que con aceites vegetales.
@@ -396,6 +404,7 @@ export default function MetodosExtraccion() {
 
           {/* 8 — Hidrodestilación */}
           <AccordionItem id="hidrodestilacion" title="8 · Hidrodestilación — aceites esenciales e hidrolatos" open={open === "hidrodestilacion"} onToggle={() => toggle("hidrodestilacion")}>
+            <FiguraLibro num="8" titulo="Hidrodestilación" src="/biblioteca/metodos/lamina-8.png" prompt="Un alambique de cobre destilando aceite esencial e hidrolato a partir de plantas, con vapor. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> El método por excelencia para obtener aceites esenciales e hidrolatos. Consiste en pasar vapor de agua a través del material vegetal, arrastrar los compuestos volátiles, y luego condensar el vapor separando el aceite esencial del agua aromatizada.</P>
             <SubLabel>Dos productos de un proceso</SubLabel>
             <P><strong style={{ color: "#c8a050" }}>Aceite esencial:</strong> La fracción lipófila. Contiene los compuestos más volátiles y aromáticos. Es extremadamente concentrado — se necesitan cientos o miles de gramos de planta para obtener pocos mililitros. Por eso son caros y potentes.</P>
@@ -439,6 +448,7 @@ export default function MetodosExtraccion() {
 
           {/* 9 — Enfleurage */}
           <AccordionItem id="enfleurage" title="9 · Enfleurage" open={open === "enfleurage"} onToggle={() => toggle("enfleurage")}>
+            <FiguraLibro num="9" titulo="Enfleurage" src="/biblioteca/metodos/lamina-9.png" prompt="Petalos de flores prensados sobre un marco con grasa para enfleurage, extrayendo el perfume. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> El método más antiguo y artesanal de todos. Históricamente usado en Grecia y el sur de Francia para capturar el perfume de flores delicadas que no soportan el calor — jazmín, rosa, azahar, nardo, violeta.</P>
             <InfoBox title="El principio">
               Las flores frescas se colocan sobre una capa de grasa neutra purificada (históricamente manteca de cerdo o vacuno purificada — exactamente como el tallow de El Floema). La grasa absorbe los compuestos aromáticos de las flores a temperatura ambiente. Las flores se reemplazan cada 24–72 horas por flores frescas hasta que la grasa está saturada de aroma. El producto se llama pomada de enfleurage.
@@ -462,6 +472,7 @@ export default function MetodosExtraccion() {
 
           {/* 10 — Cataplasma */}
           <AccordionItem id="cataplasma" title="10 · Cataplasma" open={open === "cataplasma"} onToggle={() => toggle("cataplasma")}>
+            <FiguraLibro num="10" titulo="Cataplasma" src="/biblioteca/metodos/lamina-10.png" prompt="Una cataplasma de hierbas frescas machacadas aplicada sobre un pano, compresa herbal. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
             <P><strong style={{ color: "#c8a050" }}>Qué es:</strong> El método más directo de todos — aplicar el material vegetal directamente sobre la piel sin extracción previa. No hay solvente intermediario. La planta actúa en contacto directo con el tejido.</P>
             <SubLabel>Tipos</SubLabel>
             <P><strong style={{ color: "#c8a050" }}>Planta fresca machacada:</strong> La planta fresca se tritura hasta obtener una pasta y se aplica directamente. El machacado rompe las células vegetales liberando todos los activos — enzimas activas, jugos celulares, aceites esenciales, activos hidrosolubles y lipófilos simultáneamente.</P>

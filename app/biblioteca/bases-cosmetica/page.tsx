@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BackButton } from "@/components/BackButton";
+import { FiguraLibro } from "@/components/biblioteca/FiguraLibro";
 
 // ── Grain overlay ─────────────────────────────────────────────────────────────
 function GrainOverlay() {
@@ -191,6 +192,7 @@ export default function BasesCosmetica() {
 
         {/* 1. ¿Qué es la cosmética natural? */}
         <AccordionItem id="que-es" title="¿Qué es la cosmética natural?" open={openId === "que-es"} onToggle={() => toggle("que-es")}>
+            <FiguraLibro num="1" titulo="Cosmética natural" src="/biblioteca/bases/lamina-1.png" prompt="Un conjunto de frascos de cosmetica natural, cremas y aceites botanicos con hierbas frescas. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             La cosmética natural no es simplemente usar ingredientes naturales. Es entender cómo funcionan, por qué actúan sobre la piel de una determinada manera, y cómo formularlos de forma segura y efectiva. No alcanza con reemplazar un químico de síntesis por uno de origen vegetal — si no entiendes el rol que cumple ese ingrediente en la fórmula, el resultado puede ser igualmente ineficaz o inestable.
           </Body>
@@ -216,6 +218,7 @@ export default function BasesCosmetica() {
 
         {/* 2. Tipos de productos */}
         <AccordionItem id="tipos" title="Tipos de productos cosméticos" open={openId === "tipos"} onToggle={() => toggle("tipos")}>
+            <FiguraLibro num="2" titulo="Tipos de productos" src="/biblioteca/bases/lamina-2.png" prompt="Una vitrina con tipos de productos cosmeticos: crema, serum, balsamo, barra de jabon, aceite. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <SubTitle>Por su estructura física</SubTitle>
           {[
             {
@@ -251,6 +254,7 @@ export default function BasesCosmetica() {
 
         {/* 3. La Piel */}
         <AccordionItem id="piel" title="La Piel" open={openId === "piel"} onToggle={() => toggle("piel")}>
+            <FiguraLibro num="3" titulo="La piel" src="/biblioteca/bases/lamina-3.png" prompt="Diagrama en corte de las capas de la piel humana: epidermis, dermis, hipodermis, con foliculo piloso y glandulas. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             La piel tiene tres capas principales: epidermis, dermis e hipodermis. Para la cosmética, lo que más importa es la capa más externa de la epidermis: el estrato córneo. Es una barrera formada por corneocitos (células muertas aplanadas) rodeados de capas organizadas de lípidos — como ladrillos en una pared de mortero lipídico. Tiene dos funciones críticas: mantener el agua dentro y mantener los agentes externos fuera.
           </Body>
@@ -266,6 +270,7 @@ export default function BasesCosmetica() {
 
         {/* 4. Los tensioactivos */}
         <AccordionItem id="tensioactivos" title="Los tensioactivos" open={openId === "tensioactivos"} onToggle={() => toggle("tensioactivos")}>
+            <FiguraLibro num="4" titulo="Tensioactivos" src="/biblioteca/bases/lamina-4.png" prompt="Diagrama de moleculas de tensioactivo formando una micela alrededor de una gota de aceite en agua. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             Los tensioactivos son moléculas con doble personalidad: una parte hidrofílica (ama el agua) y una parte hidrofóbica (ama el aceite). Esta doble naturaleza les permite emulsionar, limpiar, espumar y acondicionar. Se clasifican según su carga eléctrica.
           </Body>
@@ -335,6 +340,7 @@ export default function BasesCosmetica() {
 
         {/* 5. Los emolientes */}
         <AccordionItem id="emolientes" title="Los emolientes" open={openId === "emolientes"} onToggle={() => toggle("emolientes")}>
+            <FiguraLibro num="5" titulo="Emolientes" src="/biblioteca/bases/lamina-5.png" prompt="Aceites y mantecas botanicas -karite, jojoba, argan- con gotas, emolientes. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             Los emolientes nutren, suavizan y protegen la piel. En syndets, se funden con los tensioactivos y se depositan sobre la piel al enjuagar. En productos anhidros, son la base principal.
           </Body>
@@ -376,6 +382,7 @@ export default function BasesCosmetica() {
 
         {/* 6. El pH */}
         <AccordionItem id="ph" title="El pH y por qué importa" open={openId === "ph"} onToggle={() => toggle("ph")}>
+            <FiguraLibro num="6" titulo="El pH" src="/biblioteca/bases/lamina-6.png" prompt="Una escala de pH del acido al alcalino con el manto acido de la piel marcado, gradiente de color. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             La escala de pH va de 0 a 14. El 7 es neutro. Por debajo de 7 es ácido, por encima es alcalino. El pH de la piel sana es 4.5–5.5 — ligeramente ácido.
           </Body>
@@ -429,6 +436,7 @@ export default function BasesCosmetica() {
 
         {/* 7. Conservantes */}
         <AccordionItem id="conservantes" title="Conservantes" open={openId === "conservantes"} onToggle={() => toggle("conservantes")}>
+            <FiguraLibro num="7" titulo="Conservantes" src="/biblioteca/bases/lamina-7.png" prompt="Bacterias y moho microscopicos bloqueados por un escudo que protege un frasco de cosmetica. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             Necesitas conservante antimicrobiano siempre que haya agua en la fórmula. El agua es el sustrato donde crecen bacterias, hongos y levaduras. Sin conservante, un producto acuoso se contamina en días — aunque no lo veas ni lo huelas.
           </Body>
@@ -466,6 +474,7 @@ export default function BasesCosmetica() {
 
         {/* 8. El Syndet */}
         <AccordionItem id="syndet" title="El Syndet" open={openId === "syndet"} onToggle={() => toggle("syndet")}>
+            <FiguraLibro num="8" titulo="El syndet" src="/biblioteca/bases/lamina-8.png" prompt="Una barra syndet solida de limpieza con espuma, junto a ingredientes botanicos. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             Syndet = synthetic detergent. Todo producto de limpieza formulado con tensioactivos suaves. No confundas &quot;sintético&quot; con artificial — los tensioactivos de syndet natural provienen del coco, del azúcar, de la glucosa. Son biodegradables y de origen vegetal.
           </Body>
@@ -504,6 +513,7 @@ export default function BasesCosmetica() {
 
         {/* 9. Proceso general */}
         <AccordionItem id="proceso" title="Proceso general de formulación" open={openId === "proceso"} onToggle={() => toggle("proceso")}>
+            <FiguraLibro num="9" titulo="Formulación" src="/biblioteca/bases/lamina-9.png" prompt="Una mesa de formulacion: balanza, vasos de precipitado, termometro y fases combinandose, laboratorio cosmetico. Estilo grabado cientifico del siglo XIX, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, estetica de grimorio botanico, sin texto ni letras ni marca de agua." />
           <Body>
             Antes de hacer cualquier producto, define siempre el objetivo, el tipo de producto y los ingredientes. Luego sigue este orden:
           </Body>
