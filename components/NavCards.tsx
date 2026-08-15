@@ -95,6 +95,26 @@ function IconJar() {
   );
 }
 
+function IconMoon() {
+  return (
+    <svg width="38" height="46" viewBox="0 0 38 46" fill="none" aria-hidden="true">
+      <path
+        d="M25,6 C17,7 11,14 11,23 C11,32 17,39 25,40 C20,42 13,41 9,36 C4,30 4,16 9,10 C13,5 20,4 25,6 Z"
+        stroke="#c8a050" strokeWidth="0.9" fill="none" opacity="0.62"
+      />
+      <path d="M28,20 C25,17 21,17 20,20" stroke="#5a7a3a" strokeWidth="0.7" fill="none" opacity="0.5" />
+      <path d="M28,26 C25,23 21,24 20,27" stroke="#5a7a3a" strokeWidth="0.7" fill="none" opacity="0.45" />
+      <line x1="30" y1="14" x2="30" y2="32" stroke="#5a7a3a" strokeWidth="0.7" opacity="0.4" />
+      <path d="M30,32 C30,36 28,38 26,40" stroke="#5a7a3a" strokeWidth="0.6" fill="none" opacity="0.3" />
+      <g stroke="#7a4a8a" strokeWidth="0.7" opacity="0.5">
+        <path d="M31,7 l0,4 M29,9 l4,0" />
+      </g>
+      <circle cx="9" cy="14" r="0.9" fill="#c8a050" opacity="0.45" />
+      <circle cx="33" cy="37" r="0.9" fill="#7a4a8a" opacity="0.45" />
+    </svg>
+  );
+}
+
 const sections = [
   {
     key: "ingredientes",
@@ -123,6 +143,13 @@ const sections = [
     subtitle: "Emulsiones, anhidros, geles",
     href: "/biblioteca/bases-cosmetica",
     Icon: IconJarCream,
+  },
+  {
+    key: "bruja-verde",
+    label: "Bruja Verde",
+    subtitle: "Correspondencias, sahumerios & ritual",
+    href: "/bruja-verde",
+    Icon: IconMoon,
   },
 ];
 

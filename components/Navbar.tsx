@@ -40,6 +40,7 @@ export default function Navbar() {
           <li><Link href="/ingredientes" onClick={close}>Ingredientes</Link></li>
           <li><Link href="/formulas"     onClick={close}>Fórmulas</Link></li>
           <li><Link href="/recetas"      onClick={close}>Recetas</Link></li>
+          <li><Link href="/bruja-verde"  onClick={close}>Bruja Verde</Link></li>
           <li><Link href="/blog"         onClick={close}>Blog</Link></li>
           <li><Link href="/belleza"      onClick={close}>Belleza</Link></li>
           <li><Link href="/formulacion"  onClick={close}>Formulación</Link></li>
