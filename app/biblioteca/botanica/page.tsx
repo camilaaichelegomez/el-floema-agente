@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BackButton } from "@/components/BackButton";
+import { FiguraLibro } from "@/components/biblioteca/FiguraLibro";
 
 function GrainOverlay() {
   return (
@@ -102,7 +103,7 @@ const SECTIONS = ["intro","reino","celula","tejidos","organos-1","organos-2","cl
 type SectionId = (typeof SECTIONS)[number];
 
 export default function Botanica() {
-  const [open, setOpen] = useState<SectionId | null>(null);
+  const [open, setOpen] = useState<SectionId | null>("intro");
   const toggle = (id: SectionId) => setOpen(prev => prev === id ? null : id);
 
   return (
@@ -124,6 +125,7 @@ export default function Botanica() {
 
           {/* 1 — Qué es la botánica */}
           <AccordionItem id="intro" title="¿Qué es la botánica?" open={open === "intro"} onToggle={() => toggle("intro")}>
+            <FiguraLibro num="1" titulo="La botanica" src="/biblioteca/botanica/lamina-1.png" prompt="Una mesa de botanico antiguo con un herbario abierto de plantas prensadas, una lupa de bronce, un mortero y frascos de vidrio con hierbas. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
             <P>La botánica es la ciencia que estudia las plantas — su estructura, funcionamiento, clasificación, distribución, evolución y relaciones con otros organismos. Es una de las ciencias más antiguas de la humanidad porque entender las plantas ha sido una cuestión de supervivencia desde siempre.</P>
             <P>Las plantas son la base de toda la cadena alimentaria terrestre. Son la fuente de la mayoría de los medicamentos que usamos — el 25% de los fármacos modernos derivan directamente de compuestos vegetales y otro 25% son análogos sintéticos de moléculas vegetales. Son la materia prima de la cosmética natural.</P>
             <InfoBox title="La botánica y la medicina">
@@ -136,6 +138,7 @@ export default function Botanica() {
 
           {/* 2 — El reino vegetal */}
           <AccordionItem id="reino" title="El reino vegetal — qué hace única a una planta" open={open === "reino"} onToggle={() => toggle("reino")}>
+            <FiguraLibro num="2" titulo="El reino vegetal" src="/biblioteca/botanica/lamina-2.png" prompt="Una planta majestuosa iluminada por un rayo de sol captando la luz con su clorofila, simbolo de la vida vegetal. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
             <P>Las plantas pertenecen al reino Plantae. Lo que las distingue fundamentalmente de todos los demás organismos es su capacidad de realizar <strong style={{ color: "#c8a050" }}>fotosíntesis</strong> — convertir energía lumínica en energía química almacenada en glucosa usando dióxido de carbono y agua. Esta capacidad autótrofa tiene consecuencias profundas.</P>
             <div style={{ marginBottom: 14 }}>
               <p style={{ fontSize: "0.97rem", lineHeight: 1.8, color: "#d4c4a0", marginBottom: 4 }}><strong style={{ color: "#c8a050" }}>Son organismos sésiles — no se mueven.</strong></p>
@@ -157,6 +160,7 @@ export default function Botanica() {
 
           {/* 3 — La célula vegetal */}
           <AccordionItem id="celula" title="La célula vegetal — estructura detallada" open={open === "celula"} onToggle={() => toggle("celula")}>
+            <FiguraLibro num="3" titulo="La celula vegetal" src="/biblioteca/botanica/lamina-3.png" prompt="Diagrama cientifico de una celula vegetal en corte con sus organulos etiquetados: pared celular, membrana, cloroplastos, vacuola central y nucleo. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
             <P>Entender la célula vegetal es entender por qué la extracción de activos funciona como funciona.</P>
             <InfoBox title="Pared celular">
               Formada principalmente por celulosa (polisacárido de glucosa en cadenas largas). Es rígida pero no impermeable — tiene poros llamados plasmodesmos que conectan células adyacentes. La pared celular es lo que hay que romper para liberar los activos en una extracción — por eso el molido, el machacado o el calor mejoran la eficiencia extractiva. Tres capas: lámina media (une células, rica en pectinas) · pared primaria (celulosa + hemicelulosa, flexible) · pared secundaria (celulosa muy organizada, rígida).
@@ -179,6 +183,7 @@ export default function Botanica() {
 
           {/* 4 — Tejidos vegetales */}
           <AccordionItem id="tejidos" title="Tejidos vegetales" open={open === "tejidos"} onToggle={() => toggle("tejidos")}>
+            <FiguraLibro num="4" titulo="Tejidos vegetales" src="/biblioteca/botanica/lamina-4.png" prompt="Corte transversal de un tallo visto al microscopio mostrando el xilema y el floema, la epidermis y tricomas glandulares. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
             <P>Los tejidos son grupos de células con estructura y función similar. Entender los tejidos es entender dónde se concentran los activos.</P>
 
             <FamilyTitle>Tejidos meristemáticos</FamilyTitle>
@@ -219,6 +224,7 @@ export default function Botanica() {
 
           {/* 5 — Órganos I */}
           <AccordionItem id="organos-1" title="Los órganos — raíz, tallo y hoja" open={open === "organos-1"} onToggle={() => toggle("organos-1")}>
+            <FiguraLibro num="5" titulo="Raiz, tallo y hoja" src="/biblioteca/botanica/lamina-5.png" prompt="Lamina anatomica de una planta completa con la raiz, el tallo y la hoja etiquetados, mostrando nervaduras y sistema radicular. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
 
             <OrganTitle>La raíz</OrganTitle>
             <P><strong style={{ color: "#c8a050" }}>Función:</strong> Anclar la planta, absorber agua y minerales del suelo, almacenar reservas.</P>
@@ -266,6 +272,7 @@ export default function Botanica() {
 
           {/* 6 — Órganos II */}
           <AccordionItem id="organos-2" title="Los órganos — flor, fruto y semilla" open={open === "organos-2"} onToggle={() => toggle("organos-2")}>
+            <FiguraLibro num="6" titulo="Flor, fruto y semilla" src="/biblioteca/botanica/lamina-6.png" prompt="Anatomia de una flor abierta en corte con sus partes, un fruto seccionado y una semilla germinando. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
 
             <OrganTitle>La flor</OrganTitle>
             <P><strong style={{ color: "#c8a050" }}>Función:</strong> Reproducción sexual de la planta — atraer polinizadores y producir semillas.</P>
@@ -312,6 +319,7 @@ export default function Botanica() {
 
           {/* 7 — Clasificación */}
           <AccordionItem id="clasificacion" title="La clasificación botánica" open={open === "clasificacion"} onToggle={() => toggle("clasificacion")}>
+            <FiguraLibro num="7" titulo="La clasificacion botanica" src="/biblioteca/botanica/lamina-7.png" prompt="Un arbol taxonomico ramificado estilo linneano, de reino a especie, con hojas y nombres cientificos en cada rama. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
             <P>El sistema de clasificación botánica organiza la enorme diversidad de plantas en categorías jerárquicas que reflejan sus relaciones evolutivas.</P>
             <SubLabel>La jerarquía</SubLabel>
             <CodeBlock>{"Reino → División → Clase → Orden → Familia → Género → Especie"}</CodeBlock>
@@ -337,6 +345,7 @@ Especie:  Piper aduncum`}</CodeBlock>
 
           {/* 8 — Familias */}
           <AccordionItem id="familias" title="Las grandes familias de plantas medicinales" open={open === "familias"} onToggle={() => toggle("familias")}>
+            <FiguraLibro num="8" titulo="Las grandes familias" src="/biblioteca/botanica/lamina-8.png" prompt="Muestrario de familias botanicas medicinales con ejemplares de matico, milenrama y chilco dispuestos como catalogo de herbario. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
 
             <FamilyTitle>Piperaceae — la familia del matico</FamilyTitle>
             <P>Plantas herbáceas o arbustivas tropicales y subtropicales. Hojas simples alternas, frecuentemente aromáticas por aceites esenciales en células secretoras. Flores muy pequeñas en espigas densas sin pétalos.</P>
@@ -463,6 +472,7 @@ Especie:  Piper aduncum`}</CodeBlock>
 
           {/* 9 — Ciclos */}
           <AccordionItem id="ciclos" title="Ciclos de vida y cosecha" open={open === "ciclos"} onToggle={() => toggle("ciclos")}>
+            <FiguraLibro num="9" titulo="Ciclos y cosecha" src="/biblioteca/botanica/lamina-9.png" prompt="Una rueda de las estaciones alrededor de una planta que brota, florece, fructifica y descansa, con fases lunares como calendario de cosecha. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
 
             <FamilyTitle>Tipos de plantas según ciclo de vida</FamilyTitle>
             <P><strong style={{ color: "#c8a050" }}>Plantas anuales:</strong> Completan su ciclo completo en un año. La energía se destina principalmente a la reproducción rápida. Ejemplos: albahaca, cilantro, caléndula, amapola. Cosecha: durante el periodo de máxima actividad — antes de la floración completa para hojas, durante la floración para flores.</P>
@@ -498,6 +508,7 @@ Especie:  Piper aduncum`}</CodeBlock>
 
           {/* 10 — Bosque valdiviano */}
           <AccordionItem id="valdiviano" title="El bosque valdiviano — por qué sus plantas son únicas" open={open === "valdiviano"} onToggle={() => toggle("valdiviano")}>
+            <FiguraLibro num="10" titulo="El bosque valdiviano" src="/biblioteca/botanica/lamina-10.png" prompt="El bosque templado valdiviano entre la niebla: canelos, arrayanes de corteza rojiza, helechos gigantes y musgo, con luz filtrandose entre los arboles. Estilo lamina de herbario del siglo XIX y grabado botanico antiguo, tinta sepia y dorado envejecido sobre fondo verde muy oscuro, trazo fino y detallado, etiquetas en serif elegante, estetica de grimorio botanico, sin texto moderno ni marca de agua." />
             <P>El bosque valdiviano o bosque templado lluvioso del sur de Chile es uno de los ecosistemas más extraordinarios y menos conocidos del planeta. Comprender su singularidad es comprender por qué las plantas de El Floema son irreemplazables.</P>
 
             <InfoBox title="Un remanente del supercontinente Gondwana">
