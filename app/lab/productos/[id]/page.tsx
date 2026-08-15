@@ -89,7 +89,7 @@ export default async function ProductoDetallePage({
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
         <LabEncabezado titulo={formula.nombre} actual="productos" />
         <div style={{ marginBottom: "1.5rem" }}>
-          <BackButton label="← Volver a productos" />
+          <BackButton label="← Volver a productos" href="/lab/productos" />
         </div>
         <ProductoDetalle
           productId={productId}

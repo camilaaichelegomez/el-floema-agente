@@ -331,7 +331,7 @@ export default function PlantasPage() {
 
           {/* Nav */}
           <div style={{ marginBottom: "clamp(2rem,4vh,3rem)" }}>
-            <BackButton label="← Volver al inicio" />
+            <BackButton label="← Volver al inicio" href="/" />
           </div>
 
           {/* Header */}

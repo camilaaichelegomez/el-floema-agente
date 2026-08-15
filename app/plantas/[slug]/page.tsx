@@ -119,7 +119,7 @@ export default async function PlantaPage({
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(2rem,5vh,4rem) clamp(1.5rem,5vw,3rem) 6rem" }}>
           {/* Nav */}
           <div style={{ marginBottom: "clamp(2rem,4vh,3rem)" }}>
-            <BackButton label="← Volver a las plantas" />
+            <BackButton label="← Volver a las plantas" href="/plantas" />
           </div>
 
           {/* Header */}

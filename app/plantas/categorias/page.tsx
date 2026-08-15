@@ -209,7 +209,7 @@ export default function CategoriasPage() {
 
           {/* back nav */}
           <div style={{ marginBottom: "2rem" }}>
-            <BackButton label="← Volver a Plantas" />
+            <BackButton label="← Volver a Plantas" href="/plantas" />
           </div>
 
           {/* page header */}

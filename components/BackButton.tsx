@@ -1,11 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-export function BackButton({ label = "← Volver al Grimorio" }: { label?: string }) {
+export function BackButton({ label = "← Volver al Grimorio", href }: { label?: string; href?: string }) {
   const router = useRouter();
   return (
     <button
-      onClick={() => router.back()}
+      onClick={() => (href ? router.push(href) : router.back())}
       style={{
         fontFamily: "var(--font-cinzel), serif",
         fontSize: "0.62rem",
