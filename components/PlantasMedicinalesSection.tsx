@@ -9,7 +9,7 @@ import { plantaIcons } from "@/components/PlantIcons";
 const GOLD = "#c8a050";
 const CREAM = "#d4c4a0";
 const BG_CARD = "rgba(13,22,13,0.8)";
-const BG_LEFT = "rgba(10,18,10,0.82)";
+const BG_LEFT = "rgba(10,18,10,0.72)";
 
 /* ── Datos del acordeón ─────────────────────────────────────── */
 
