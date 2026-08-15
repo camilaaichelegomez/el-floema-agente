@@ -51,212 +51,7 @@ interface Recipe {
 }
 
 // ── Recipe data ────────────────────────────────────────────────────────────────
-const RECIPES: Recipe[] = [
-  {
-    id: "matico",
-    name: "Syndet Facial — Matico",
-    tag: "Syndet facial · Piel reactiva",
-    desc: "Para piel reactiva, enrojecida o con tendencia atópica",
-    batch: "Lote: 100 g",
-    ph: "pH objetivo: 5.0–5.5",
-    ingredients: [
-      { name: "SCI", pct: "40%", grams: "40 g" },
-      { name: "Betaína de coco", pct: "18%", grams: "18 g" },
-      { name: "Glucósido de coco", pct: "12%", grams: "12 g" },
-      { name: "Tallow infusionado matico", pct: "10%", grams: "10 g" },
-      { name: "Manteca karité", pct: "8%", grams: "8 g" },
-      { name: "Avena coloidal en polvo", pct: "4%", grams: "4 g" },
-      { name: "Caolín", pct: "2%", grams: "2 g" },
-      { name: "Pantenol en polvo", pct: "1%", grams: "1 g" },
-      { name: "Vitamina E", pct: "0.5%", grams: "0.5 g" },
-      { name: "AE manzanilla", pct: "0.3%", grams: "0.3 g" },
-      { name: "AE lavanda", pct: "0.2%", grams: "0.2 g" },
-      { name: "Ácido cítrico", pct: "c/s", grams: "~0.5–1 g" },
-    ],
-    steps: [
-      "Funde tallow + karité a 65 °C en baño maría.",
-      "Agrega SCI y betaína — mezcla hasta homogéneo.",
-      "A 55 °C agrega glucósido de coco.",
-      "A 50 °C agrega avena, caolín y pantenol tamizados.",
-      "A 42 °C agrega vitamina E.",
-      "A 38 °C agrega AE.",
-      "Disuelve ácido cítrico en 2 g de glicerina — agrega y mide pH.",
-      "Moldea rápido — la masa endurece pronto.",
-      "Desmolda a las 48 horas — cura 3-4 semanas.",
-    ],
-  },
-  {
-    id: "arrayan",
-    name: "Shampoo Sólido — Arrayán",
-    tag: "Shampoo sólido · Cabello normal",
-    desc: "Limpieza suave con brillo y suavidad",
-    batch: "Lote: 100 g",
-    ph: "pH objetivo: 4.5–5.0 (solución 10%)",
-    ingredients: [
-      { name: "SCI", pct: "45%", grams: "45 g" },
-      { name: "SLSA", pct: "15%", grams: "15 g" },
-      { name: "Betaína de coco", pct: "13%", grams: "13 g" },
-      { name: "Manteca karité", pct: "10%", grams: "10 g" },
-      { name: "Aceite de ricino", pct: "5%", grams: "5 g" },
-      { name: "Proteína hidrolizada trigo", pct: "3%", grams: "3 g" },
-      { name: "Almidón de arroz", pct: "5%", grams: "5 g" },
-      { name: "Arrayán liofilizado", pct: "2%", grams: "2 g" },
-      { name: "AE cedro", pct: "0.8%", grams: "0.8 g" },
-      { name: "AE palo de ho", pct: "0.5%", grams: "0.5 g" },
-      { name: "AE ciprés", pct: "0.2%", grams: "0.2 g" },
-      { name: "Ácido cítrico", pct: "c/s", grams: "~0.5 g" },
-    ],
-    steps: [
-      "Funde karité + ricino a 70 °C.",
-      "Agrega SCI y betaína — mezcla bien.",
-      "A 60 °C agrega SLSA en polvo poco a poco.",
-      "A 52 °C agrega proteína y almidón tamizados.",
-      "A 48 °C agrega arrayán liofilizado.",
-      "A 42 °C agrega vitamina E.",
-      "A 38 °C agrega AE.",
-      "Mide pH — ajusta con ácido cítrico en glicerina.",
-      "Moldea — desmolda a las 48 horas.",
-      "Cura 3-4 semanas mínimo.",
-    ],
-  },
-  {
-    id: "pitra",
-    name: "Syndet Facial — Pitra",
-    tag: "Syndet facial · Piel mixta y grasa",
-    desc: "Limpieza profunda suave, poros refinados",
-    batch: "Lote: 100 g",
-    ph: "pH objetivo: 4.5–5.0",
-    ingredients: [
-      { name: "SCI", pct: "45%", grams: "45 g" },
-      { name: "Betaína de coco", pct: "15%", grams: "15 g" },
-      { name: "Glucósido de coco", pct: "10%", grams: "10 g" },
-      { name: "Tallow infusionado pitra", pct: "8%", grams: "8 g" },
-      { name: "Aceite de jojoba", pct: "6%", grams: "6 g" },
-      { name: "Arcilla verde", pct: "3%", grams: "3 g" },
-      { name: "Almidón de arroz", pct: "5%", grams: "5 g" },
-      { name: "Niacinamida en polvo", pct: "2%", grams: "2 g" },
-      { name: "Pitra liofilizada", pct: "2%", grams: "2 g" },
-      { name: "Vitamina E", pct: "0.5%", grams: "0.5 g" },
-      { name: "AE árbol de té", pct: "0.3%", grams: "0.3 g" },
-      { name: "AE ciprés", pct: "0.2%", grams: "0.2 g" },
-      { name: "Ácido cítrico", pct: "c/s", grams: "~0.5 g" },
-    ],
-    steps: [
-      "Funde tallow + jojoba a 65 °C.",
-      "Agrega SCI y betaína — mezcla hasta homogéneo.",
-      "A 55 °C agrega glucósido de coco.",
-      "A 50 °C agrega polvos tamizados juntos: arcilla, almidón, niacinamida, pitra.",
-      "A 40 °C agrega vitamina E.",
-      "A 38 °C agrega AE.",
-      "Ajusta pH con ácido cítrico en glicerina.",
-      "Moldea — desmolda 48 horas — cura 3-4 semanas.",
-    ],
-  },
-  {
-    id: "maqui",
-    name: "Syndet Facial — Maqui",
-    tag: "Syndet facial · Piel madura",
-    desc: "Antioxidante, regenerador, luminosidad",
-    batch: "Lote: 100 g",
-    ph: "pH objetivo: 5.0–5.5",
-    warning: "⚠️ Rosa mosqueta y maqui agregar siempre bajo 38 °C — termosensibles.",
-    ingredients: [
-      { name: "SCI", pct: "38%", grams: "38 g" },
-      { name: "Betaína de coco", pct: "18%", grams: "18 g" },
-      { name: "Glucósido de coco", pct: "12%", grams: "12 g" },
-      { name: "Tallow infusionado maqui", pct: "10%", grams: "10 g" },
-      { name: "Aceite rosa mosqueta", pct: "5%", grams: "5 g" },
-      { name: "Escualano", pct: "4%", grams: "4 g" },
-      { name: "Manteca karité", pct: "5%", grams: "5 g" },
-      { name: "Proteína seda en polvo", pct: "2%", grams: "2 g" },
-      { name: "Maqui liofilizado", pct: "2%", grams: "2 g" },
-      { name: "Vitamina E", pct: "0.5%", grams: "0.5 g" },
-      { name: "AE incienso", pct: "0.3%", grams: "0.3 g" },
-      { name: "AE neroli", pct: "0.2%", grams: "0.2 g" },
-      { name: "Ácido cítrico", pct: "c/s", grams: "~0.5 g" },
-    ],
-    steps: [
-      "Funde tallow + karité + escualano a 63 °C.",
-      "Agrega SCI y betaína — mezcla.",
-      "A 55 °C agrega glucósido.",
-      "A 48 °C agrega proteína de seda tamizada.",
-      "A 40 °C agrega vitamina E.",
-      "A 37 °C agrega rosa mosqueta, maqui liofilizado y AE.",
-      "Ajusta pH.",
-      "Moldea — desmolda 48 horas — cura 4 semanas.",
-    ],
-  },
-  {
-    id: "laurel",
-    name: "Champú Líquido — Laurel",
-    tag: "Champú líquido · Nutritivo",
-    desc: "Con hidrolato de laurel y extracto de matico",
-    batch: "Lote: 100 g",
-    ph: "pH objetivo: 5.0–5.5",
-    warning: "⚠️ Conservante OBLIGATORIO — contiene agua.",
-    ingredients: [
-      { name: "Hidrolato de laurel", pct: "45%", grams: "45 g" },
-      { name: "Betaína de coco", pct: "22%", grams: "22 g" },
-      { name: "Glucósido de coco", pct: "13%", grams: "13 g" },
-      { name: "Glicerina vegetal", pct: "5%", grams: "5 g" },
-      { name: "Extracto glicérico matico", pct: "5%", grams: "5 g" },
-      { name: "Proteína hidrolizada trigo", pct: "3%", grams: "3 g" },
-      { name: "Pantenol", pct: "2%", grams: "2 g" },
-      { name: "Aceite de argán", pct: "2%", grams: "2 g" },
-      { name: "Polisorbato 20", pct: "2%", grams: "2 g" },
-      { name: "AE cedro", pct: "0.5%", grams: "0.5 g" },
-      { name: "AE palo de ho", pct: "0.3%", grams: "0.3 g" },
-      { name: "Vitamina E", pct: "0.2%", grams: "0.2 g" },
-      { name: "Cosgard", pct: "0.5%", grams: "0.5 g" },
-      { name: "Ácido cítrico 10%", pct: "c/s", grams: "hasta pH 5.0–5.5" },
-    ],
-    steps: [
-      "Mezcla hidrolato + glicerina + extracto glicérico a temperatura ambiente.",
-      "Agrega betaína de coco — mezcla suave sin espumar.",
-      "Agrega glucósido de coco — mezcla suave.",
-      "Agrega proteína y pantenol — disuelven fácil.",
-      "Mezcla aceite de argán + polisorbato 20 aparte hasta transparente — luego incorpora.",
-      "Agrega AE a la mezcla argán+polisorbato antes de incorporar.",
-      "Agrega vitamina E.",
-      "Agrega Cosgard.",
-      "Ajusta pH con ácido cítrico en solución gota a gota — mide constantemente.",
-      "Envasa en frasco con bomba o dosificador.",
-    ],
-  },
-  {
-    id: "chilco",
-    name: "Limpiador Líquido — Chilco",
-    tag: "Limpiador líquido · Piel sensible",
-    desc: "Ultra suave, sin enjuague o con enjuague",
-    batch: "Lote: 100 g",
-    ph: "pH objetivo: 4.8–5.2",
-    warning: "⚠️ Conservante OBLIGATORIO — contiene agua.",
-    ingredients: [
-      { name: "Hidrolato de manzanilla", pct: "58%", grams: "58 g" },
-      { name: "Betaína de coco", pct: "20%", grams: "20 g" },
-      { name: "Glucósido de coco", pct: "10%", grams: "10 g" },
-      { name: "Glicerina vegetal", pct: "5%", grams: "5 g" },
-      { name: "Extracto glicérico chilco", pct: "3%", grams: "3 g" },
-      { name: "Alantoína", pct: "0.5%", grams: "0.5 g" },
-      { name: "Pantenol", pct: "1%", grams: "1 g" },
-      { name: "AE manzanilla", pct: "0.1%", grams: "0.1 g" },
-      { name: "Vitamina E", pct: "0.2%", grams: "0.2 g" },
-      { name: "Cosgard", pct: "0.5%", grams: "0.5 g" },
-      { name: "Ácido cítrico 10%", pct: "c/s", grams: "hasta pH 4.8–5.2" },
-    ],
-    steps: [
-      "Disuelve alantoína en el hidrolato tibio (40 °C) — mezcla hasta transparente.",
-      "Enfría a temperatura ambiente.",
-      "Agrega glicerina + extracto de chilco.",
-      "Agrega betaína de coco y glucósido — mezcla muy suave.",
-      "Agrega pantenol y vitamina E.",
-      "Agrega Cosgard.",
-      "Mezcla AE con 0.1 g de polisorbato 20 aparte — incorpora.",
-      "Ajusta pH con ácido cítrico gota a gota.",
-      "Envasa en frasco con bomba o dosificador de 50 ml.",
-    ],
-  },
-];
+const RECIPES: Recipe[] = [];
 
 // ── Ingredient table ───────────────────────────────────────────────────────────
 function IngredientTable({ ingredients }: { ingredients: Ingredient[] }) {
@@ -531,9 +326,46 @@ export default function RecetasPage() {
         </div>
 
         {/* Recipe cards */}
-        {RECIPES.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
-        ))}
+        {RECIPES.length === 0 ? (
+          <div
+            style={{
+              border: "1px solid rgba(200,160,80,0.18)",
+              borderRadius: "1rem",
+              padding: "clamp(2.5rem,6vh,4rem) 2rem",
+              textAlign: "center",
+              background: "rgba(255,255,255,0.02)",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "var(--font-grimoire)",
+                fontSize: "0.62rem",
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "rgba(200,160,80,0.5)",
+                marginBottom: "0.9rem",
+              }}
+            >
+              El grimorio en blanco
+            </p>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontStyle: "italic",
+                fontSize: "clamp(1rem,1.8vw,1.15rem)",
+                color: "rgba(212,196,160,0.6)",
+                lineHeight: 1.7,
+                maxWidth: 460,
+                margin: "0 auto",
+              }}
+            >
+              Todavía no hay recetas publicadas. Iremos sumando aquí las fórmulas
+              a medida que las vayamos creando y probando.
+            </p>
+          </div>
+        ) : (
+          RECIPES.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe} />)
+        )}
       </div>
     </div>
   );
