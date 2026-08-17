@@ -316,6 +316,29 @@ SYSTEM_PROMPT_BELLEZA = """Eres Floema, asesora de belleza botánica de El Floem
 
 SYSTEM_PROMPT_FORMULACION = """Eres Floema, asistente de formulación cosmética experta. Ayudas a Camila a formular sus propios productos: shampoos sólidos, syndets faciales, cremas, ungüentos, mantequillas corporales, sérums, sales de baño, jabones. Conoces ingredientes, porcentajes seguros, fases de emulsión, conservantes naturales, emulsionantes, y compatibilidad de activos. Respondes con precisión técnica de formuladora profesional, citando evidencia cuando esté disponible. Esta herramienta es de uso personal e interno, no para consumidores finales."""
 
+SYSTEM_PROMPT_BOTANICO = """Eres el Botánico de El Floema: especialista en botánica y, sobre todo, en la EXTRACCIÓN de los compuestos activos de las plantas. No eres un agente de salud ni de rutinas de belleza — tu terreno es la planta y cómo llevar sus principios activos a una preparación aprovechable.
+
+Dominas:
+
+1. LA PLANTA: identificación, partes útiles (hoja, flor, corteza, raíz, semilla), y qué compuestos activos concentra cada una (alcaloides, flavonoides, taninos, aceites esenciales, antocianinas, mucílagos, resinas, ácidos fenólicos, etc.). Priorizas la flora nativa chilena (maqui, matico, arrayán, triwe, pitra, canelo, boldo, bailahuén, etc.) cuando aplica.
+
+2. LA QUÍMICA DE LA EXTRACCIÓN: qué solvente extrae qué. Explica por qué un compuesto es soluble en agua, en alcohol, en aceite o en glicerina, y cómo la polaridad, el calor y el pH afectan el rendimiento. Advierte cuando un activo es termosensible o volátil (ej: las antocianinas del maqui se degradan con calor y no pasan a un hidrolato; conviene una tintura o glicerito en frío).
+
+3. LOS MÉTODOS, con parámetros concretos:
+   - Tintura: proporción planta:alcohol (1:5 seca, 1:3 fresca), graduación ideal según el activo, tiempo de macerado (y cómo acelerarlo con calor suave ~40°C), filtrado.
+   - Hidrolato / destilación: qué capta (compuestos volátiles y aromáticos) y qué NO.
+   - Macerado oleoso, glicerito, infusión, decocción, extracto hidroglicerinado.
+   - Conservación, graduación final, y cálculo de cantidades.
+
+4. SEGURIDAD: dosis de uso razonables, plantas tóxicas o fotosensibilizantes, y cuándo un extracto NO es apto para cosmética o consumo.
+
+CÓMO RESPONDES:
+- Con precisión técnica y didáctica: explica el PORQUÉ químico, no solo el paso a paso.
+- Da proporciones, tiempos, graduaciones y temperaturas concretas cuando el usuario pida una preparación.
+- Cuando uses información de la BIBLIOTECA, indícalo entre corchetes con el nombre de la fuente, ej. [manual-plantas-tinturas].
+- Español, tono cálido pero riguroso — un maestro extractor que enseña el oficio.
+- Esta herramienta es de uso personal e interno de El Floema."""
+
 SYSTEM_PROMPT = """Eres un guía de medicina integrativa y botánica para El Floema, una plataforma de conocimiento sobre plantas medicinales y salud holística. Tu misión es EDUCAR — no solo decir qué hacer, sino explicar el PORQUÉ detrás de cada recomendación, para que la persona comprenda su cuerpo y tome decisiones informadas.
 
 Tu conocimiento integra de forma profunda:
@@ -353,12 +376,67 @@ REGLAS OBLIGATORIAS:
 - Responde en español, con tono cálido, educativo y riguroso — como un médico integrativo que enseña, no que prescribe
 - Máximo 800 palabras para dar respuestas completas y ricas"""
 
+# ── Biblioteca de libros de El Floema (biblioteca_chunks, búsqueda de texto) ──
+# A diferencia de las colecciones de artículos científicos (pgvector), esto es la
+# biblioteca de LIBROS de Camila indexada como texto. Se consulta con la función
+# SQL match_biblioteca. Alimenta al Agente Botánico y complementa a los demás.
+def search_biblioteca(query, top_k=4):
+    try:
+        client = _get_supabase()
+        res = client.rpc("match_biblioteca", {"consulta": query, "match_count": top_k}).execute()
+        return res.data or []
+    except Exception as e:
+        print(f"Supabase biblioteca no disponible: {e}", flush=True)
+        return []
+
+def format_biblioteca(chunks):
+    if not chunks:
+        return ""
+    lines = []
+    for c in chunks:
+        fuente = c.get("fuente", "biblioteca")
+        texto = (c.get("texto") or "").strip().replace("\n", " ")
+        lines.append(f"[{fuente}] {texto}")
+    return "\n\n".join(lines)
+
+def ask_gemini_botanico(question, chunks, history):
+    biblio = format_biblioteca(chunks) if chunks else "(Sin fragmentos relevantes en la biblioteca)"
+    history_block = ""
+    for turn in history[-6:]:
+        history_block += f"Usuario: {turn['user']}\nBotánico: {turn['assistant']}\n"
+    prompt = (
+        f"HISTORIAL:\n{history_block}\n" if history_block else ""
+    ) + (
+        f"PREGUNTA: {question}\n\n"
+        f"BIBLIOTECA (extractos de los libros de formulación, fitoterapia y extracción de El Floema):\n{biblio}\n\n"
+        f"Responde integrando la información de la biblioteca cuando sea relevante, "
+        f"indicando la fuente entre corchetes [nombre-del-libro]. Si la biblioteca no cubre algo, "
+        f"apóyate en tu conocimiento de botánica y química de extracción."
+    )
+    ctx_tokens = len(biblio) // 4
+    print(f"[botanico] biblioteca_chunks={len(chunks)} rag_tokens~{ctx_tokens}", flush=True)
+    try:
+        response = _get_gemini_client().models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=genai_types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT_BOTANICO,
+                max_output_tokens=4096,
+                temperature=0.7,
+            ),
+        )
+        return response.text.strip()
+    except Exception as e:
+        return f"[Error Gemini: {e}]"
+
 def ask_gemini(question, articles, history):
     context = format_context(articles) if articles else "(Sin articulos relevantes)"
     history_block = ""
     for turn in history[-4:]:
         history_block += f"Usuario: {turn['user']}\nAgente: {turn['assistant']}\n"
-    prompt = f"HISTORIAL:\n{history_block}\nPREGUNTA: {question}\n\nEVIDENCIA CIENTIFICA:\n{context}\n\nResponde integrando la evidencia, citando con [N]."
+    biblio = format_biblioteca(search_biblioteca(question, top_k=3))
+    biblio_block = f"\n\nBIBLIOTECA (libros de El Floema):\n{biblio}" if biblio else ""
+    prompt = f"HISTORIAL:\n{history_block}\nPREGUNTA: {question}\n\nEVIDENCIA CIENTIFICA:\n{context}{biblio_block}\n\nResponde integrando la evidencia, citando con [N]."
     try:
         response = _get_gemini_client().models.generate_content(
             model=GEMINI_MODEL,
@@ -378,9 +456,11 @@ def ask_gemini_belleza(question, articles, history):
     history_block = ""
     for turn in history[-6:]:
         history_block += f"Usuario: {turn['user']}\nFloema: {turn['assistant']}\n"
+    biblio = format_biblioteca(search_biblioteca(question, top_k=3))
+    biblio_block = f"\n\nBIBLIOTECA (libros de El Floema):\n{biblio}" if biblio else ""
     prompt = (
         f"HISTORIAL:\n{history_block}\n" if history_block else ""
-    ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde integrando la evidencia cuando sea relevante, citando con [N]."
+    ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}{biblio_block}\n\nResponde integrando la evidencia cuando sea relevante, citando con [N]."
     sys_tokens   = len(SYSTEM_PROMPT_BELLEZA) // 4
     ctx_tokens   = len(context) // 4
     prompt_tokens = len(prompt) // 4
@@ -441,9 +521,11 @@ def ask_gemini_formulacion(question, articles, history):
     history_block = ""
     for turn in history[-6:]:
         history_block += f"Usuario: {turn['user']}\nFloema: {turn['assistant']}\n"
+    biblio = format_biblioteca(search_biblioteca(question, top_k=4))
+    biblio_block = f"\n\nBIBLIOTECA (libros de formulación de El Floema):\n{biblio}" if biblio else ""
     prompt = (
         f"HISTORIAL:\n{history_block}\n" if history_block else ""
-    ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}\n\nResponde con precisión técnica, citando evidencia con [N] cuando esté disponible."
+    ) + f"PREGUNTA: {question}\n\nEVIDENCIA CIENTÍFICA:\n{context}{biblio_block}\n\nResponde con precisión técnica, citando la evidencia con [N] y la biblioteca con [nombre-del-libro] cuando corresponda."
     sys_tokens    = len(SYSTEM_PROMPT_FORMULACION) // 4
     ctx_tokens    = len(context) // 4
     prompt_tokens = len(prompt) // 4
@@ -1146,6 +1228,24 @@ def create_app():
             })
         except Exception as e:
             print("ERROR EN /ask-formulacion:", traceback.format_exc())
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/ask-botanico", methods=["POST"])
+    def ask_botanico():
+        try:
+            data     = request.get_json()
+            question = data.get("question", "").strip()
+            history  = data.get("history", [])
+            if not question:
+                return jsonify({"error": "Pregunta vacia"}), 400
+            chunks   = search_biblioteca(question, top_k=6)
+            response = ask_gemini_botanico(question, chunks, history)
+            return jsonify({
+                "response":      response,
+                "sources_count": len(chunks),
+            })
+        except Exception as e:
+            print("ERROR EN /ask-botanico:", traceback.format_exc())
             return jsonify({"error": str(e)}), 500
 
     @app.route("/health")
